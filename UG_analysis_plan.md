@@ -19,7 +19,10 @@
 ### data clean
 
 1. Exclude those age under 50
+
 2. group ideator-attempters as attempters
+
+   ​
 
 ### data description
 
