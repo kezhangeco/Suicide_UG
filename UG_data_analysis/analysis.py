@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 def main_fairness():
@@ -9,9 +9,11 @@ def main_fairness():
     #fair = 5-5, 6-4;
     #unfair = 7-3, 8-2, 9 -1
 
-    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding="ISO-8859-1")
+    # df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding="ISO-8859-1")
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', encoding="ISO-8859-1")
     df['fairness']= np.where((df['Fairness_score'] == 1) | (df['Fairness_score'] == 2), 'fair', 'unfair')
-    # fairCount = df.groupby(['fairness', 'AcceptOffer']).size().unstack(fill_value=0)
+    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', index=False)
+
     fairCount = df.groupby(['fairness', 'AcceptOffer']).size().unstack(fill_value=0)
     print(fairCount)
     fairCount.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/fairness.csv")
@@ -21,14 +23,16 @@ def main_fairness():
     reject_unfair = fairCount.iat[1,0]/(fairCount.iat[1,0]+fairCount.iat[1,1])
     y = [reject_fair, reject_unfair]
     print('percentage of fairness trial vs unfair trial',y)
-    # groups = ['reject_fair', 'reject_unfair']
-    # x_pos = np.arange(len(groups))
-    # plt.bar(x_pos,y,align='center')
-    # plt.xticks(x_pos,groups)
-    #
-    # ax = plt.gca()
-    # ax.set_ylim([0, 1])
-    # plt.show()
+    groups = ['reject_fair', 'reject_unfair']
+    x_pos = np.arange(len(groups))
+    plt.bar(x_pos,y,align='center')
+    plt.xticks(x_pos,groups)
+
+    ax = plt.gca()
+    ax.set_ylim([0, 1])
+    plt.show()
+
+
 
 def byGroup():
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
@@ -64,11 +68,29 @@ def demo_description():
     df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/ug_demos.csv', index = False)
 
     demo_bygroup = df.groupby('group').describe()
-    demo_bygroup.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/demo_describe.csv')
+    demo_bygroup.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/demo_describe.csv', index = False)
     print(demo_bygroup)
 
+def questionnaires_description():
+    # add 'group' to distinguish LL and HL
+    # describe questionnaires information, such as depression, MMSE and others
 
+    df = pd.read_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\raw_data_backup\\questionnaires.xlsx', sheetname='July 2017 UG DATA')
+    df['group'] = np.where(df['COMMENT'] == 'ATTEMPTER', np.where(df['MAX LETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), df['COMMENT'])
+    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\questionnaires.csv', index = False)
 
+    question_bygroup = df.groupby('group').describe()
+    question_bygroup.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\questionnaire_describe.csv')
+
+questionnaires_description()
+
+def punishType():
+    ###code baseline as punishType condition 0###
+
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', encoding = "ISO-8859-1")
+    df['PunishingType'] = np.where(df['PunishingType'].isnull(), 0, df['PunishingType'])
+    print(df['PunishingType'])
+    # df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\UG_clean_data\\all_data.csv', index = False)
 
 
 
