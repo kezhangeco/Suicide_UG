@@ -46,7 +46,7 @@
 
    - sensitivity to fairness
 
-2.  Categorical data are compared by chi-square tests across the groups (if there's any categorical data)
+2. Categorical data are compared by chi-square tests across the groups (if there's any categorical data)
 
 3. Percentage of acceptance:
 

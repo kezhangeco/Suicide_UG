@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 #df = pd.read_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv", dtype={'Fairness_score': int})
-df = pd.read_csv("C:\\Users\\ke\\ownCloud\Suicide_UG\\UG_clean_data\\all_data.csv", encoding = "ISO-8859-1")
+df = pd.read_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv", encoding = "ISO-8859-1")
+
 #print(df.dtypes)
 
 
@@ -35,15 +36,19 @@ def main_fairness():
 
 def byGroup():
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
+
+    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1")
     df["group"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
                                                                            np.where(df['COMMENT'] == 'IDEATOR', 'ideator',
                                                                                     np.where(df['COMMENT'] == 'IDEATOR-ATTEMPTER', np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'),
                                                                                              np.where(df['COMMENT'] == 'ATTEMPTER', np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), 'NA')))))
-    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data_group.csv')
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1")
 
 def demo_description():
-    #describe demographic data not by group.
-    df = pd.read_csv('C:\\Users\\ke\ownCloud\\Suicide_UG\\ug_demos.csv', encoding="ISO-8859-1")
+    # add 'group' variable into demographic data
+    # describe demographic info, mean, median, sd...
+
+    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/new_data/ug_demos.csv', encoding = "ISO-8859-1")
     df["group"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
                                                                            np.where(df['COMMENT'] == 'IDEATOR',
                                                                                     'ideator',
@@ -60,11 +65,13 @@ def demo_description():
                                                                                                                'AttempterLL',
                                                                                                                'AttempterHL'),
                                                                                                       'NA')))))
-    # df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\ug_demos.csv')
-    demo_bygroup = df.groupby('group').describe()
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/ug_demos.csv')
 
-    demo_bygroup.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\demo_describe.csv')
+    demo_bygroup = df.groupby('group').describe()
+    demo_bygroup.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/demo_describe.csv')
     print(demo_bygroup)
+
+byGroup()
 demo_description()
 
 
