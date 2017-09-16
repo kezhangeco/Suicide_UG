@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+from scipy.stats import chisquare
 
 def main_fairness():
-    #check the main effect of fairness, whether people accept more fair offer.
+    #check the main effect of fairness, whether people accept more fair offer in terms of percentage.
     #5 levels of fairness for the offers (1 = 50/50; 2 = 60/40; 3 = 70/30; 4 = 8/2; 5 = 90/10);
     #fair = 5-5, 6-4;
     #unfair = 7-3, 8-2, 9 -1
@@ -32,7 +32,13 @@ def main_fairness():
     ax.set_ylim([0, 1])
     plt.show()
 
+def ttest_offer_acceptance():
+    #Are people significantly accepting more fair offers than unfair offers?
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', encoding="ISO-8859-1")
+    fair_accept = df.groupby(['id', 'AcceptOffer', 'fairness']).size()
+    fair_accept.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\acceptance_describe.csv')
 
+ttest_offer_acceptance()
 
 def byGroup():
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
