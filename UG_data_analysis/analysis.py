@@ -34,11 +34,11 @@ def main_fairness():
 
 def ttest_offer_acceptance():
     #Are people significantly accepting more fair offers than unfair offers?
+    #in total population
     df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', encoding="ISO-8859-1")
     fair_accept = df.groupby(['id', 'AcceptOffer', 'fairness']).size()
     fair_accept.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\acceptance_describe.csv')
 
-ttest_offer_acceptance()
 
 def byGroup():
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
@@ -73,9 +73,19 @@ def demo_description():
                                                                                                       'NA')))))
     df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/ug_demos.csv', index = False)
 
-    demo_bygroup = df.groupby('group').describe()
-    demo_bygroup.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/demo_describe.csv', index = False)
-    print(demo_bygroup)
+    var_ls = ['group','BASELINEAGE', "SUICIDEAGE", 'SUICID2AGE', 'MAXLETHALITY', 'EDUCATION', 'GENDERTEXT', 'MARITALTEXT']
+
+    df_demo_groups = df.groupby('group')[var_ls].groups
+
+    print(df_demo_groups)
+
+    attempterHL = df[var_ls][df_demo_groups['AttempterHL']]
+    attempterLL = df[var_ls][df_demo_groups['AttempterLL']]
+    depression = df[var_ls][df_demo_groups['depression']]
+    ideator = df[var_ls][df_demo_groups['ideator']]
+
+
+demo_description()
 
 def questionnaires_description():
     # add 'group' to distinguish LL and HL
@@ -88,7 +98,6 @@ def questionnaires_description():
     question_bygroup = df.groupby('group').describe()
     question_bygroup.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\questionnaire_describe.csv')
 
-questionnaires_description()
 
 def punishType():
     ###code baseline as punishType condition 0###
