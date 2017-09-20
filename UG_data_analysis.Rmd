@@ -32,7 +32,102 @@ print(binom.test(212, 212+2481))
 You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
-plot(pressure)
+# demograhics ANOVA in 5 levels and 4 levels, are groups different in demographics?
+demo <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\ug_demos.csv")
+
+# ANOVA in 5 levels, where attempters are HH and LL separately
+baselineAge <- aov(demo$BASELINEAGE~demo$group)
+consentAge <- aov(demo$PROTECT2AGE, demo$group)
+suicideAge <- aov(demo$SUICIDEAGE, demo$group)
+maxlethal <- aov(demo$MAXLETHALITY, demo$group)
+
+print("baseline age")
+summary(baselineAge)
+print("consent age")
+summary(consentAge)
+print("suicide age")
+summary(suicideAge)
+print("max lethality")
+summary(maxlethal)
+
+
+demo["baseline_age"] <- NA
+demo$baseline_age[demo$group4 == "attempter"] <- "A"
+demo$baseline_age[demo$group4 == "control"] <- "C"
+demo$baseline_age[demo$group4 == "depression"] <- "D"
+demo$baseline_age[demo$group4 == "ideator"] <- "I"
+
+
+
+baselineAge <- aov(demo$BASELINEAGE~demo$baseline_age)
+consentAge <- aov(demo$PROTECT2AGE, demo$abbr)
+suicideAge <- aov(demo$SUICIDEAGE, demo$abbr)
+maxlethal <- aov(demo$MAXLETHALITY, demo$abbr)
+
+print("baseline age")
+summary(baselineAge)
+print("consent age")
+summary(consentAge)
+print("suicide age")
+summary(suicideAge)
+print("max lethality")
+summary(maxlethal)
+
+
+baselineAge_hsd <- TukeyHSD(baselineAge)
+plot(baselineAge_hsd)
+baselineAge_hsd
+
+```
+
+
+```{r}
+# significance test on if groups are significantly different in accepting fair/unfair offer.
+?prop.test
+
+###five levels
+groups5_fair <- matrix(
+  c(45, 44, 50, 42, 31, 210, 256, 310, 303, 254),
+  nrow = 5, ncol=2, dimnames = list(c("AttHL", "AttLL", "Control", "Depression", "ideator"), c("reject_fair", "accept_fair")))
+
+
+groups5_unfair <- matrix(
+  c(463, 550, 584, 456, 428, 608, 710, 928, 993, 769),
+  nrow = 5, ncol=2, dimnames = list(c("AttHL", "AttLL", "Control", "Depression", "ideator"), c("reject_unfair", "accept_unfair")))
+
+groups5_fair_p <- matrix(
+  c(0.82, 0.85, 0.86, 0.88, 0.89, 0.18, 0.15, 0.14, 0.12, 0.11),
+  nrow = 5, ncol=2, dimnames = list(c("AttHL", "AttLL", "Control", "Depression", "ideator"), c("reject_fair", "accept_fair")))
+
+
+groups5_unfair_p <- matrix(
+  c(0.57, 0.56, 0.61, 0.69, 0.64, 0.43, 0.44, 0.39, 0.31, 0.36),
+  nrow = 5, ncol=2, dimnames = list(c("AttHL", "AttLL", "Control", "Depression", "ideator"), c("reject_unfair", "accept_unfair")))
+
+###four levels
+
+groups4_fair_p <- matrix(
+  c(0.84, 0.86, 0.88, 0.89, 0.16, 0.14, 0.12, 0.11),
+  nrow = 4, ncol=2, dimnames = list(c("Att", "Control", "Depression", "ideator"), c("reject_fair", "accept_fair")))
+
+
+groups4_unfair_p <- matrix(
+  c(0.57, 0.61, 0.69, 0.64, 0.43, 0.39, 0.31, 0.36),
+  nrow = 4, ncol=2, dimnames = list(c("Att", "Control", "Depression", "ideator"), c("reject_unfair", "accept_unfair")))
+
+print("fair")
+print(groups5_fair_p)
+
+print("unfair")
+print(groups5_unfair_p)
+
+print("fair")
+print(groups4_fair_p)
+
+print("unfair")
+print(groups4_fair_p)
+
+?binom.test
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

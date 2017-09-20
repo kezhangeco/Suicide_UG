@@ -42,19 +42,24 @@ def ttest_offer_acceptance():
 
 def byGroup():
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv',  encoding="ISO-8859-1")
 
-    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1")
-    df["group"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
+    # df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1")
+    df["group5"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
                                                                            np.where(df['COMMENT'] == 'IDEATOR', 'ideator',
                                                                                     np.where(df['COMMENT'] == 'IDEATOR-ATTEMPTER', np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'),
                                                                                              np.where(df['COMMENT'] == 'ATTEMPTER', np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), 'NA')))))
-    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1", index = False)
+
+    df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter', df['group5'])
+    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data1.csv', encoding = "ISO-8859-1", index = False)
+
+byGroup()
 
 def demo_description():
-    # add 'group' variable into demographic data
+    # add 'group' variable into demographic data: 5 levels group and 4 levels group. HH and LL attempters
     # describe demographic info, mean, median, sd...
 
-    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/new_data/ug_demos.csv', encoding = "ISO-8859-1")
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\new_data\\ug_demos.csv', encoding = "ISO-8859-1")
     df["group"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
                                                                            np.where(df['COMMENT'] == 'IDEATOR',
                                                                                     'ideator',
@@ -71,21 +76,13 @@ def demo_description():
                                                                                                                'AttempterLL',
                                                                                                                'AttempterHL'),
                                                                                                       'NA')))))
-    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/ug_demos.csv', index = False)
+    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\ug_demos.csv', index = False)
 
-    var_ls = ['group','BASELINEAGE', "SUICIDEAGE", 'SUICID2AGE', 'MAXLETHALITY', 'EDUCATION', 'GENDERTEXT', 'MARITALTEXT']
+    df1 = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\ug_demos.csv', encoding = "ISO-8859-1")
+    df1['group4'] = np.where((df1['group'] == 'AttempterLL') | (df1['group'] == 'AttempterHL'), 'attempter', df1['group'])
+    print(df1)
+    df1.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\ug_demos1.csv', index=False)
 
-    df_demo_groups = df.groupby('group')[var_ls].groups
-
-    print(df_demo_groups)
-
-    attempterHL = df[var_ls][df_demo_groups['AttempterHL']]
-    attempterLL = df[var_ls][df_demo_groups['AttempterLL']]
-    depression = df[var_ls][df_demo_groups['depression']]
-    ideator = df[var_ls][df_demo_groups['ideator']]
-
-
-demo_description()
 
 def questionnaires_description():
     # add 'group' to distinguish LL and HL
