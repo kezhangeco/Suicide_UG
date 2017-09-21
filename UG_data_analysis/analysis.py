@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chisquare
+import ggplot
 
 def main_fairness():
     #check the main effect of fairness, whether people accept more fair offer in terms of percentage.
@@ -32,13 +33,6 @@ def main_fairness():
     ax.set_ylim([0, 1])
     plt.show()
 
-def ttest_offer_acceptance():
-    #Are people significantly accepting more fair offers than unfair offers?
-    #in total population
-    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', encoding="ISO-8859-1")
-    fair_accept = df.groupby(['id', 'AcceptOffer', 'fairness']).size()
-    fair_accept.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\acceptance_describe.csv')
-
 
 def byGroup():
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
@@ -53,7 +47,6 @@ def byGroup():
     df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter', df['group5'])
     df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data1.csv', encoding = "ISO-8859-1", index = False)
 
-byGroup()
 
 def demo_description():
     # add 'group' variable into demographic data: 5 levels group and 4 levels group. HH and LL attempters
@@ -106,5 +99,15 @@ def punishType():
 
 
 
+def byGroup_condition_accept():
+    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1")
+    df['ReappraisalDirection'].fillna(0, inplace = True)
+    ct = pd.crosstab([df.group5, df.ReappraisalDirection, df.fairness], df.AcceptOffer)
+    ct1 = pd.crosstab([df.group4, df.ReappraisalDirection, df.fairness], df.AcceptOffer)
+    ct.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/group5.xlsx')
+    ct1.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/group4.xlsx')
 
+    df_byGroup = df.groupby('id')
+    print(df_byGroup)
 
+byGroup_condition_accept()

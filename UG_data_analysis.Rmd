@@ -82,7 +82,10 @@ baselineAge_hsd
 
 
 ```{r}
-# significance test on if groups are significantly different in accepting fair/unfair offer.
+library(TeachingDemos)
+library(readxl)
+
+# significance test on if each group are significantly different in accepting fair/unfair offer.
 ?prop.test
 
 ###five levels
@@ -105,6 +108,15 @@ groups5_unfair_p <- matrix(
   nrow = 5, ncol=2, dimnames = list(c("AttHL", "AttLL", "Control", "Depression", "ideator"), c("reject_unfair", "accept_unfair")))
 
 ###four levels
+groups4_fair <- matrix(
+  c(89, 50, 42, 31, 466, 310, 303, 254),
+  nrow = 4, ncol=2, dimnames = list(c("Att", "Control", "Depression", "ideator"), c("reject_fair", "accept_fair")))
+
+
+groups4_unfair <- matrix(
+  c(1013, 584, 456, 428, 1318, 928, 993, 769),
+  nrow = 4, ncol=2, dimnames = list(c("Att", "Control", "Depression", "ideator"), c("reject_unfair", "accept_unfair")))
+
 
 groups4_fair_p <- matrix(
   c(0.84, 0.86, 0.88, 0.89, 0.16, 0.14, 0.12, 0.11),
@@ -115,19 +127,65 @@ groups4_unfair_p <- matrix(
   c(0.57, 0.61, 0.69, 0.64, 0.43, 0.39, 0.31, 0.36),
   nrow = 4, ncol=2, dimnames = list(c("Att", "Control", "Depression", "ideator"), c("reject_unfair", "accept_unfair")))
 
+
+
+?Map
+b_group5_fair <- Map(binom.test, groups5_fair[, "accept_fair"], rowSums(groups5_fair))
+b_group5_unfair <- Map(binom.test, groups5_unfair[, "accept_unfair"], rowSums(groups5_unfair))
+b_group4_fair <- Map(binom.test, groups4_fair[, "accept_fair"], rowSums(groups4_fair))
+b_group4_unfair <- Map(binom.test, groups4_unfair[, "accept_unfair"], rowSums(groups4_unfair))
+
 print("fair")
+print(groups5_fair)
 print(groups5_fair_p)
+print(b_group5_fair)
 
 print("unfair")
+print(groups5_unfair)
 print(groups5_unfair_p)
+print(b_group5_unfair)
 
 print("fair")
+print(groups4_fair)
 print(groups4_fair_p)
+print(b_group4_fair)
 
 print("unfair")
-print(groups4_fair_p)
+print(groups4_unfair)
+print(groups4_unfair_p)
+print(b_group4_unfair)
 
-?binom.test
+### if one group is signiifcantly different in accepting fair/unfair offer
+?chisq.test
+print("chisq on accepting fair across groups")
+print(chisq.test(groups5_fair[, "accept_fair"]))
+
+print("chisq on accepting unfair across groups")
+print(chisq.test(groups5_unfair[, "accept_unfair"]))
+
+print("chisq on accepting fair across groups")
+print(chisq.test(groups4_fair[, "accept_offer"]))
+
+print("chisq on accepting unfair across groups")
+print(chisq.test(groups4_unfair[, "accept_unfair"]))
+
+# 3-way ANOVA
+group5 <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/group5_condition_offer.xlsx", sheet = "Sheet2")
+Y <- scan()
+a1= anova(lm(group5$Accept~group5$fairness*group5$ReappraisalDirection*group5$group5))
+summary(a1)
+```
+
+```{r}
+library(readxl)
+# three way anova
+x <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/group4_condition_offer.xlsx", sheet = "percentage", range = "A1:D25")
+
+df <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv")
+
+print(aov(df$AcceptOffer~df$group4*df$ReappraisalDirection&df$fairness))
+
+fair <- c(0.96, 0.63, 0.93, 0.96, 0.68, 0.94, 0.97, 0.72, 0.93, 0.99, )
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
