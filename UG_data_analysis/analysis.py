@@ -3,90 +3,90 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chisquare
 import ggplot
-
-def main_fairness():
-    #check the main effect of fairness, whether people accept more fair offer in terms of percentage.
-    #5 levels of fairness for the offers (1 = 50/50; 2 = 60/40; 3 = 70/30; 4 = 8/2; 5 = 90/10);
-    #fair = 5-5, 6-4;
-    #unfair = 7-3, 8-2, 9 -1
-
-    # df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding="ISO-8859-1")
-    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', encoding="ISO-8859-1")
-    df['fairness']= np.where((df['Fairness_score'] == 1) | (df['Fairness_score'] == 2), 'fair', 'unfair')
-    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', index=False)
-
-    fairCount = df.groupby(['fairness', 'AcceptOffer']).size().unstack(fill_value=0)
-    print(fairCount)
-    fairCount.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/fairness.csv")
-
-    #bar graph
-    reject_fair = fairCount.iat[0,0]/(fairCount.iat[0,0]+fairCount.iat[0,1])
-    reject_unfair = fairCount.iat[1,0]/(fairCount.iat[1,0]+fairCount.iat[1,1])
-    y = [reject_fair, reject_unfair]
-    print('percentage of fairness trial vs unfair trial',y)
-    groups = ['reject_fair', 'reject_unfair']
-    x_pos = np.arange(len(groups))
-    plt.bar(x_pos,y,align='center')
-    plt.xticks(x_pos,groups)
-
-    ax = plt.gca()
-    ax.set_ylim([0, 1])
-    plt.show()
+from openpyxl import load_workbook
 
 
 def byGroup():
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
-    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv',  encoding="ISO-8859-1")
+    # group 5: split attempter into HL and LL
+    # group 4: does not split attempters
+    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/merged_panels/all_task_data.csv',  encoding="ISO-8859-1",
+                     dtype={'StakeImg': object, 'ReappraisalText': object, 'ReappraisalDirection': object,
+                            'PunishingType': object})
 
-    # df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1")
+
     df["group5"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
                                                                            np.where(df['COMMENT'] == 'IDEATOR', 'ideator',
-                                                                                    np.where(df['COMMENT'] == 'IDEATOR-ATTEMPTER', np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'),
-                                                                                             np.where(df['COMMENT'] == 'ATTEMPTER', np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), 'NA')))))
+                                                                                    np.where(df['COMMENT'] == 'IDEATOR-ATTEMPTER',
+                                                                                             np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'),
+                                                                                             np.where(df['COMMENT'] == 'ATTEMPTER',
+                                                                                                      np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), 'NA')))))
 
     df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter', df['group5'])
-    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data1.csv', encoding = "ISO-8859-1", index = False)
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/all_task_data_demo.csv', encoding = "ISO-8859-1", index = False)
 
 
 def demo_description():
     # add 'group' variable into demographic data: 5 levels group and 4 levels group. HH and LL attempters
     # describe demographic info, mean, median, sd...
 
-    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\new_data\\ug_demos.csv', encoding = "ISO-8859-1")
-    df["group"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
-                                                                           np.where(df['COMMENT'] == 'IDEATOR',
-                                                                                    'ideator',
-                                                                                    np.where(df[
-                                                                                                 'COMMENT'] == 'IDEATOR-ATTEMPTER',
-                                                                                             np.where(
-                                                                                                 df['MAXLETHALITY'] < 4,
-                                                                                                 'AttempterLL',
-                                                                                                 'AttempterHL'),
-                                                                                             np.where(df[
-                                                                                                          'COMMENT'] == 'ATTEMPTER',
-                                                                                                      np.where(df[
-                                                                                                                   'MAXLETHALITY'] < 4,
-                                                                                                               'AttempterLL',
-                                                                                                               'AttempterHL'),
-                                                                                                      'NA')))))
-    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\ug_demos.csv', index = False)
+    # df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/UG_CON_DEMOS_UPDATED.csv', encoding = "ISO-8859-1")
+    # df["group5"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
+    #                                                                        np.where(df['COMMENT'] == 'IDEATOR',
+    #                                                                                 'ideator',
+    #                                                                                 np.where(df[
+    #                                                                                              'COMMENT'] == 'IDEATOR-ATTEMPTER',
+    #                                                                                          np.where(
+    #                                                                                              df['MAXLETHALITY'] < 4,
+    #                                                                                              'AttempterLL',
+    #                                                                                              'AttempterHL'),
+    #                                                                                          np.where(df[
+    #                                                                                                       'COMMENT'] == 'ATTEMPTER',
+    #                                                                                                   np.where(df[
+    #                                                                                                                'MAXLETHALITY'] < 4,
+    #                                                                                                            'AttempterLL',
+    #                                                                                                            'AttempterHL'),
+    #                                                                                                   'NA')))))
+    #
+    # df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter', df['group5'])
+    # df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.csv', index=False)
+    #
+    df1 = pd.read_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.csv", encoding = "ISO-8859-1")
+    group5_demo = df1.groupby(['group5'])['BASELINEAGE', 'PROTECT2AGE', 'AGETODAY', 'MAXLETHALITY', 'EDUCATION'].describe()
+    group4_demo = df1.groupby(['group4'])['BASELINEAGE', 'PROTECT2AGE', 'AGETODAY', 'MAXLETHALITY', 'EDUCATION'].describe()
+    print(group5_demo)
+    print(group4_demo)
 
-    df1 = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\ug_demos.csv', encoding = "ISO-8859-1")
-    df1['group4'] = np.where((df1['group'] == 'AttempterLL') | (df1['group'] == 'AttempterHL'), 'attempter', df1['group'])
-    print(df1)
-    df1.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\ug_demos1.csv', index=False)
+    writer = pd.ExcelWriter("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/demo_summary.xlsx")
+    group5_demo.to_excel(writer, 'group5_age')
+    group4_demo.to_excel(writer, 'group4_age')
+    writer.save()
+    writer.close()
 
 
 def questionnaires_description():
-    # add 'group' to distinguish LL and HL
+    # add 'group5' to distinguish LL and HL
+    # add 'group4' to have only 4 groups
     # describe questionnaires information, such as depression, MMSE and others
 
-    df = pd.read_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\raw_data_backup\\questionnaires.xlsx', sheetname='July 2017 UG DATA')
-    df['group'] = np.where(df['COMMENT'] == 'ATTEMPTER', np.where(df['MAX LETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), df['COMMENT'])
-    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\questionnaires.csv', index = False)
+    df = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/questionnaires.xlsx', sheetname='July 2017 UG DATA')
+    df['group5'] = np.where(df['COMMENT'] == 'ATTEMPTER', np.where(df['MAX LETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), df['COMMENT'])
+    df['group4'] = df['COMMENT']
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/questionnaires.csv', index = False)
 
-    question_bygroup = df.groupby('group').describe()
-    question_bygroup.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\questionnaire_describe.csv')
+
+
+    book = load_workbook("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/demo_summary.xlsx")
+    writer = pd.ExcelWriter("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/demo_summary.xlsx", engine = 'openpyxl')
+    writer.book = book
+
+    question_bygroup5 = df.groupby('group5').describe(include='all')
+    question_bygroup4 = df.groupby('group4').describe(include='all')
+
+    question_bygroup5.to_excel(writer, 'group5_questionnaires')
+    question_bygroup4.to_excel(writer, 'group4_questionnaired')
+    writer.save()
+    writer.close()
 
 
 def punishType():
@@ -110,4 +110,3 @@ def byGroup_condition_accept():
     df_byGroup = df.groupby('id')
     print(df_byGroup)
 
-byGroup_condition_accept()

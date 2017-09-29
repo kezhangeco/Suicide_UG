@@ -20,9 +20,13 @@
 
 ### data clean
 
-1. Exclude those age under 50
+1. Merge context, baseline, and demo data into 1 panel sheet.
 
-2. group ideator-attempters as attempters
+2. One person changed from LL attempter to ideator
+
+3. Exclude those age under 50
+
+4. group ideator-attempters as attempters
 
    ​
 
