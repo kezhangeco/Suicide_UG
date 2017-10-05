@@ -50,10 +50,10 @@ def demo_description():
     #
     # df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter', df['group5'])
     # df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.csv', index=False)
-    #
+
     df1 = pd.read_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.csv", encoding = "ISO-8859-1")
-    group5_demo = df1.groupby(['group5'])['BASELINEAGE', 'PROTECT2AGE', 'AGETODAY', 'MAXLETHALITY', 'EDUCATION'].describe()
-    group4_demo = df1.groupby(['group4'])['BASELINEAGE', 'PROTECT2AGE', 'AGETODAY', 'MAXLETHALITY', 'EDUCATION'].describe()
+    group5_demo = df1.groupby(['group5'])['BASELINEAGE', 'PROTECT2AGE', 'AGETODAY', 'MAXLETHALITY', 'EDUCATION'].describe(percentiles=None)
+    group4_demo = df1.groupby(['group4'])['BASELINEAGE', 'PROTECT2AGE', 'AGETODAY', 'MAXLETHALITY', 'EDUCATION'].describe(percentiles=None)
     print(group5_demo)
     print(group4_demo)
 
@@ -88,25 +88,11 @@ def questionnaires_description():
     writer.save()
     writer.close()
 
+def demo_summ_clean():
+    summ = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary_py.xlsx')
+    summ = summ.dropna(axis = 0, how = "all")
+    print(summ)
 
-def punishType():
-    ###code baseline as punishType condition 0###
+    summ.to_csv('/Users/kezhang/Desktop/UG_summary_py.csv')
 
-    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv', encoding = "ISO-8859-1")
-    df['PunishingType'] = np.where(df['PunishingType'].isnull(), 0, df['PunishingType'])
-    print(df['PunishingType'])
-    # df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\UG_clean_data\\all_data.csv', index = False)
-
-
-
-def byGroup_condition_accept():
-    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv', encoding = "ISO-8859-1")
-    df['ReappraisalDirection'].fillna(0, inplace = True)
-    ct = pd.crosstab([df.group5, df.ReappraisalDirection, df.fairness], df.AcceptOffer)
-    ct1 = pd.crosstab([df.group4, df.ReappraisalDirection, df.fairness], df.AcceptOffer)
-    ct.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/group5.xlsx')
-    ct1.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/group4.xlsx')
-
-    df_byGroup = df.groupby('id')
-    print(df_byGroup)
-
+demo_summ_clean()
