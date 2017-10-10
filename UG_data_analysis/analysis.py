@@ -89,10 +89,31 @@ def questionnaires_description():
     writer.close()
 
 def demo_summ_clean():
-    summ = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary_py.xlsx')
-    summ = summ.dropna(axis = 0, how = "all")
-    print(summ)
+    summ5 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary.xlsx', sheetname='group5')
+    summ4 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary.xlsx', sheetname='group4')
 
-    summ.to_csv('/Users/kezhang/Desktop/UG_summary_py.csv')
+    rows = ['min', 'max', '25%', '50%', '75%', 'max', 'unique', 'top', 'freq']
 
-demo_summ_clean()
+    summ_g5 = ~summ5.stats.isin(rows)
+    summ_g5 = summ5[summ_g5]
+
+    summ_g4 = ~summ4.stats.isin(rows)
+    summ_g4 = summ4[summ_g4]
+
+
+    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary_py.xlsx')
+    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary_py.xlsx', engine='openpyxl')
+    writer.book = book
+
+    summ_g5.to_excel(writer, 'group5', index = False)
+    summ_g4.to_excel(writer, 'group4', index = False)
+    writer.save()
+    writer.close()
+
+
+def summ_gender():
+    summ = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.csv')
+    summ = summ[['ID', 'GENDERTEXT', 'RACETEXT', 'MARITALTEXT', 'group5', 'group4']]
+    summ.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_gender.xlsx')
+
+summ_gender()
