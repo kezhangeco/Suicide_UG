@@ -23,7 +23,7 @@ def byGroup():
                                                                                                       np.where(df['MAXLETHALITY'] < 4, 'AttempterLL', 'AttempterHL'), 'NA')))))
 
     df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter', df['group5'])
-    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/all_task_data_demo.csv', encoding = "ISO-8859-1", index = False)
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/merged_panels/ug_all_task_data.csv', encoding = "ISO-8859-1", index = False)
 
 
 def demo_description():
@@ -116,4 +116,3 @@ def summ_gender():
     summ = summ[['ID', 'GENDERTEXT', 'RACETEXT', 'MARITALTEXT', 'group5', 'group4']]
     summ.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_gender.xlsx')
 
-summ_gender()

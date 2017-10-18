@@ -66,3 +66,23 @@
 
    3) calculate the percentage of acceptabce under control and task context.
 
+
+
+## GLMM MODEL
+
+- Goal: whether suicide attempters responded differently to unfaireness and stake during UG.
+- Binary logistic generalized mixed model (GLMM)
+- Parameter estimates were derived using MLE based on adaptive Gauss-Hermite quadrature rule.
+
+## Mutllevel structural equarion modelling (MLSEM)
+
+- Goal: whether the effect of stake on acceptance was influenced by income, implusivity, exective control, interpersonal dysfunction.
+- Each participant contribute 16 trials.
+- decomposes the data into within-subject and between-subjects components, allow models for each level.
+
+
+
+
+
+
+
