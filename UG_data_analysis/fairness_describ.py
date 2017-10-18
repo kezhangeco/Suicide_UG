@@ -52,25 +52,35 @@ def byGroup_reappraisal_fair():
     df['ReappraisalDirection'].fillna('baseline', inplace = True)
     df['ReappraisalDirection'] = np.where(df['ReappraisalDirection'] == 1, 'punish',
                                           np.where(df['ReappraisalDirection'] == 2, 'empathy', df['ReappraisalDirection']))
-    ct_group5_reappraisal = pd.crosstab([df.group5, df.ReappraisalDirection, df.fairness], df.AcceptOffer, normalize='index')
-    ct_group4_reappraisal = pd.crosstab([df.group4, df.ReappraisalDirection, df.fairness], df.AcceptOffer, normalize='index')
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', index=False)
 
-    ct_group5 = pd.crosstab([df.group5, df.fairness], df.AcceptOffer, normalize='index')
-    ct_group4 = pd.crosstab([df.group4, df.fairness], df.AcceptOffer, normalize='index')
+    # ct_group5_reappraisal = pd.crosstab([df.group5, df.ReappraisalDirection, df.fairness], df.AcceptOffer, normalize='index')
+    # ct_group4_reappraisal = pd.crosstab([df.group4, df.ReappraisalDirection, df.fairness], df.AcceptOffer, normalize='index')
+    #
+    # ct_group5 = pd.crosstab([df.group5, df.fairness], df.AcceptOffer, normalize='index')
+    # ct_group4 = pd.crosstab([df.group4, df.fairness], df.AcceptOffer, normalize='index')
+    #
+    # workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx')
+    # workbook.close()
+    #
+    # book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx')
+    # writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx', engine='openpyxl')
+    # writer.book = book
+    #
+    # ct_group5_reappraisal.to_excel(writer, 'group5_reappraisal')
+    # ct_group4_reappraisal.to_excel(writer, 'group4_reappraisal')
+    # ct_group5.to_excel(writer, 'group5')
+    # ct_group4.to_excel(writer, 'group4')
+    # writer.save()
+    # writer.close()
 
-    workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx')
-    workbook.close()
+def fairness():
+    #check the main effect of fairness, whether people accept more fair offer in terms of percentage.
+    #5 levels of fairness for the offers (1 = 50/50; 2 = 60/40; 3 = 70/30; 4 = 8/2; 5 = 90/10);
+    #fair = 5-5, 6-4;
+    #unfair = 7-3, 8-2, 9 -1
 
-    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx')
-    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx', engine='openpyxl')
-    writer.book = book
+    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
+    df['fairness']= np.where((df['Fairness_score'] == 1) | (df['Fairness_score'] == 2), 'fair', 'unfair')
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', index=False)
 
-    ct_group5_reappraisal.to_excel(writer, 'group5_reappraisal')
-    ct_group4_reappraisal.to_excel(writer, 'group4_reappraisal')
-    ct_group5.to_excel(writer, 'group5')
-    ct_group4.to_excel(writer, 'group4')
-    writer.save()
-    writer.close()
-
-
-byGroup_reappraisal_fair()
