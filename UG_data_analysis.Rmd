@@ -188,4 +188,150 @@ print(aov(df$AcceptOffer~df$group4*df$ReappraisalDirection&df$fairness))
 fair <- c(0.96, 0.63, 0.93, 0.96, 0.68, 0.94, 0.97, 0.72, 0.93, 0.99, )
 ```
 
+```{r}
+# chisquare for basline condition fairness x group
+library(readxl)
+
+baseline_group4 <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/chisquare_crosstab.xlsx", sheet = "baseline_group4_percent")
+baseline_group5 <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/chisquare_crosstab.xlsx", sheet = "baseline_group5_percent")
+
+print("4 groups in baseline")
+group4 <- xtabs(baseline_group4$accept~baseline_group4$group4 + baseline_group4$fairness)
+print(group4)
+print(chisq.test(group4))
+
+print("5 groups in baseline")
+group5 <- xtabs(baseline_group5$accept~baseline_group5$group5 + baseline_group5$fairness)
+print(group5)
+print(chisq.test(group5))
+
+```
+
+```{r}
+# experimental conditions
+# 3 way chisquare fairness x reappraisal x group
+
+group4 <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/chisquare_crosstab.xlsx", sheet = "group4_3way_percent")
+group5 <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/chisquare_crosstab.xlsx", sheet = "group5_3way_percent")
+
+group4_count <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/chisquare_crosstab.xlsx", sheet = "group4_3way_count")
+group5_count <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/chisquare_crosstab.xlsx", sheet = "group5_3way_count")
+
+
+print("4 groups three way chi-square")
+group4_3way <- xtabs(group4$accept~group4$group4 + group4$ReappraisalDirection + group4$fairness)
+print(group4_3way)
+ftable(group4_3way)
+print(summary(xtabs(group4$accept~group4$group4 + group4$fairness + group4$ReappraisalDirection)))
+
+print("5 groups three way chi-square")
+group5_3way <- xtabs(group5$accept~group5$group5 + group5$ReappraisalDirection + group5$fairness)
+print(group5_3way)
+ftable(group5_3way)
+print(summary(xtabs(group5$accept~group5$group5 + group5$fairness + group5$ReappraisalDirection)))
+
+print("4 groups fair x group")
+m <- matrix(
+  c(78.33, 56.02, 81.25, 63.69, 83.04, 67.70, 83.5, 65.83),
+  nrow = 2, ncol = 4, dimnames = list(
+    c("fair", "unfair"), c("attempter", "control", "depression", "ideator")
+  )
+)
+print(m)
+print(chisq.test(m))
+
+print("4 groups reappraisal x group")
+m <- matrix(
+  c(81.41, 39.21, 88.62, 45.51, 84.78, 56.52, 91.91, 46.54), 
+  nrow = 2, ncol = 4, dimnames = list(
+  c("empathy", "punish"), c("attempter", "control", "depression", "ideator")))
+print(m)
+print(chisq.test(m))
+
+print("5 groups fair x group")
+m <- matrix(
+  c(76.47, 57.28, 80, 54.89, 81.25, 63.69, 83.04, 67.7, 83.5, 65.83), 
+  nrow = 2, ncol = 5, dimnames = list(
+  c("fair", "unfair"), c("attempterHL", "attempterLL", "control", "depression", "ideator")))
+print(m)
+print(chisq.test(m))
+
+print("5 groups reappraisal x group")
+m <- matrix(
+  c(84.61, 37.33, 78.54, 40.89, 88.62, 45.51, 84.78, 56.52, 91.92, 46.54), 
+  nrow = 2, ncol = 5, dimnames = list(
+  c("empathy", "punish"), c("attempterHL", "attempterLL", "control", "depression", "ideator")))
+print(m)
+print(chisq.test(m))
+
+print("reappraisal x fairness")
+m <- matrix(
+  c(94.45, 83.82, 67.57, 40.83),
+  nrow = 2, ncol = 2, dimnames = list(
+    c("fair","unfair"), c("empathy", "punish"))
+)
+print(m)
+print(chisq.test(m))
+
+```
+```{r}
+# compare baseline and experimental
+library(gmodels)
+
+group4 <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx", sheet = "group4_3way")
+group5 <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx", sheet = "group5_3way")
+
+group4_count <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx", sheet = "group4_reappraisal")
+group5_count <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/fair_reappraisal.xlsx", sheet = "group5_reappraisal")
+
+print("3 way chisquare in 4 groups, baseline vs. punish vs. empathy")
+group4_3way <- xtabs(group4$accept~group4$group + group4$condition + group4$fairness)
+print(group4_3way)
+ftable(group4_3way)
+print(summary(group4_3way))
+
+print("3 way chisquare in 5 groups, baseline vs. punish vs. empathy")
+group5_3way <- xtabs(group5$accept~group5$group + group5$condition + group5$fairness)
+print(group5_3way)
+ftable(group5_3way)
+print(summary(group5_3way))
+
+print("3 way chisquare in 4 groups, baseline vs.framing")
+group4_3way <- xtabs(group4$accept~group4$group + group4$condition1 + group4$fairness)
+print(group4_3way)
+ftable(group4_3way)
+print(summary(group4_3way))
+
+print("3 way chisquare in 5 groups, baseline vs.framing")
+group5_3way <- xtabs(group5$accept~group5$group + group5$condition1 + group5$fairness)
+print(group5_3way)
+ftable(group5_3way)
+print(summary(group5_3way))
+
+print("2 way chisquare in 4 groups, fairness x group")
+m <- matrix(
+  c(84.02, 56.53, 86.11, 61.38, 87.83, 68.53, 88.89, 64.06), 
+  nrow = 2, ncol = 4, dimnames = list(
+  c("fair", "unfair"), c("attempter", "control", "depression", "ideator")))
+print(m)
+print(chisq.test(m))
+
+print("2 way chisquare in 5 groups, fairness x group")
+m <- matrix(
+  c(82.35, 56.77, 85.47, 56.33, 86.11, 61.38, 87.83, 68.53, 88.89, 64.06), 
+  nrow = 2, ncol = 5, dimnames = list(
+  c("fair", "unfair"), c("attempterHL","attempterLL", "control", "depression", "ideator")))
+print(m)
+print(chisq.test(m))
+
+print("fair x framing")
+m <- matrix(
+  c(88.89, 61.49, 94.56, 83.82, 67.57, 40.82), 
+  nrow = 2, ncol = 3, dimnames = list(
+  c("fair", "unfair"), c("baseline", "empathy", "punish")))
+print(m)
+print(chisq.test(m))
+
+```
+
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
