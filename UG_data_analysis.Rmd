@@ -332,6 +332,21 @@ m <- matrix(
 print(m)
 print(chisq.test(m))
 
+print("groups x framing")
+m <- matrix(
+  c(62.05, 84.62, 37.33, 63.00, 78.54, 40.89, 65.67, 88.62, 45.51, 73.04, 84.78, 56.52, 68.63, 91.92, 46.54), 
+  nrow = , ncol = 5, dimnames = list(
+  c("baseline", "empathy", "punish"), c("attempterHL","attempterLL", "control", "depression", "ideator")))
+print(m)
+print(chisq.test(m))
+
+
+m <- matrix(
+  c(62.56, 81.41, 39.21, 63.00, 78.54, 40.89, 65.67, 88.62, 45.51, 73.04, 84.78, 56.52, 68.63, 91.92, 46.54), 
+  nrow = , ncol = 5, dimnames = list(
+  c("baseline", "empathy", "punish"), c("attempterHL","attempterLL", "control", "depression", "ideator")))
+print(m)
+print(chisq.test(m))
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
