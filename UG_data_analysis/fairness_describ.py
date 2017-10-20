@@ -73,7 +73,6 @@ def byGroup_reappraisal_fair():
     writer.save()
     writer.close()
 
-byGroup_reappraisal_fair()
 
 def fairness():
     #check the main effect of fairness, whether people accept more fair offer in terms of percentage.
@@ -113,6 +112,18 @@ def byGroup_baseline_fairness():
     ct_group5_p.to_excel(writer, 'baseline_group5')
     writer.save()
 
+def stack_accept():
+    # arrange stack size and acceptance rate
+    all_data = pd.read_csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+    baseline = all_data[all_data.ReappraisalDirection == 'baseline']
+    ct = pd.crosstab([baseline.ID, baseline.TotalAmountAtStake], baseline.AcceptOffer, margins=True)
+    ct = pd.crosstab([baseline.ID, baseline.TotalAmountAtStake], baseline.AcceptOffer, normalize='index')
+    print(ct)
+
+
+stack_accept()
+
+
 
 def byGroup_reappraisal_fairness():
     all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
@@ -136,7 +147,6 @@ def byGroup_reappraisal_fairness():
     # ct_group4_p.to_excel(writer, 'group4_3way')
     writer.save()
 
-byGroup_reappraisal_fairness()
 
 def tryversion():
     df = pd.read_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\try.xlsx')
