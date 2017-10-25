@@ -47,11 +47,12 @@ def try_data():
     print(f2)
     all_data = pd.DataFrame()
 
-    frames = [f1, f2]
+    # frames = [f1, f2]
     # df = pd.concat(frames,axis=0)
-    df = all_data.append(frames,ignore_index=True)
+    # df = all_data.append(frames,ignore_index=True)
+    f1 = f1.append(f2)[f2.columns.tolist()]
 
-    print(df)
+    print(f1)
 try_data()
 
 
@@ -60,5 +61,6 @@ def control():
     # extra all HC data
     all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
     HC = all_data[all_data.group5 == 'control']
-    HC.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/controls_data.xlsx', index=False)
-
+    # # HC.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/controls_data.xlsx', index=False)
+    # for row in range(0:HC.length):
+    #     excel.writerow(HC["pid"][row],)
