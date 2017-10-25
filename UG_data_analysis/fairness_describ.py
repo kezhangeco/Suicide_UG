@@ -112,18 +112,117 @@ def byGroup_baseline_fairness():
     ct_group5_p.to_excel(writer, 'baseline_group5')
     writer.save()
 
-def stack_accept():
-    # arrange stack size and acceptance rate
-    all_data = pd.read_csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+def stack_accept_baseline():
+    # arrange stack size and acceptance rate in baseline data
+    all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
     baseline = all_data[all_data.ReappraisalDirection == 'baseline']
-    ct = pd.crosstab([baseline.ID, baseline.TotalAmountAtStake], baseline.AcceptOffer, margins=True)
-    ct = pd.crosstab([baseline.ID, baseline.TotalAmountAtStake], baseline.AcceptOffer, normalize='index')
-    print(ct)
+    ct1 = pd.crosstab([baseline.ID, baseline.TotalAmountAtStake], baseline.AcceptOffer, margins=True)
+    ct2 = pd.crosstab([baseline.ID, baseline.TotalAmountAtStake], baseline.AcceptOffer, normalize='index')
+    ct3 = pd.crosstab(baseline.TotalAmountAtStake, baseline.AcceptOffer, margins=True)
+    ct4 = pd.crosstab(baseline.TotalAmountAtStake, baseline.AcceptOffer, normalize='index')
+    ct5 = pd.crosstab(baseline.PlayerProposedAmount, baseline.AcceptOffer, normalize='index')
+    ct6 = pd.crosstab(baseline.Fairness_score, baseline.AcceptOffer, normalize='index')
+    ct7 = pd.crosstab([baseline.TotalAmountAtStake, baseline.group5], baseline.AcceptOffer, margins=True)
+    ct8 = pd.crosstab([baseline.TotalAmountAtStake, baseline.group5], baseline.AcceptOffer, normalize='index')
+    ct9 = pd.crosstab([baseline.PlayerProposedAmount, baseline.group5], baseline.AcceptOffer, normalize='index')
+    ct10 = pd.crosstab([baseline.Fairness_score, baseline.group5], baseline.AcceptOffer, normalize='index')
+
+    workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/baseline_stackSize.xlsx')
+    workbook.close()
+    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/baseline_stackSize.xlsx')
+    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/baseline_stackSize.xlsx', engine = 'openpyxl')
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+
+    ct1.to_excel(writer, 'totalSizeByID_count')
+    ct2.to_excel(writer, 'totalSizeByID2_percent')
+    ct3.to_excel(writer, 'totalSize_count')
+    ct4.to_excel(writer, 'totalSize_percent')
+    ct5.to_excel(writer, 'proposedSize')
+    ct6.to_excel(writer, 'fairscore')
+    ct7.to_excel(writer, 'totalSizeByGroup_count')
+    ct8.to_excel(writer, 'totalSizeByGroup_percent')
+    ct9.to_excel(writer, 'proposedSizeByGroup')
+    ct10.to_excel(writer, 'fairscoreByGroup')
+    writer.save()
 
 
-stack_accept()
+def stack_accept_framing():
+    all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
+    punish = all_data[all_data.ReappraisalDirection == 'punish']
+    empathy = all_data[all_data.ReappraisalDirection == 'empathy']
+
+    ct1 = pd.crosstab(punish.TotalAmountAtStake, punish.AcceptOffer, normalize='index')
+    ct2 = pd.crosstab(punish.PlayerProposedAmount, punish.AcceptOffer, normalize='index')
+    ct3 = pd.crosstab(punish.Fairness_score, punish.AcceptOffer, normalize='index')
+    ct4 = pd.crosstab([punish.TotalAmountAtStake, punish.group5], punish.AcceptOffer, normalize='index')
+    ct5 = pd.crosstab([punish.PlayerProposedAmount, punish.group5], punish.AcceptOffer, normalize='index')
+    ct6 = pd.crosstab([punish.Fairness_score, punish.group5], punish.AcceptOffer, normalize='index')
 
 
+    workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/punish_stackSize.xlsx')
+    workbook.close()
+    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/punish_stackSize.xlsx')
+    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/punish_stackSize.xlsx', engine='openpyxl')
+    writer.book = book
+    ct1.to_excel(writer, 'totalSize_accept')
+    ct2.to_excel(writer, 'proposedSize')
+    ct3.to_excel(writer, 'fairscore')
+    ct4.to_excel(writer, 'totalSizeByGroup')
+    ct5.to_excel(writer, 'proposedSizedByGroup')
+    ct6.to_excel(writer, 'fairscoreByGroup')
+    writer.save()
+    writer.close()
+
+    ct7 = pd.crosstab(empathy.TotalAmountAtStake, empathy.AcceptOffer, normalize='index')
+    ct8 = pd.crosstab(empathy.PlayerProposedAmount, empathy.AcceptOffer, normalize='index')
+    ct9 = pd.crosstab(empathy.Fairness_score, empathy.AcceptOffer, normalize='index')
+    ct10 = pd.crosstab([empathy.TotalAmountAtStake, empathy.group5], empathy.AcceptOffer, normalize='index')
+    ct11 = pd.crosstab([empathy.PlayerProposedAmount, empathy.group5], empathy.AcceptOffer, normalize='index')
+    ct12 = pd.crosstab([empathy.Fairness_score, empathy.group5], empathy.AcceptOffer, normalize='index')
+
+    workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/empathy_stackSize.xlsx')
+    workbook.close()
+    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/empathy_stackSize.xlsx')
+    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/empathy_stackSize.xlsx', engine='openpyxl')
+    writer.book = book
+    ct7.to_excel(writer, 'totalSize_accept')
+    ct8.to_excel(writer, 'proposedSize')
+    ct9.to_excel(writer, 'fairscore')
+    ct10.to_excel(writer, 'totalSizeByGroup')
+    ct11.to_excel(writer, 'proposedSizedByGroup')
+    ct12.to_excel(writer, 'fairscoreByGroup')
+    writer.save()
+    writer.close()
+
+def stake_accept_reappraisal_control():
+    # acceptance rate and stake size of HC
+    # acceptance rate with stake size (player proposed size), social framing
+    # acceptance rate with fairness (binary), social framing
+
+    controls = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/controls_data.xlsx', encoding="ISO-8859-1")
+    ct1 = pd.crosstab(controls.TotalAmountAtStake, controls.AcceptOffer, normalize='index')
+    ct2 = pd.crosstab(controls.PlayerProposedAmount, controls.AcceptOffer, normalize='index')
+    ct3 = pd.crosstab(controls.Fairness_score, controls.AcceptOffer, normalize='index')
+    ct4 = pd.crosstab([controls.PlayerProposedAmount, controls.ReappraisalDirection], controls.AcceptOffer, normalize='index')
+    ct5 = pd.crosstab([controls.fairness, controls.ReappraisalDirection], controls.AcceptOffer, normalize='index')
+
+    # workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/stackSize_controls.xlsx')
+    # workbook.close()
+    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/stackSize_controls.xlsx')
+    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/stackSize_controls.xlsx', engine='openpyxl')
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+
+    # ct1.to_excel(writer, 'totalSize_accept')
+    # ct2.to_excel(writer, 'proposedSize')
+    # ct3.to_excel(writer, 'fairscore')
+    ct4.to_excel(writer, 'proposedSize_framing')
+    ct5.to_excel(writer, 'fair_framing')
+    writer.save()
+    writer.close()
+
+stake_accept_reappraisal_control()
 
 def byGroup_reappraisal_fairness():
     all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")

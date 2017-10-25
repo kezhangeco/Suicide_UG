@@ -27,15 +27,38 @@ def add_demo():
 def all_task_data():
     #merge context data and baseline data into one file.###
 
-    files = glob.glob("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/merged_panels/*.csv")
+    files = glob.glob("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/*.csv")
     all_data = pd.DataFrame()
     for f in files:
         df = pd.read_csv(f,encoding = "ISO-8859-1")
         all_data = all_data.append(df)[df.columns.tolist()]
-    print(all_data.head())
-    all_data.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/merged_panels/all_task_data.csv", index=False)
+        # all_data = all_data.append(df)
+        # return all_data1, all_data2
+    print(all_data)
+
+
+    # all_data1.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/all_try1.csv", index=False)
+    # all_data2.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/all_try2.csv", index=False)
+
+def try_data():
+    f1 = pd.read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/try.xlsx")
+    f2 = pd.read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/try2.xlsx")
+    print(f1)
+    print(f2)
+    all_data = pd.DataFrame()
+
+    frames = [f1, f2]
+    # df = pd.concat(frames,axis=0)
+    df = all_data.append(frames,ignore_index=True)
+
+    print(df)
+try_data()
 
 
 
-add_demo()
-all_task_data()
+def control():
+    # extra all HC data
+    all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
+    HC = all_data[all_data.group5 == 'control']
+    HC.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/controls_data.xlsx', index=False)
+

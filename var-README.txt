@@ -8,12 +8,12 @@
 		StakeImg: pieFS4.bmp (pie image)
 		text:  cannot afford to send her son to college. (contextual message)
 		
-		Fairness_score: 4 (can be 1-5)
-		1-50/50 split
-		2-40/60 split
+		Fairness_score: 4 (can be 1-5) 
+		1-50/50 split (fair)
+		2-40/60 split 
 		3-30/70 split
 		4-20/80 split
-		5-10/90 split
+		5-10/90 split ()
 
 
 		ReappraisalText: Sharon cannot afford to send her son to college. (same as text above)
