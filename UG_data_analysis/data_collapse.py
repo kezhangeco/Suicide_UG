@@ -27,40 +27,70 @@ def add_demo():
 def all_task_data():
     #merge context data and baseline data into one file.###
 
-    files = glob.glob("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/*.csv")
+    files = glob.glob("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\*.csv")
     all_data = pd.DataFrame()
     for f in files:
         df = pd.read_csv(f,encoding = "ISO-8859-1")
         all_data = all_data.append(df)[df.columns.tolist()]
-        # all_data = all_data.append(df)
-        # return all_data1, all_data2
+
     print(all_data)
 
+    all_data.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\ug_all_task_data.csv')
 
-    # all_data1.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/all_try1.csv", index=False)
-    # all_data2.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/all_try2.csv", index=False)
+def all_task_data_recode():
+    # insert recoded values
+    # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
+    # group 5: split attempter into HL and LL
+    # group 4: does not split attempters
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\ug_all_task_data.csv',
+                     encoding="ISO-8859-1",
+                     dtype={'StakeImg': object, 'ReappraisalText': object, 'ReappraisalDirection': object,
+                            'PunishingType': object})
 
-def try_data():
-    f1 = pd.read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/try.xlsx")
-    f2 = pd.read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/try/try2.xlsx")
-    print(f1)
-    print(f2)
-    all_data = pd.DataFrame()
+    df["group5"] = np.where(df['PATTYPE'] == 'CONTROL', 'control', np.where(df['PATTYPE'] == 'DEPRESSION', 'depression',
+                                                                            np.where(df['COMMENT'] == 'IDEATOR',
+                                                                                     'ideator',
+                                                                                     np.where(df[
+                                                                                                  'COMMENT'] == 'IDEATOR-ATTEMPTER',
+                                                                                              np.where(df[
+                                                                                                           'MAXLETHALITY'] < 4,
+                                                                                                       'AttempterLL',
+                                                                                                       'AttempterHL'),
+                                                                                              np.where(df[
+                                                                                                           'COMMENT'] == 'ATTEMPTER',
+                                                                                                       np.where(df[
+                                                                                                                    'MAXLETHALITY'] < 4,
+                                                                                                                'AttempterLL',
+                                                                                                                'AttempterHL'),
+                                                                                                       'NA')))))
 
-    # frames = [f1, f2]
-    # df = pd.concat(frames,axis=0)
-    # df = all_data.append(frames,ignore_index=True)
-    f1 = f1.append(f2)[f2.columns.tolist()]
+    df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter',
+                            df['group5'])
 
-    print(f1)
-try_data()
+    # check the main effect of fairness, whether people accept more fair offer in terms of percentage.
+    # 5 levels of fairness for the offers (1 = 50/50; 2 = 60/40; 3 = 70/30; 4 = 8/2; 5 = 90/10);
+    # fair = 5-5, 6-4;
+    # unfair = 7-3, 8-2, 9 -1
 
+    df['fairness'] = np.where((df['Fairness_score'] == 1) | (df['Fairness_score'] == 2), 'fair', 'unfair')
+    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', index=False)
+
+
+def reappra():
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv')
+    df['PunishingType'].fillna('baseline', inplace=True)
+    df['ReappraisalDirection'].fillna('baseline', inplace=True)
+    df['ReappraisalDirection'] = np.where(df['ReappraisalDirection'] == 1, 'punish',
+                                          np.where(df['ReappraisalDirection'] == 2, 'empathy',
+                                                   df['ReappraisalDirection']))
+    print(df['ReappraisalDirection'])
+    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', index=False)
 
 
 def control():
     # extra all HC data
-    all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
+    all_data = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv',
+                           encoding="ISO-8859-1")
     HC = all_data[all_data.group5 == 'control']
-    # # HC.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/controls_data.xlsx', index=False)
-    # for row in range(0:HC.length):
-    #     excel.writerow(HC["pid"][row],)
+    HC.to_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\controls_data.xlsx')
+
