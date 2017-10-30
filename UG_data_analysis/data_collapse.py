@@ -35,14 +35,14 @@ def all_task_data():
 
     print(all_data)
 
-    all_data.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\ug_all_task_data.csv')
+    all_data.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\*.csv')
 
 def all_task_data_recode():
     # insert recoded values
     # new var identifies the subject's group: control, depressed_control, ideator, AttempterHL, AttempterLL
     # group 5: split attempter into HL and LL
     # group 4: does not split attempters
-    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\ug_all_task_data.csv',
+    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv',
                      encoding="ISO-8859-1",
                      dtype={'StakeImg': object, 'ReappraisalText': object, 'ReappraisalDirection': object,
                             'PunishingType': object})
@@ -73,8 +73,7 @@ def all_task_data_recode():
     # unfair = 7-3, 8-2, 9 -1
 
     df['fairness'] = np.where((df['Fairness_score'] == 1) | (df['Fairness_score'] == 2), 'fair', 'unfair')
-    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', index=False)
-
+    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data_groupissue.csv', index=False)
 
 def reappra():
     df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv')
@@ -89,8 +88,15 @@ def reappra():
 
 def control():
     # extra all HC data
-    all_data = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv',
+    all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv',
                            encoding="ISO-8859-1")
     HC = all_data[all_data.group5 == 'control']
-    HC.to_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\controls_data.xlsx')
+    HC.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/controls_data.xlsx')
 
+def bind_demoQuestionnaire_groups():
+    question = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaires.csv')
+    demo = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.csv')
+    merged = question.join(demo, on='ID')
+    print(merged)
+
+bind_demoQuestionnaire_groups()

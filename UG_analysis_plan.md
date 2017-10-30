@@ -1,4 +1,4 @@
-@@ -1,63 +0,0 @@
+
 
 # UG analysis plan 
 
@@ -73,6 +73,32 @@
 - Goal: whether suicide attempters responded differently to unfaireness and stake during UG.
 - Binary logistic generalized mixed model (GLMM)
 - Parameter estimates were derived using MLE based on adaptive Gauss-Hermite quadrature rule.
+
+### research question
+
+what types of context and groups influence one's offer acceptance?
+
+### Hypotheses:
+
+1. social context influence offer acceptance
+2. psychiatric group influence offer acceptance, after controlling for social context
+3. psychiatric group moderates the social context-offer acceptance relationship. 
+
+### Alternative models
+
+1. **Manipulate social framing context**:
+
+   Only input "empathy" and "punish" context, and excludes "Baseline" into the model. To see if timing matters in offer acceptance. Because baseline always the first, then empathy and punish are randomized, the order of the trials may influence the behaviour. 
+
+2. **Manipulate participant type**:
+
+   Remove "controls". Look at how the variable of depression influence the offer acceptance. It is meaningless to leave controls in the group. 
+
+### Steps
+
+1. Confirm the missing data, are they missing at random?
+
+
 
 ## Mutllevel structural equarion modelling (MLSEM)
 
