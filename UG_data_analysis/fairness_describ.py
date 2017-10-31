@@ -106,7 +106,7 @@ def byGroup_baseline_fairness():
 
 def stack_accept_baseline():
     # arrange stack size and acceptance rate in baseline data
-    all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
+    all_data = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', encoding="ISO-8859-1")
 
     baseline = all_data[all_data.ReappraisalDirection == 'baseline']
     ct1 = pd.crosstab([baseline.ID, baseline.TotalAmountAtStake], baseline.AcceptOffer, margins=True)
@@ -117,13 +117,15 @@ def stack_accept_baseline():
     ct6 = pd.crosstab([baseline.PlayerProposedAmount, baseline.group5], baseline.AcceptOffer, normalize='index')
     ct7 = pd.crosstab([baseline.Fairness_score, baseline.group5], baseline.AcceptOffer, margins=True)
     ct8 = pd.crosstab([baseline.Fairness_score, baseline.group5], baseline.AcceptOffer, normalize='index')
+    ct13 = pd.crosstab([baseline.OpponentProposedAmount, baseline.group5], baseline.AcceptOffer, margins=True)
+    ct14 = pd.crosstab([baseline.OpponentProposedAmount, baseline.group5], baseline.AcceptOffer, normalize='index')
     print(baseline.PlayerProposedAmount.unique())
     print(ct5)
 
-    workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/baseline_stackSize.xlsx')
+    workbook = xlsxwriter.Workbook('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\baseline_stackSize.xlsx')
     workbook.close()
-    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/baseline_stackSize.xlsx')
-    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/baseline_stackSize.xlsx', engine = 'openpyxl')
+    book = load_workbook('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\stackSize_baseline.xlsx')
+    writer = pd.ExcelWriter('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\stackSize_baseline.xlsx', engine = 'openpyxl')
     writer.book = book
     writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
 
@@ -136,11 +138,14 @@ def stack_accept_baseline():
     ct6.to_excel(writer, 'proposedSizeByGroup_percent')
     ct7.to_excel(writer, 'fairscoreByGroup_count')
     ct8.to_excel(writer, 'fairscoreByGroup_percent')
+    ct13.to_excel(writer, 'oppoProposedSize_count')
+    ct14.to_excel(writer, 'oppoProposedSize_percent')
 
     writer.save()
 
+
 def stack_accept_framing():
-    all_data = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
+    all_data = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', encoding="ISO-8859-1")
     punish = all_data[all_data.ReappraisalDirection == 'punish']
     empathy = all_data[all_data.ReappraisalDirection == 'empathy']
 
@@ -150,19 +155,25 @@ def stack_accept_framing():
     ct4 = pd.crosstab([punish.PlayerProposedAmount, punish.group5], punish.AcceptOffer, normalize='index')
     ct5 = pd.crosstab([punish.Fairness_score, punish.group5], punish.AcceptOffer, margins=True)
     ct6 = pd.crosstab([punish.Fairness_score, punish.group5], punish.AcceptOffer, normalize='index')
+    ct13 = pd.crosstab([punish.OpponentProposedAmount, punish.group5], punish.AcceptOffer, margins=True)
+    ct14 = pd.crosstab([punish.OpponentProposedAmount, punish.group5], punish.AcceptOffer, normalize='index')
 
 
     workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/punish_stackSize.xlsx')
     workbook.close()
-    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/punish_stackSize.xlsx')
-    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/punish_stackSize.xlsx', engine='openpyxl')
+    book = load_workbook('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\stackSize_punish.xlsx')
+    writer = pd.ExcelWriter('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\stackSize_punish.xlsx', engine='openpyxl')
     writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+
     ct1.to_excel(writer, 'totalSizeByGroup_count')
     ct2.to_excel(writer, 'totalSizeByGroup_percent')
     ct3.to_excel(writer, 'proposedSizeByGroup_count')
     ct4.to_excel(writer, 'proposedSizeByGroup_percent')
     ct5.to_excel(writer, 'fairscoreByGroup_count')
     ct6.to_excel(writer, 'fairscoreByGroup_percent')
+    ct13.to_excel(writer, 'oppoProposedSize_count')
+    ct14.to_excel(writer, 'oppoProposedSize_percent')
     writer.save()
     writer.close()
 
@@ -172,21 +183,26 @@ def stack_accept_framing():
     ct10 = pd.crosstab([empathy.PlayerProposedAmount, empathy.group5], empathy.AcceptOffer, normalize='index')
     ct11 = pd.crosstab([empathy.Fairness_score, empathy.group5], empathy.AcceptOffer, margins=True)
     ct12 = pd.crosstab([empathy.Fairness_score, empathy.group5], empathy.AcceptOffer, normalize='index')
+    ct15 = pd.crosstab([empathy.OpponentProposedAmount, empathy.group5], empathy.AcceptOffer, margins=True)
+    ct16 = pd.crosstab([empathy.OpponentProposedAmount, empathy.group5], empathy.AcceptOffer, normalize='index')
 
-    workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/empathy_stackSize.xlsx')
-    workbook.close()
-    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/empathy_stackSize.xlsx')
-    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/empathy_stackSize.xlsx', engine='openpyxl')
+    # workbook = xlsxwriter.Workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/empathy_stackSize.xlsx')
+    # workbook.close()
+    book = load_workbook('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\stackSize_empathy.xlsx')
+    writer = pd.ExcelWriter('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\stackSize_empathy.xlsx', engine='openpyxl')
     writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+
     ct7.to_excel(writer, 'totalSizeByGroup_count')
     ct8.to_excel(writer, 'totalSizeByGroup_percent')
     ct9.to_excel(writer, 'proposedSizeByGroup_count')
     ct10.to_excel(writer, 'proposedSizeByGroup_percent')
     ct11.to_excel(writer, 'fairscoreByGroup_count')
     ct12.to_excel(writer, 'fairscoreByGroup_percent')
+    ct15.to_excel(writer, 'oppoProposedSize_count')
+    ct16.to_excel(writer, 'oppoProposedSize_percent')
     writer.save()
     writer.close()
-
 
 def stake_accept_reappraisal_control():
     # acceptance rate and stake size of HC
