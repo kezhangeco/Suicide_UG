@@ -32,7 +32,7 @@
 
 ### data description
 
-1. Demographic, clinical, and SES indicators, those continuous measure  are compared across the 5 groups by ANOVA.
+1. Demographic, clinical, and SES indicators, those continuous measure  are compared across the 4/5 groups by ANOVA.
 
    **groups:**
 
@@ -40,7 +40,7 @@
    - DEPRESSION-DEPRESSION(non-suicidal)
    - SUICIDAL-IDEATOR
    - SUICIDAL-ATTEMPTER: HL, LL
-     - HL>=4
+     - HL>=4 (max lethality)
      - LL<4
 
    **Demographic and SES:**
@@ -55,16 +55,23 @@
 
    - sensitivity to fairness
 
-2. Categorical data are compared by chi-square tests across the groups (if there's any categorical data)
+2. Categorical data are compared by chi-square tests across the groups: gender & race
 
-3. Percentage of acceptance:
+3. ANOVA description:
 
-   1) calculate the percentage of acceptance of unfair offer in aggregate level
+   - Variables tested without controls:
+     - HRSD NO SUI
+     - SSI BL CURRENT
+     - DEP ONSET AGE
+   - Variables tested only with attempters:
+     - AGE AT FIRST ATTEMPT
+     - SIS ML TOTAL
+     - SIS ML PLAN 
 
-   2) calculate the percentage of acceptance of unfair offer by groups
+   ​
 
 
-   3) calculate the percentage of acceptabce under control and task context.
+   
 
 
 
