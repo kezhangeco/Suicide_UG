@@ -16,10 +16,17 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r cars}
 # is fairness ratio orthogonal with stake size?
 
-myData <- read.csv("ug_all_task_data.csv")
+myData <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
 corr <- cor(myData$Fairness_score, myData$PlayerProposedAmount)
+corr1 <- cor(myData$Fairness_score, myData$OpponentProposedAmount)
+corr2 <- cor(myData$Fairness_score, myData$TotalAmountAtStake)
 print(corr)
-summary(corr)
+print(corr1)
+print(corr2)
+```
+
+```{r}
+
 ```
 
 ## Including Plots

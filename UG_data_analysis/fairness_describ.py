@@ -264,6 +264,14 @@ def byGroup_reappraisal_fairness():
     # ct_group4_p.to_excel(writer, 'group4_3way')
     writer.save()
 
+def fairRatio_trialCount():
+    # count the number of fair/unfair trials in various fairness ratio
+    all_data = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', encoding="ISO-8859-1")
+    trialCount = pd.crosstab(all_data.Fairness_score, all_data.AcceptOffer, margins=True)
+    print(trialCount)
+    trialCount.to_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\fairRatio_trialCount.xlsx')
+
+fairRatio_trialCount()
 
 def tryversion():
     df = pd.read_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\try.xlsx')
