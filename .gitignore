@@ -1,57 +1,6 @@
-*.iml
-*.xml
 
-C:\\Users\\ke\\ownCloud\Suicide_UG\\UG_clean_data\\all_data.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\fairness.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data_group.csv
-
-C:\\Users\\ke\ownCloud\\Suicide_UG\\ug_demos.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\demo_describe
-
-/Volumes/LAB/Suicide_UG/UG_raw_data/*
-
-C:\\Users\\ke\ownCloud\\Suicide_UG\\new_data\\baseline_master_data_frame.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\new_data\\context_master_data_frame.csv
-
-C:\\Users\\ke\ownCloud\\Suicide_UG\\new_data\\ug_demos.csv
-
-/Users/kezhang/ownCloud/Suicide_UG/new_data/baseline_master_data_frame.csv
-
-/Users/kezhang/ownCloud/Suicide_UG/new_data/context_master_data_frame.csv
-
-/Users/kezhang/ownCloud/Suicide_UG/new_data/ug_demos.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\baseline_demo.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\context_demo.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\*.csv
-
-/Users/kezhang/ownCloud/Suicide_UG/*.csv
-
-/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/all_data.csv
-
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_data\\all_data.csv
-
-*.xml
-
-<<<<<<< HEAD
 *.xml
 
 *.iml
 
-*.xml
-=======
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\*.csv
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\merged_panels\\ug_all_task_data.csv
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv
-C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\controls_data.xlsx
-/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv
-/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/baseline_stackSize.xlsx
-/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/punish_stackSize.xlsx
-
->>>>>>> origin/master
+*.pptx
