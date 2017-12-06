@@ -75,6 +75,33 @@ def all_task_data_recode():
     df['fairness'] = np.where((df['Fairness_score'] == 1) | (df['Fairness_score'] == 2), 'fair', 'unfair')
     df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data_groupissue.csv', index=False)
 
+def demo_group():
+    df = pd.read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\raw_data_backup\\questionnaires_withBatch2.xlsx",
+                        sheetname = "July 2017 UG DATA")
+    df["group5"] = np.where(df['COMMENT'] == 'CONTROL', 'control', np.where(df['COMMENT'] == 'DEPRESSION', 'depression',
+                                                                            np.where(df['COMMENT'] == 'IDEATOR',
+                                                                                     'ideator',
+                                                                                     np.where(df[
+                                                                                                  'COMMENT'] == 'IDEATOR-ATTEMPTER',
+                                                                                              np.where(df[
+                                                                                                           'MAX LETHALITY'] < 4,
+                                                                                                       'AttempterLL',
+                                                                                                       'AttempterHL'),
+                                                                                              np.where(df[
+                                                                                                           'COMMENT'] == 'ATTEMPTER',
+                                                                                                       np.where(df[
+                                                                                                                    'MAX LETHALITY'] < 4,
+                                                                                                                'AttempterLL',
+                                                                                                                'AttempterHL'),
+                                                                                                       'NA')))))
+
+    df['group4'] = np.where((df['group5'] == 'AttempterLL') | (df['group5'] == 'AttempterHL'), 'attempter',
+                            df['group5'])
+
+    df.to_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\questionnaire.xlsx', index=False)
+
+demo_group()
+
 def reappra():
     df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv')
     df['PunishingType'].fillna('baseline', inplace=True)
@@ -99,4 +126,3 @@ def bind_demoQuestionnaire_groups():
     merged = question.join(demo, on='ID')
     print(merged)
 
-bind_demoQuestionnaire_groups()
