@@ -2,28 +2,27 @@ import pandas as pd
 import numpy as np
 import glob
 
-def add_demo():
+def add_demo_task():
     #### merge demo data to the task data.###
+    # recode empty reappraisal cells(null values) to "baseline"
 
-    baseline = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/baseline_master_data_frame.csv',  encoding = "ISO-8859-1")
-    context = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/context_master_data_frame.csv',  encoding = "ISO-8859-1")
-    demo = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/UG_CON_DEMOS_UPDATED.csv', encoding = "ISO-8859-1")
+    demo = pd.read_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx')
+    task = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', encoding = "ISO-8859-1")
 
-    baseline = baseline.rename(columns={'id': 'ID'})
-    context = context.rename(columns={'id': 'ID'})
+    demo = demo.rename(columns = {'ID' : 'id'})
+    variables = ['id', 'PROTECT2AGE', 'GENDERTEXT', 'MARITALTEXT', 'RACETEXT', 'ETHNICITYTEXT', 'group5', 'group4']
 
-    #combine demographic into task data
-    baseline_demo = pd.merge(baseline, demo, how='left')
-    context_demo = pd.merge(context,demo, how='left')
+    task_demo = pd.merge(task, demo[variables], on = 'id')
 
-    #edit the trial number, context data follows baseline data
-    baseline_demo['merge_trial'] = baseline_demo['Trial_Number']
-    context_demo['merge_trial'] = context_demo['Trial_Number'] + 26
+    task_demo['PunishingType'].fillna('baseline', inplace = True)
+    task_demo['ReappraisalDirection'].fillna('baseline', inplace=True)
+    task_demo['ReappraisalDirection'] = np.where(task_demo['ReappraisalDirection'] == 1, 'punish',
+                                          np.where(task_demo['ReappraisalDirection'] == 2, 'empathy',
+                                                   task_demo['ReappraisalDirection']))
 
-    baseline_demo.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/merged_panels/baseline_demo.csv', index = False)
-    context_demo.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/merged_panels/context_demo.csv', index = False)
+    task_demo.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv')
 
-def mergeTwoBatch():
+def mergeTwoBatch_demog():
     oldContext = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/context_master_data_frame.csv',  encoding = "ISO-8859-1")
     oldBase = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/baseline_master_data_frame.csv',  encoding = "ISO-8859-1")
     newContext = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/data_batch2_raw/new_ug_context_n18.csv',  encoding = "ISO-8859-1")
@@ -94,16 +93,17 @@ def demo_group():
 
 def all_task_data():
     #merge context data and baseline data into one file.###
-
-    files = glob.glob('/Users/kezhang/ownCloud/Suicide_UG/raw_data_backup/raw/*.csv')
+    demo = pd.read_excel('C:\\Users\\ke\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx')
+    files = glob.glob('C:\\Users\\ke\\ownCloud\\Suicide_UG\\raw_data_backup\\trials\\*.csv')
     all_data = pd.DataFrame()
     for f in files:
-        df = pd.read_csv(f,encoding = "ISO-8859-1")
+        df = pd.read_csv(f, encoding = "ISO-8859-1")
         all_data = all_data.append(df)[df.columns.tolist()]
 
-    print(all_data)
-    all_data.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv')
-
+    print(all_data['id'].nunique())
+    print(demo['ID'].nunique())
+    print(list(set(demo.ID.tolist()) - set(all_data.id.tolist())))
+    all_data.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', index = False)
 
 def all_task_data_recode():
     # insert recoded values

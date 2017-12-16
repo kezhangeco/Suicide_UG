@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import ggplot
 from openpyxl import load_workbook
 from scipy import stats
+from statsmodels.stats.multicomp import (pairwise_tukeyhsd, MultiComparison)
 
 
 def byGroup():
@@ -94,8 +94,13 @@ def summ_gender():
     summ.to_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_gender.xlsx')
 
 def compareMean():
-    df = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx')
-    df1 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx')
+    # df = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx')
+    # df1 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx')
+    df1 = pd.read_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx')
+    df = pd.read_excel('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx')
+
+    df1[['group5'], ['group4']] = df1[['group5'], ['group4']].astype(str)
+    print('dtype ', df1['group5'].dtype)
 
     demo_ls = ['PROTECT2AGE', 'MARITALTEXT', 'GENDERTEXT', 'EDUCATION', 'RACETEXT']
     question_ls = ['DEP ONSET AGE', 'HOUSEHOLD INCOME', 'HRSD NO SUI', 'MMSE TOTAL', 'PER CAPITA INCOME',
@@ -109,6 +114,8 @@ def compareMean():
     control = df1[df1['group4'] == 'control'][demo_ls]
     depression = df1[df1['group4'] == 'depression'][demo_ls]
 
+
+
     ## demo ANOVAs
     demo_anova_ls = ['PROTECT2AGE', 'EDUCATION']
     for i in demo_anova_ls:
@@ -118,6 +125,10 @@ def compareMean():
     for j in demo_anova_ls:
         f, p = stats.f_oneway(attempter[j], ideator[j], control[j], depression[j])
         print('4 groups', j, 'f value: ', f, 'p value: ', p)
+
+    tukey = pairwise_tukeyhsd(df1['group5'], df1['PROTECT2AGE'])
+    print(tukey[0])
+
 
     # questionnaires stats
     attempter = df[df['group4'] == 'attempter'][question_ls]
@@ -148,6 +159,7 @@ def compareMean():
     for n in question_exclHC_ls:
         f, p = stats.f_oneway(attempter[n], ideator[n], depression[n])
         print('One attempter No control', n, 'f value: ', f, 'p value: ', p)
+
 
 
 compareMean()

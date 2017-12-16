@@ -12,13 +12,13 @@ def main_fairness():
     #fair = 5-5, 6-4;
     #unfair = 7-3, 8-2, 9 -1
 
-    df = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', encoding="ISO-8859-1")
+    df = pd.read_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv',
+                     encoding = "ISO-8859-1")
     df['fairness']= np.where((df['Fairness_score'] == 1) | (df['Fairness_score'] == 2), 'fair', 'unfair')
-    df.to_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv', index=False)
+    df.to_csv('C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv', index=False)
 
     fairCount = df.groupby(['fairness', 'AcceptOffer']).size().unstack(fill_value=0)
     print(fairCount)
-    fairCount.to_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_data/fairness.csv")
 
     #bar graph
     reject_fair = fairCount.iat[0,0]/(fairCount.iat[0,0]+fairCount.iat[0,1])
@@ -33,7 +33,6 @@ def main_fairness():
     ax = plt.gca()
     ax.set_ylim([0, 1])
     plt.show()
-
 
 def punishType():
     ##recode punishing type
@@ -65,6 +64,8 @@ def byGroup_reappraisal_fair():
     ct_group4_reappraisal.to_excel(writer, 'group4_reappraisal_percent')
     writer.save()
     writer.close()
+
+byGroup_reappraisal_fair()
 
 def fairness():
     #check the main effect of fairness, whether people accept more fair offer in terms of percentage.

@@ -20,13 +20,21 @@
 
 ## Data clean:
 
-1. Merge context, baseline, and demo data into 1 panel sheet.
+1. One person changed from LL attempter to ideator
+2. Exclude those age under 50
+3. group ideator-attempters as attempters
 
-2. One person changed from LL attempter to ideator
+Steps: 
 
-3. Exclude those age under 50
+1. Merge context, baseline data into 1 panel sheet ('data_collapse.py').
 
-4. group ideator-attempters as attempters
+2. add participants type into task spreadsheet
+
+3. reorder trial number: baseline 1-26, context from 27 on
+
+4. identify whether trials are fair or unfair: fair = 5-5, 6-4; unfair = others (fairness_describe.py)
+
+   ​
 
    ​
 
@@ -53,8 +61,7 @@
 
    **Clinical:**
 
-   - sensitivity to fairness: fairness_score & total stake size
-   - rest of variables
+   - rest of variables in the questionnaires
 
 2. Categorical data are compared by chi-square tests across the groups: gender & race
 
@@ -69,7 +76,9 @@
      - SIS ML TOTAL
      - SIS ML PLAN
 
+4. Fairness description
 
+   - how each group accept fairness offer under different reappraisal condition: baseline, punish, empathy. 
 
 
 
