@@ -1,0 +1,45 @@
+---
+title: "HLM_HSB_example"
+author: "Ke"
+date: '2017-12-20'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(foreign)
+hsb2 <- read.table('https://stats.idre.ucla.edu/wp-content/uploads/2016/02/hsb2-2.csv', header=T, sep=",")
+
+
+if (file.exists("hsb.rds")){
+    hsb <- readRDS("hsb.rds")
+} else {
+    hsb.url <- "http://www.stata-press.com/data/mlmus3/hsb.dta"
+    hsb <- read.dta(hsb.url)
+    saveRDS(hsb, "hsb.rds")
+}
+
+hsb1 <- read.dta('hsb1.dta')
+```
+```{r}
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

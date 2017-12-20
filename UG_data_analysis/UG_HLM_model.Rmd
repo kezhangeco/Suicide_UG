@@ -57,6 +57,23 @@ ggplot(tmp1, aes(factor(group5), y = value, fill = factor(group5))) +
 ```
 
 ```{r}
+library(plyr)
+library(lme4)
+library(Matrix)
+library(nlme)
+library(readxl)
+# UG models data clean
+ 
+task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+demoQuestion <- merge(demo, question, on = "ID")
+allData <- merge(task, demoQuestion, on = "ID")
+allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
+allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita"))
+```
+
+```{r}
 # test if HLM is needed: whether there is variation over the level 2 variable: participant ID
 # task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
 task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
@@ -76,10 +93,14 @@ print(summary(randomInterceptOnly))
 ```{r}
 # exam level 2 participant variable "participants clinical type" influence on acceptance
 m_group4 <- glmer(allData$AcceptOffer ~ group4 + (1|ID), data = allData, family = binomial)
-m_group5 <- glmer(allData$AcceptOffer ~ group5 + (1|ID), data = allData, family = binomial)
 print(summary(m_group4))
-print(summary(m_group5))
 
+```
+
+```{r}
+# exam level 2 participant variable "participants clinical type" influence on acceptance
+m_group5 <- glmer(allData$AcceptOffer ~ group5 + (1|ID), data = allData, family = binomial)
+print(summary(m_group5))
 ```
 
 ```{r}
@@ -96,8 +117,14 @@ print(summary(m_depress))
 
 ```{r}
 # exam level 2 participant variable "household income" influence on acceptance
-m_income <- glmer(allData$AcceptOffer ~ income + (1|ID), data = allData, family = binomial)
-print(summary(m_income))
+m_income1 <- glmer(allData$AcceptOffer ~ HouseholdIncome + (1|ID), data = allData, family = binomial)
+print(summary(m_income1))
+```
+
+```{r}
+# exam level 2 participant variable "household income" influence on acceptance
+m_income2 <- glmer(allData$AcceptOffer ~ IncomePerCapita + (1|ID), data = allData, family = binomial)
+print(summary(m_income2))
 ```
 
 ```{r}
@@ -107,19 +134,12 @@ print(summary(m_gender))
 ```
 
 ```{r}
-library(plyr)
-library(lme4)
-library(nlme)
-# UG models
- 
-task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
-demoQuestion <- merge(demo, question, on = "ID")
-allData <- merge(task, demoQuestion, on = "ID")
-allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
-allData <- rename(allData, c("HOUSEHOLD INCOME" = "income", "HRSD NO SUI" = "HRSD_NO_SUI"))
+# exam level 2 participant variable "race" influence on acceptance
+m_race <- glmer(allData$AcceptOffer ~ RACETEXT + (1|ID), data = allData, family = binomial)
+print(summary(m_race))
+```
 
+```{r}
 # random intercept, fixed predictors at level 1
 m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + (1|ID), data = allData, family = binomial)
 print(summary(m0))
@@ -127,7 +147,8 @@ print(summary(m0))
 
 ```{r}
 # random intercept (at level 1), random slope (at level 2 variables)
-# Reappraisal is proxy to time variable
+# Level 1 variables do not vary across participants ID, as all participant had the same task, and the types of task do not vary across PID. Hence a random slope models (the following models) are not necessary.
+
 m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + (ReappraisalDirection|ID), data = allData, family = binomial)
 print(summary(m1))
 
@@ -145,6 +166,7 @@ print(summary(m3))
 
 
 ```{r}
+# testing sample data
 library(ggplot2)
 library(GGally)
 

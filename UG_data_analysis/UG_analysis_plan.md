@@ -114,10 +114,10 @@ what types of context and groups influence one's offer acceptance?
 |         |              | Household Income*                   |
 |         |              | Cognitive ability(DRS)              |
 |         |              | Gender                              |
+|         |              | Race                                |
 | Level 1 | Trials       | Fairness (ratio + total stake size) |
 |         |              | Social framing context              |
-|         |              |                                     |
-|         |              | Offer Acceptance (DV)               |
+|         |              | **Offer Acceptance (DV)**           |
 
 ### HLM2
 
@@ -129,10 +129,10 @@ what types of context and groups influence one's offer acceptance?
 |         |              | Household Income*                   |
 |         |              | Cognitive ability(DRS)              |
 |         |              | Gender                              |
+|         |              | Race                                |
 | Level 2 | Framing      | Social context                      |
 | Level 1 | Trials       | Fairness (ratio + total stake size) |
-|         |              |                                     |
-|         |              | Offer Acceptance (DV)               |
+|         |              | **Offer Acceptance (DV)**           |
 
 
 
