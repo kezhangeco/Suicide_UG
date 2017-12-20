@@ -56,7 +56,20 @@ ggplot(tmp1, aes(factor(group5), y = value, fill = factor(group5))) +
 ```
 
 ```{r}
+# test if HLM is needed: whether there is variation over the context: subject type
+task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+
+interceptOnly <- glm(task$AcceptOffer ~ 1, family = binomial, data = task)
+randomInterceptOnly <- glmer(task$AcceptOffer ~ 1 + (1|group4), data = task, family = binomial)
+print(summary(interceptOnly))
+cat("BIC of no subject type variation", BIC(interceptOnly))
+print(summary(randomInterceptOnly))
+```
+
+```{r}
 library(plyr)
+library(lme4)
+library(nlme)
 # UG models
 # random factors: 
 task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
@@ -73,6 +86,8 @@ print(summary(m))
 m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + Gender + DRS + income + HRSD_NO_SUI + PROTECT2AGE + group4 + (1|ID), data = allData, family = binomial)
 print(summary(m1))
 ```
+
+
 
 ```{r}
 library(ggplot2)
