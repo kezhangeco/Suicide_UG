@@ -7,6 +7,20 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+# set up enviornment
+library(lme4)
+library(ggplot2)
+library(GGally)
+library(plyr)
+library(Matrix)
+library(nlme)
+library(readxl)
+library(reshape2)
+library(VIF)
+library(numDeriv)
+```
+
 ## R Markdown
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
@@ -31,10 +45,6 @@ print(corr2)
 # describe predictors by clinical groups
 # DRS and Household income: r = 0.398, HRSD NO SUI & age = -0.25, HRSD NO SUI & Household income = r = -0.27
 
-library(lme4)
-library(readxl)
-library(ggplot2)
-library(GGally)
 task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
 demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
 question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
@@ -50,6 +60,7 @@ tmp1 <- melt(demoQuestion[, c("group5", "PROTECT2AGE", "HOUSEHOLD INCOME", "HRSD
 ggplot(tmp, aes(factor(group4), y = value, fill = factor(group4))) +
   geom_boxplot() +
   facet_wrap(~ variable, scales = "free_y")
+
 ggplot(tmp1, aes(factor(group5), y = value, fill = factor(group5))) +
   geom_boxplot() +
   facet_wrap(~ variable, scales = "free_y")
@@ -57,20 +68,41 @@ ggplot(tmp1, aes(factor(group5), y = value, fill = factor(group5))) +
 ```
 
 ```{r}
-library(plyr)
-library(lme4)
-library(Matrix)
-library(nlme)
-library(readxl)
+
 # UG models data clean
  
-task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+#demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+#question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
+
 demoQuestion <- merge(demo, question, on = "ID")
 allData <- merge(task, demoQuestion, on = "ID")
 allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
+
 allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita"))
+
+# rescale and center continuous parameters, because there are large differences in the scales of parameters.
+# scale() = (value - mean)/sd
+predictors <- c("HRSD_NO_SUI", "PROTECT2AGE", "HouseholdIncome", "totalStake", "IncomePerCapita")
+rescaled_predictors = scale(allData[, predictors])
+
+# replace the scaled predictors into the original dataframe
+allData_scaled <- allData
+allData_scaled[predictors] <- rescaled_predictors 
+
+```
+
+```{r}
+# multicollinearity
+df = allData[, c("HRSD_NO_SUI", "group4", "PROTECT2AGE", "HouseholdIncome", "GENDERTEXT", "RACETEXT", "ReappraisalDirection", "totalStake", "Fairness_score", "DRS")]
+df = df[complete.cases(df$DRS), ]
+
+x=vif(df)
+print(x)
 ```
 
 ```{r}
@@ -101,12 +133,14 @@ print(summary(m_group4))
 # exam level 2 participant variable "participants clinical type" influence on acceptance
 m_group5 <- glmer(allData$AcceptOffer ~ group5 + (1|ID), data = allData, family = binomial)
 print(summary(m_group5))
+
 ```
 
 ```{r}
 # exam level 2 participant variable "age" influence on acceptance
-m_age <- glmer(allData$AcceptOffer ~ PROTECT2AGE + (1|ID), data = allData, family = binomial)
+m_age <- glmer(allData_scaled$AcceptOffer ~ PROTECT2AGE + (1|ID), data = allData_scaled, family = binomial)
 print(summary(m_age))
+
 ```
 
 ```{r}
@@ -117,14 +151,15 @@ print(summary(m_depress))
 
 ```{r}
 # exam level 2 participant variable "household income" influence on acceptance
-m_income1 <- glmer(allData$AcceptOffer ~ HouseholdIncome + (1|ID), data = allData, family = binomial)
+m_income1 <- glmer(allData$AcceptOffer ~ scale(HouseholdIncome) + (1|ID), data = allData, family = binomial)
 print(summary(m_income1))
 ```
 
 ```{r}
 # exam level 2 participant variable "household income" influence on acceptance
-m_income2 <- glmer(allData$AcceptOffer ~ IncomePerCapita + (1|ID), data = allData, family = binomial)
+m_income2 <- glmer(allData$AcceptOffer ~ scale(IncomePerCapita) + (1|ID), data = allData, family = binomial)
 print(summary(m_income2))
+
 ```
 
 ```{r}
@@ -140,9 +175,41 @@ print(summary(m_race))
 ```
 
 ```{r}
+# exam level 1 participant variable "framing" influence on acceptance
+m_framing <- glmer(allData$AcceptOffer ~ ReappraisalDirection + (1|ID), data = allData, family = binomial)
+print(summary(m_framing))
+
+```
+
+```{r}
+# exam level 1 participant variable "total stake size" influence on acceptance
+m_stakeSize <- glmer(allData$AcceptOffer ~ totalStake + (1|ID), data = allData, family = binomial)
+print(summary(m_stakeSize))
+```
+
+```{r}
+# exam level 1 participant variable "fairness score" influence on acceptance
+m_fair <- glmer(allData$AcceptOffer ~ Fairness_score + (1|ID), data = allData, family = binomial)
+print(summary(m_fair))
+```
+
+```{r}
 # random intercept, fixed predictors at level 1
 m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + (1|ID), data = allData, family = binomial)
 print(summary(m0))
+```
+
+```{r}
+## random intercept, fixed predictors at level 1 and 2
+# with scaled continous predictors
+m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * RACETEXT + GENDERTEXT + (1|ID), data = allData, family = binomial, optimizer="bobyqa")
+print(summary(m1))
+
+# double check the gradient calculations and convergence test. See if the inconvergence matter.
+derivs1 <- m1@optinfo$derivs
+m1_grad <- with(derivs1, solve(Hessian, gradient))
+max(abs(m1_grad))
+print("gradient > 0.001, the inconvergence is worriesome")
 ```
 
 ```{r}
@@ -164,12 +231,8 @@ print(summary(m3))
 ```
 
 
-
 ```{r}
 # testing sample data
-library(ggplot2)
-library(GGally)
-
 hdp <- read.csv("https://stats.idre.ucla.edu/stat/data/hdp.csv")
 hdp1 <- within(hdp, {
   Married <- factor(Married, levels = 0:1, labels = c("no", "yes"))
