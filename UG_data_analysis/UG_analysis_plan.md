@@ -109,12 +109,12 @@ what types of context and groups influence one's offer acceptance?
 | Level   | Hierarchy    | variables                           |
 | ------- | ------------ | ----------------------------------- |
 | Level 2 | Participants | Participants Type(clinical)         |
-|         |              | age*                                |
-|         |              | Depression(HRSD NO SUI)             |
-|         |              | Household Income*                   |
-|         |              | Cognitive ability(DRS)              |
-|         |              | Gender                              |
-|         |              | Race                                |
+|         |              | **age***                            |
+|         |              | **Depression(HRSD NO SUI)**         |
+|         |              | **Household Income***               |
+|         |              | **Cognitive ability(DRS)**          |
+|         |              | **Gender**                          |
+|         |              | **Race**                            |
 | Level 1 | Trials       | Fairness (ratio + total stake size) |
 |         |              | Social framing context              |
 |         |              | **Offer Acceptance (DV)**           |
