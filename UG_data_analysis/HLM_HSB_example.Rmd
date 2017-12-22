@@ -31,7 +31,17 @@ if (file.exists("hsb.rds")){
 hsb1 <- read.dta('hsb1.dta')
 ```
 ```{r}
+library(foreign)
+library(mlmRev)
+names(Exam)
+print(Exam)
+m1 <- lmer(normexam ~ standLRT + schavg + (1 + standLRT|school), data = Exam)
+m2 <- lmer(normexam ~ standLRT + schavg + (standLRT|school), data = Exam)
 
+anova(m1, m2)
+print(m1)
+print("---------------")
+print(m2)
 ```
 
 ## Including Plots

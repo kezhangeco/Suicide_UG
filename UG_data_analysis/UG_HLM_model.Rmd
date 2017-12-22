@@ -19,6 +19,7 @@ library(readxl)
 library(reshape2)
 library(VIF)
 library(numDeriv)
+library(MuMIn)
 ```
 
 ## R Markdown
@@ -198,6 +199,42 @@ print(summary(m_fair))
 m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + (1|ID), data = allData, family = binomial)
 print(summary(m0))
 ```
+
+
+```{r}
+# basic model
+# random intercept, fixed predictors at 1 and 2
+model_basic <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + group4 + (1|ID), data = allData, family = binomial)
+print(model_basic)
+options(na.action = "na.fail")
+dd <- dredge(global.model = model_basic)
+print(dd)
+
+# Best model
+print(summary(get.models(dd,1)[[1]]))
+
+```
+
+
+```{r}
+# comparing the basic models
+mb1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + (1|ID), data = allData, family = binomial)
+mb2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + (1|ID), data = allData, family = binomial)
+mb3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + group4 + (1|ID), data = allData, family = binomial)
+mb4 <- glmer(allData$AcceptOffer ~ totalStake + Fairness_score + (1|ID), data = allData, family = binomial)
+mb5 <- glmer(allData$AcceptOffer ~ totalStake + group4 + (1|ID), data = allData, family = binomial)
+mb6 <- glmer(allData$AcceptOffer ~ Fairness_score + group4 + (1|ID), data = allData, family = binomial)
+
+mb7 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + (1|ID), data = allData, family = binomial)
+mb8 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + group4 + (1|ID), data = allData, family = binomial)
+mb9 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + group4 + (1|ID), data = allData, family = binomial)
+mb10 <- glmer(allData$AcceptOffer ~ totalStake + Fairness_score + group4 + (1|ID), data = allData, family = binomial)
+
+anova(m_framing, m_stakeSize, m_fair, m_group4, mb1, mb2, mb2, mb3, mb4, mb5, mb6, mb7, mb8, mb9, mb10, model_basic)
+print(summary(mb2))
+print(summary(mb8))
+```
+
 
 ```{r}
 ## random intercept, fixed predictors at level 1 and 2
