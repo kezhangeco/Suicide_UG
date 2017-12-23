@@ -84,8 +84,6 @@ Steps:
 
 # GLMM 
 
-
-
 - **Goal**: whether suicide attempters responded differently to unfaireness and stake during UG.
 - Binary logistic generalized mixed model (GLMM)
 - Parameter estimates were derived using MLE based on adaptive Gauss-Hermite quadrature rule.
@@ -145,6 +143,48 @@ what types of context and groups influence one's offer acceptance?
 2. **Manipulate participant type**:
 
    Remove "controls". Look at how the variable of depression influence the offer acceptance. It is meaningless to leave controls in the group. 
+
+3. **Longitudinal model:**
+
+   Add "ReappraisalDirection" as the "time" variable. Whether the framing treatment leads to different acceptance than the baseline.
+
+   - "Baseline": $T$ = 0
+
+   - "punish" & "empathy": $T$ = 1
+
+   - $T_{it}$: dedicated time predictor; $X_{it}$: time-varying predictors (level 1 variables); $Z_{i}$: time-invariant predictors (level 2 variables)
+
+   - $$
+     Level\ 1:\,Y_{it} = \pi_{0i} + \pi_{1i}(T_{it}) + \pi_{2i}(X_{it}) +\epsilon_{it} \\
+     \pi_{0i} = \beta_{00} + \beta_{01} (Z_i) + r_{0i}\\
+     $$
+
+     $$
+     Level\ 2:\, \pi_{1i} = \beta_{10} + r_{1i} \\
+     \pi_{2i} = \beta_{20} + r_{2i}
+     $$
+
+     ​
+
+
+## Steps in R
+
+### 1. Test assumptions
+
+### 2. Intraclass correlation
+
+Whether trials are more similar in the same cluster than between the clusters?
+
+### 3. Handle with categorical IVs
+
+- Encode "control" as the comparison group
+- Fairness_score <- as.factor(Fairness_score): emphasize it is a categorical rather than a continuous IV.
+
+
+
+
+
+
 
 
 

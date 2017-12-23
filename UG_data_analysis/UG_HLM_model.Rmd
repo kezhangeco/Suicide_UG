@@ -69,7 +69,6 @@ ggplot(tmp1, aes(factor(group5), y = value, fill = factor(group5))) +
 ```
 
 ```{r}
-
 # UG models data clean
  
 #task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
@@ -86,20 +85,22 @@ allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmo
 
 allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita"))
 
-# rescale and center continuous parameters, because there are large differences in the scales of parameters.
-# scale() = (value - mean)/sd
-predictors <- c("HRSD_NO_SUI", "PROTECT2AGE", "HouseholdIncome", "totalStake", "IncomePerCapita")
-rescaled_predictors = scale(allData[, predictors])
+allData$Fairness_score <- as.factor(allData$Fairness_score)
+allData$ID <- as.factor(allData$ID)
+allData$AcceptOffer <- as.factor(allData$AcceptOffer)
 
-# replace the scaled predictors into the original dataframe
-allData_scaled <- allData
-allData_scaled[predictors] <- rescaled_predictors 
+#allData$group4 <- ordered(allData$group4, levels = c("attempter", "ideator", "depression", "control"))
+#allData$group5 <- ordered(allData$group5, levels = c("Control", "AttempterHL", "AttempterLL", "ideator", "depression"))
+
+# check variable types
+sapply(allData, class)
 
 ```
 
 ```{r}
 # multicollinearity
 df = allData[, c("HRSD_NO_SUI", "group4", "PROTECT2AGE", "HouseholdIncome", "GENDERTEXT", "RACETEXT", "ReappraisalDirection", "totalStake", "Fairness_score", "DRS")]
+df = allData[, c("HRSD_NO_SUI", "PROTECT2AGE", "HouseholdIncome", "totalStake", "DRS")]
 df = df[complete.cases(df$DRS), ]
 
 x=vif(df)
@@ -108,8 +109,8 @@ print(x)
 
 ```{r}
 # test if HLM is needed: whether there is variation over the level 2 variable: participant ID
-# task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
-task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+ task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
 
 # intercept only
 interceptOnly <- glm(task$AcceptOffer ~ 1, family = binomial, data = task)
@@ -202,19 +203,18 @@ print(summary(m0))
 
 
 ```{r}
-# basic model
-# random intercept, fixed predictors at 1 and 2
+# basic model + loop all alternatives 
+## random intercept, fixed predictors at 1 and 2
 model_basic <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + group4 + (1|ID), data = allData, family = binomial)
 print(model_basic)
 options(na.action = "na.fail")
 dd <- dredge(global.model = model_basic)
 print(dd)
 
-# Best model
+## Best model
 print(summary(get.models(dd,1)[[1]]))
 
 ```
-
 
 ```{r}
 # comparing the basic models
@@ -224,6 +224,7 @@ mb3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + group4 + (1|ID), data 
 mb4 <- glmer(allData$AcceptOffer ~ totalStake + Fairness_score + (1|ID), data = allData, family = binomial)
 mb5 <- glmer(allData$AcceptOffer ~ totalStake + group4 + (1|ID), data = allData, family = binomial)
 mb6 <- glmer(allData$AcceptOffer ~ Fairness_score + group4 + (1|ID), data = allData, family = binomial)
+print(summary(mb6))
 
 mb7 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + (1|ID), data = allData, family = binomial)
 mb8 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + group4 + (1|ID), data = allData, family = binomial)
@@ -233,6 +234,20 @@ mb10 <- glmer(allData$AcceptOffer ~ totalStake + Fairness_score + group4 + (1|ID
 anova(m_framing, m_stakeSize, m_fair, m_group4, mb1, mb2, mb2, mb3, mb4, mb5, mb6, mb7, mb8, mb9, mb10, model_basic)
 print(summary(mb2))
 print(summary(mb8))
+```
+
+```{r}
+# models includes the level 2 predictors + loop loop all alternatives 
+## random intercept, fixed predictors at 1 and 2
+m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * RACETEXT + GENDERTEXT + (1|ID), data = allData, family = binomial)
+
+options(na.action = "na.fail")
+all_models <- dredge(global.model = m1)
+print(all_models)
+
+## Best model
+print(summary(get.models(all_models,1)[[1]]))
+
 ```
 
 
@@ -262,22 +277,15 @@ print(summary(m2))
 
 ```{r}
 # random intercept, level 1 and level 2 predictors 
-m3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + Gender + income + PROTECT2AGE + group4 + (1 + ReappraisalDirection|ID), data = allData, family = binomial)
+m3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + Gender + HouseholdIncome + PROTECT2AGE + group4 + (1 + ReappraisalDirection|ID), data = allData, family = binomial)
 print(summary(m3))
 
 ```
 
 
 ```{r}
-# testing sample data
-hdp <- read.csv("https://stats.idre.ucla.edu/stat/data/hdp.csv")
-hdp1 <- within(hdp, {
-  Married <- factor(Married, levels = 0:1, labels = c("no", "yes"))
-  DID <- factor(DID)
-  HID <- factor(HID)
-})
-
-ggpairs(hdp[, c("IL6", "CRP", "LengthofStay", "Experience")])
+# longitudinal model
+# use reappraisalDirection as the time series.
 
 ```
 

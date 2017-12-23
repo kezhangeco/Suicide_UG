@@ -7,6 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(foreign)
+library(mlmRev)
 ```
 
 ## R Markdown
@@ -16,7 +18,6 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
-library(foreign)
 hsb2 <- read.table('https://stats.idre.ucla.edu/wp-content/uploads/2016/02/hsb2-2.csv', header=T, sep=",")
 
 
@@ -30,8 +31,8 @@ if (file.exists("hsb.rds")){
 
 hsb1 <- read.dta('hsb1.dta')
 ```
+
 ```{r}
-library(foreign)
 library(mlmRev)
 names(Exam)
 print(Exam)
@@ -42,6 +43,10 @@ anova(m1, m2)
 print(m1)
 print("---------------")
 print(m2)
+```
+
+```{r}
+Lang <- read.csv("C:\\Users\\ke\\Downloads\\Language.csv")
 ```
 
 ## Including Plots
