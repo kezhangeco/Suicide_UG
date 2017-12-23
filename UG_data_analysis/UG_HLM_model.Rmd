@@ -71,13 +71,13 @@ ggplot(tmp1, aes(factor(group5), y = value, fill = factor(group5))) +
 ```{r}
 # UG models data clean
  
-#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-#demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-#question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
 
-task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
-demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
-question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
+#task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+#demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+#question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
 
 demoQuestion <- merge(demo, question, on = "ID")
 allData <- merge(task, demoQuestion, on = "ID")
@@ -109,8 +109,8 @@ print(x)
 
 ```{r}
 # test if HLM is needed: whether there is variation over the level 2 variable: participant ID
- task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
-#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+# task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
 
 # intercept only
 interceptOnly <- glm(task$AcceptOffer ~ 1, family = binomial, data = task)
@@ -140,7 +140,7 @@ print(summary(m_group5))
 
 ```{r}
 # exam level 2 participant variable "age" influence on acceptance
-m_age <- glmer(allData_scaled$AcceptOffer ~ PROTECT2AGE + (1|ID), data = allData_scaled, family = binomial)
+m_age <- glmer(allData$AcceptOffer ~ PROTECT2AGE + (1|ID), data = allData, family = binomial)
 print(summary(m_age))
 
 ```
@@ -154,6 +154,7 @@ print(summary(m_depress))
 ```{r}
 # exam level 2 participant variable "household income" influence on acceptance
 m_income1 <- glmer(allData$AcceptOffer ~ scale(HouseholdIncome) + (1|ID), data = allData, family = binomial)
+
 print(summary(m_income1))
 ```
 
@@ -202,13 +203,13 @@ print(summary(m0))
 ```
 
 
-```{r}
+```{r} 
 # basic model + loop all alternatives 
 ## random intercept, fixed predictors at 1 and 2
 model_basic <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + group4 + (1|ID), data = allData, family = binomial)
 print(model_basic)
 options(na.action = "na.fail")
-dd <- dredge(global.model = model_basic)
+dd <- dredge(global.model = model_basic, rank="AICc")
 print(dd)
 
 ## Best model
@@ -242,11 +243,13 @@ print(summary(mb8))
 m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * RACETEXT + GENDERTEXT + (1|ID), data = allData, family = binomial)
 
 options(na.action = "na.fail")
-all_models <- dredge(global.model = m1)
+all_models <- dredge(global.model = m1, rank="AICc")
 print(all_models)
 
 ## Best model
 print(summary(get.models(all_models,1)[[1]]))
+### OR
+print(aicrank[1])
 
 ```
 
