@@ -46,7 +46,13 @@ print(m2)
 ```
 
 ```{r}
-Lang <- read.csv("C:\\Users\\ke\\Downloads\\Language.csv")
+data("dative")
+print(dative)
+```
+
+```{r}
+Lang <- read.csv("/Users/kezhang/Downloads/Language.csv")
+Langpp <- data.frame(ID = Lang$ID, school = Lang$school, Process = Lang$Process, Application = Lang$Application, Grammar = Lang$Grammar, Mechanics = Lang$Mechanics, stack(Lang, select = LangScore1:LangScore6))
 ```
 
 ## Including Plots

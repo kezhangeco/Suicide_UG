@@ -104,33 +104,41 @@ what types of context and groups influence one's offer acceptance?
 
 ###HLM1
 
-| Level   | Hierarchy    | variables                           |
-| ------- | ------------ | ----------------------------------- |
-| Level 2 | Participants | Participants Type(clinical)         |
-|         |              | **age***                            |
-|         |              | **Depression(HRSD NO SUI)**         |
-|         |              | **Household Income***               |
-|         |              | **Cognitive ability(DRS)**          |
-|         |              | **Gender**                          |
-|         |              | **Race**                            |
-| Level 1 | Trials       | Fairness (ratio + total stake size) |
-|         |              | Social framing context              |
-|         |              | **Offer Acceptance (DV)**           |
+| Level   | Hierarchy    | variables                   |
+| ------- | ------------ | --------------------------- |
+| Level 2 | Participants | Participants Type(clinical) |
+|         |              | **age***                    |
+|         |              | **Depression(HRSD NO SUI)** |
+|         |              | **Household Income***       |
+|         |              | **Cognitive ability(DRS)**  |
+|         |              | **Gender**                  |
+|         |              | **Race**                    |
+|         |              | **marriage**                |
+|         |              | **MMSE**                    |
+|         |              | **Education**               |
+| Level 1 | Trials       | total stake size            |
+|         |              | Fairness ratio              |
+|         |              | Social framing context      |
+|         |              | **Offer Acceptance (DV)**   |
 
 ### HLM2
 
-| Level   | Hierarchy    | Variables                           |
-| ------- | ------------ | ----------------------------------- |
-| Level 3 | Participants | Participants Type(clinical)         |
-|         |              | age*                                |
-|         |              | Depression(HRSD NO SUI)             |
-|         |              | Household Income*                   |
-|         |              | Cognitive ability(DRS)              |
-|         |              | Gender                              |
-|         |              | Race                                |
-| Level 2 | Framing      | Social context                      |
-| Level 1 | Trials       | Fairness (ratio + total stake size) |
-|         |              | **Offer Acceptance (DV)**           |
+| Level   | Hierarchy    | Variables                   |
+| ------- | ------------ | --------------------------- |
+| Level 3 | Participants | Participants Type(clinical) |
+|         |              | age*                        |
+|         |              | Depression(HRSD NO SUI)     |
+|         |              | Household Income*           |
+|         |              | Cognitive ability(DRS)      |
+|         |              | Gender                      |
+|         |              | Race                        |
+|         |              | MMSE                        |
+|         |              | Education                   |
+|         |              | marriage                    |
+| Level 2 | Framing      | Social context              |
+| Level 1 | Trials       | Fairness ratio              |
+|         |              | total stake size            |
+|         |              | **Offer Acceptance (DV)**   |
 
 
 
@@ -169,16 +177,34 @@ what types of context and groups influence one's offer acceptance?
 
 ## Steps in R
 
-### 1. Test assumptions
+### 1. Intraclass correlation (ICC)
 
-### 2. Intraclass correlation
+- Determine if multi-level modeling is the correct choice for our analysis.
+- The ICC measures the degree of clustering in our data and answers the question, “How much does my Level 2 predict the total variance of my study?” If your ICC is greater than 0, you have a multi-level study.
 
-Whether trials are more similar in the same cluster than between the clusters?
+### 2. Test continous IVs correlation
+
+Prepare for potential collinearity
 
 ### 3. Handle with categorical IVs
 
 - Encode "control" as the comparison group
 - Fairness_score <- as.factor(Fairness_score): emphasize it is a categorical rather than a continuous IV.
+
+
+### 4. Test collinearity
+
+### 5. Choose global models and run
+
+### 6. Test model fit
+
+   	1. Exam plots of fitted values vs. residuals for the entire model
+     2. Test whether violate the ***assumptions*** of HLM (r package "sjPlot")
+      3. Test whether overdisperse
+      4. Simulation
+
+### 7. Model selection
+
 
 
 
