@@ -21,7 +21,6 @@ library(MuMIn)
 library(HLMdiag)
 library(DHARMa)
 library(bitops)
-library(RCurl)
 library(nloptr)
 library(optimx)
 library(dfoptim)
@@ -37,13 +36,13 @@ When you click the **Knit** button a document will be generated that includes bo
 
 # Import and Clean data
 ```{r}
-task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+#demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+#question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
 
-#task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
-#demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
-#question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
+task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
 
 demoQuestion <- merge(demo, question, on = "ID")
 allData <- merge(task, demoQuestion, on = "ID")
@@ -262,16 +261,23 @@ Model 4 and 8 are both best fit model. Although Model 4 has the smallest AIC, bu
 Model 4: $$logit(accept) = Fairness\,score + ReappraisalDirection + (1 | ID)$$
 Model 8: $$logit(accept) = Fairness\,score + ReappraisalDirection + scale(totalStake) + (1 | ID)$$
 
+### Best fit model
 ```{r}
+
 print(get.models(d_m_level1, subset = delta < 2))
 
 # the smallest AIC
-d_m_level1_1 <- get.models(d_m_level1,1)[[1]]
+d_m_level1_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+summary(d_m_level1_1)
 
 # the second smallest AIC
-d_m_level1_2 <- get.models(d_m_level1, subset = 0 < delta & delta < 0.07)
+d_m_level1_2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+
+# best model
+anova(d_m_level1_1, d_m_level1_2)
 
 ```
+The models with/without the predictor $totalStake$ are not significantly differ. So choose the parsimonious model with the fewer predictors: Model 4 (without $totalStake$) at the level 1 only predictors.
 
 ## Random intercept & random slope\predictors (Level 1 only): *Reappraisal Direction*
 
@@ -281,29 +287,38 @@ The global model of the random intercept and slope (Reappraisal Direction) is:
 ```{r}
 m_level1_slope1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-m_level1_slope1_all <- all_fit(m_level1_slope1)
 summary(m_level1_slope1)
 
 ```
 
 The summary of all alternative models is, ranked from AICc low to high:
 ```{r}
-#options(na.fail = "na.fail")
 m_d_level1_slope1 <- dredge(global.model = m_level1_slope1, rank = "AICc")
 print(m_d_level1_slope1)
 ```
 Model 8 and 4 are both best fit model. Although Model 8 has the smallest AIC, but since they have dAIC (delta) < 2. The best fits models are:
 
+Model 8: $$logit(accept) = Fairness\,score + Reappraisal\,Direction + scale(total\,Stake) + (Reappraisal\,Direction | ID)$$
+Model 4: $$logit(accept) = Fairness\,score + Reappraisal\,Direction + (Reappraisal\,Direction | ID)$$
+
+
 ```{r}
 print(get.models(m_d_level1_slope1, subset = delta < 2))
 
 # the smallest AIC
-m_d_level1_slope1_1 <- get.models(m_d_level1_slope1,1)[[1]]
+m_d_level1_slope1_1 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalDirection + scale(totalStake) + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
+
+
+summary(m_d_level1_slope1_1)
 
 # the second smallest AIC
-m_d_level1_slope1_2 <- get.models(m_d_level1_slope1, subset = 0 < delta & delta < 2)
-```
+m_d_level1_slope1_2 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalDirection  + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
+
+# best model
+anova(m_d_level1_slope1_1, m_d_level1_slope1_2)
+```
+The two models are not significantly different from each other. So choose the parsimonious model: model 4.
 
 ## Random intercept & random slope\predictors (Level 1 only): *Fairness score*
 
@@ -313,15 +328,12 @@ The global model of the random intercept and slope (fairness score) is:
 ```{r}
 m_level1_slope2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (Fairness_score|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-m_level1_slope2_all <- all_fit(m_level1_slope2)
 summary(m_level1_slope2)
 
 ```
-The global model can't be converge at various optimizers. May abandon this model?
 
 The summary of all alternative models is, ranked from AICc low to high:
 ```{r}
-#options(na.fail = "na.fail")
 m_d_level1_slope2 <- dredge(global.model = m_level1_slope2, rank = "AICc")
 print(m_d_level1_slope2)
 ```
@@ -335,13 +347,14 @@ Model 8: $$logit(accept) = Fairness\,score + ReappraisalDirection + scale(total\
 print(get.models(m_d_level1_slope2, subset = delta < 2))
 
 # the smallest AIC
-m_d_level1_slope2_1 <- get.models(m_d_level1_slope2,1)[[1]]
+m_d_level1_slope2_1 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalDirection + (Fairness_score|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 # the second smallest AIC
-m_d_level1_slope2_2 <- get.models(m_d_level1_slope2, subset = 0 < delta & delta < 2)
+m_d_level1_slope2_2 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalDirection + scale(totalStake) + (Fairness_score|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 anova(m_d_level1_slope2_1, m_d_level1_slope2_2)
 ```
+The two models are not significantly differ. But choose the parsimonious model: model 4.
 
 ## Random intercept & random slope\predictors (Level 1 only): *Fairness score*, *reappraisal*
 
@@ -356,7 +369,7 @@ m_level1_slope3_all <- all_fit(m_level1_slope3)
 
 summary(m_level1_slope3_all)
 ```
-The models can't be converged by all optimizers.
+The models can't be converged by all optimizers and at the max iterations. Abandon?
 
 #RUNNNNNN______________________________________
 all alternative models:
@@ -394,6 +407,11 @@ $$logit(accept) = predictors + Reappraisal\,Direction|ID$$
 ```{r}
 m_group4 <- glmer(allData$AcceptOffer ~ group4 + (1|ID), data = allData, family = binomial)
 print(summary(m_group4))
+
+# plot
+ggplot(allData, aes(x = group4, y = AcceptOffer)) +
+  geom_point(shape = 1, position = position_jitter(width = 0.05, height = 0.05)) +
+  stat_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE)
 ```
 The group factor does influence the DV, because of the smaller intercept variance than the null.
 
@@ -410,6 +428,9 @@ The group factor does influence the DV, because of the smaller intercept varianc
 m_age <- glmer(allData$AcceptOffer ~ PROTECT2AGE + (1|ID), data = allData, family = binomial)
 print(summary(m_age))
 
+# plot
+ggplot(allData, aes(x = PROTECT2AGE, y = AcceptOffer) + geom_point() +
+         stat_smooth(method = "glm"), method.args = list(family = "binomial"), se = FALSE)
 ```
 The age factor does not influence the DV, because of the larger intercept variance than the null.
 
