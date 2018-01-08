@@ -65,6 +65,8 @@ def questionnaires_description():
     writer.save()
     writer.close()
 
+questionnaires_description()
+
 def demo_summ_clean():
     summ5 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary.xlsx', sheetname='group5')
     summ4 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary.xlsx', sheetname='group4')
@@ -162,7 +164,6 @@ def compareMean():
 
 
 
-compareMean()
 
 
 

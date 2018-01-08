@@ -198,18 +198,11 @@ Prepare for potential collinearity
 
 ### 6. Test model fit
 
-   	1. Exam plots of fitted values vs. residuals for the entire model
-     2. Test whether violate the ***assumptions*** of HLM (r package "sjPlot")
-      3. Test whether overdisperse
-      4. Simulation
-
 ### 7. Model selection
 
+use model averaging.
 
-
-
-
-
+### 8. Final model assumption
 
 
 

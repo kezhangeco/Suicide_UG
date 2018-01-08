@@ -1,0 +1,690 @@
+---
+title: "UG graphs predictors interaction across group"
+author: "Ke"
+date: '2018-01-01'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(plyr)
+library(reshape2)
+library(readxl)
+library(lme4)
+task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+demoQuestion <- merge(demo, question, on = "ID")
+allData <- merge(task, demoQuestion, on = "ID")
+
+allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
+
+allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita", "MMSE TOTAL" = "MMSE"))
+
+allData$Fairness_score <- as.factor(allData$Fairness_score)
+allData$ID <- as.factor(allData$ID)
+allData$AcceptOffer <- as.factor(allData$AcceptOffer)
+```
+
+## R Markdown
+
+```{r, include=FALSE}
+attempter <- subset(allData, allData$group4 == "attempter")
+control <- subset(allData, allData$group4 == "control")
+ideator <- subset(allData, allData$group4 == "ideator")
+depression <- subset(allData, allData$group4 == "depression")
+attHL <- subset(attempter, attempter$group5 == "AttempterHL")
+attLL <- subset(attempter, attempter$group5 == "AttempterLL")
+```
+
+# Binary fairness x group
+```{r somePlot, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ fairness, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ fairness, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ fairness, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ fairness, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ fairness, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ fairness, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = factor(fairness), y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) +
+  ylab("Predicted probability of acceptance")
+
+ggplot(new_data5, aes(x = factor(fairness), y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  ylab("Predicted probability of acceptance")
+
+```
+
+*Visually no group x fairnss interaction effect.*
+
+# Group x stake size
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ totalStake, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ totalStake, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ totalStake, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ totalStake, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ totalStake, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ totalStake, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = totalStake, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = totalStake, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  ylab("Predicted probability of acceptance")
+
+```
+
+*Visually no interaction effect.*
+
+# Group x fairness_score
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ Fairness_score, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ Fairness_score, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ Fairness_score, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ Fairness_score, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ Fairness_score, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ Fairness_score, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = Fairness_score, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = Fairness_score, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  ylab("Predicted probability of acceptance")
+
+```
+
+```{r, include=FALSE}
+# fair score x group4
+m_groupFair <- glmer(allData$AcceptOffer ~ group4 * Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
+summary(m_groupFair)
+```
+
+*The group seems interacts with the level of fairness. And the fairness score is nonlinearly affect the acceptance.*
+
+# Group x opponent offered magnitudes
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ OpponentProposedAmount, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ OpponentProposedAmount, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ OpponentProposedAmount, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ OpponentProposedAmount, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ OpponentProposedAmount, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ OpponentProposedAmount, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = OpponentProposedAmount, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = OpponentProposedAmount, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Visually no interaction effect.*
+
+# Gender x group
+
+```{r, echo=FALSE}
+
+m_att <- glm(attempter$AcceptOffer ~ Gender, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ Gender, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ Gender, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ Gender, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ Gender, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ Gender, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = Gender, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = Gender, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+Visually no interaction effect.
+
+# Group x income
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ HouseholdIncome, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ HouseholdIncome, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ HouseholdIncome, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ HouseholdIncome, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ HouseholdIncome, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ HouseholdIncome, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = HouseholdIncome, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = HouseholdIncome, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Income x group has interaction effect in group 5 only. AttempterLL accept gambles as the income increase. Other groups are rather no change.*
+
+# Group x race
+
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ RACETEXT, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ RACETEXT, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ RACETEXT, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ RACETEXT, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ RACETEXT, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ RACETEXT, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = RACETEXT, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = RACETEXT, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Interaction effect in group x race. Although the race is not balanced between groups. Particularly, depressed Asians are less likely accept gambles than white and african american, who are extremly likely to accept gamble.*
+
+
+```{r, include=FALSE}
+# Income x race
+m_att <- glm(attempter$AcceptOffer ~ RACETEXT * HouseholdIncome, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ RACETEXT * HouseholdIncome, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ RACETEXT * HouseholdIncome, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ RACETEXT * HouseholdIncome, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ RACETEXT * HouseholdIncome, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ RACETEXT * HouseholdIncome, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = HouseholdIncome, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group4) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = HouseholdIncome, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
+  facet_wrap(~group5) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+# Group x marriage
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ MARITALTEXT, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ MARITALTEXT, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ MARITALTEXT, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ MARITALTEXT, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ MARITALTEXT, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ MARITALTEXT, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = MARITALTEXT, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = MARITALTEXT, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+
+# Group x Reappraisal Direction
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ ReappraisalDirection, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ ReappraisalDirection, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ ReappraisalDirection, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ ReappraisalDirection, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ ReappraisalDirection, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ ReappraisalDirection, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = ReappraisalDirection, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = ReappraisalDirection, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Visually no interaction effect.*
+
+# Group x education
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ EDUCATION, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ EDUCATION, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ EDUCATION, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ EDUCATION, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ EDUCATION, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ EDUCATION, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = EDUCATION, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = EDUCATION, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Education and groups visually have interaction effect.*
+
+# Group x MMSE
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ MMSE, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ MMSE, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ MMSE, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ MMSE, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ MMSE, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ MMSE, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = MMSE, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = MMSE, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Unbalanced distribution of MMSE. The intertion effect exists. Depression patients and controls tend to have higher MMSE, and less likely to accept gambles as the score increases.*
+
+# Group x age
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ PROTECT2AGE, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ PROTECT2AGE, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ PROTECT2AGE, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ PROTECT2AGE, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ PROTECT2AGE, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ PROTECT2AGE, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = PROTECT2AGE, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = PROTECT2AGE, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Interaction effect exists. Ideators were less likely to accept gambles as the age increases.*
+
+# Group x HRSD NO SUI
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ HRSD_NO_SUI, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ HRSD_NO_SUI, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ HRSD_NO_SUI, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ HRSD_NO_SUI, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ HRSD_NO_SUI, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ HRSD_NO_SUI, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = HRSD_NO_SUI, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = HRSD_NO_SUI, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Visually seems small interaction effect.*
+
+# Group x EXIT
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ EXIT, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ EXIT, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ EXIT, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ EXIT, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ EXIT, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ EXIT, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = EXIT, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = EXIT, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+# Group x BIS_nonplan
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ BIS_NONPLAN, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ BIS_NONPLAN, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ BIS_NONPLAN, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ BIS_NONPLAN, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ BIS_NONPLAN, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ BIS_NONPLAN, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = BIS_NONPLAN, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = BIS_NONPLAN, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Visually small or no interaction effect.*
+
+# Group x Interpersonal
+```{r, echo=FALSE}
+m_att <- glm(attempter$AcceptOffer ~ IIP15INTAMBV, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ IIP15INTAMBV, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ IIP15INTAMBV, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ IIP15INTAMBV, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ IIP15INTAMBV, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ IIP15INTAMBV, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = IIP15INTAMBV, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+ggplot(new_data5, aes(x = IIP15INTAMBV, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+
+```
+
+*Small interaction effect may exists. Control were more likely to accept gambles as the interpersonal score increases.*
+
