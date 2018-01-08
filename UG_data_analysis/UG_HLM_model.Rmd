@@ -53,12 +53,13 @@ allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SU
 allData$Fairness_score <- as.factor(allData$Fairness_score)
 allData$ID <- as.factor(allData$ID)
 allData$AcceptOffer <- as.factor(allData$AcceptOffer)
+allData$PROTECT2AGE <- as.numeric(allData$PROTECT2AGE)
 
 #allData$group4 <- ordered(allData$group4, levels = c("attempter", "ideator", "depression", "control"))
 #allData$group5 <- ordered(allData$group5, levels = c("Control", "AttempterHL", "AttempterLL", "ideator", "depression"))
 
 # check variable types
-sapply(allData, class)
+sapply(allData["PROTECT2AGE"], class)
 ```
 
 ## Is fairness ratio orthogonal with stake size?
@@ -428,9 +429,6 @@ The group factor does influence the DV, because of the smaller intercept varianc
 m_age <- glmer(allData$AcceptOffer ~ PROTECT2AGE + (1|ID), data = allData, family = binomial)
 print(summary(m_age))
 
-# plot
-ggplot(allData, aes(x = PROTECT2AGE, y = AcceptOffer) + geom_point() +
-         stat_smooth(method = "glm"), method.args = list(family = "binomial"), se = FALSE)
 ```
 The age factor does not influence the DV, because of the larger intercept variance than the null.
 
@@ -495,9 +493,13 @@ MMSE does not influence the DV by itself.
 
 The global model of random intercept (1|ID) is 
 ```{r}
+# with marriage
 m_level12_interceptOnly <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(EDUCATION) + scale(MMSE) + MARITALTEXT + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-summary(m_level12_interceptOnly)
+m_level12_interceptOnly_noMar <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(EDUCATION) + scale(MMSE) + MARITALTEXT + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
+
+# without marriage
+anova(m_level12_interceptOnly, m_level12_interceptOnly_noMar)
 
 ```
 
@@ -556,58 +558,74 @@ $$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + gro
 $$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + group4 + \\PROTECT2AGE + HRSD\,NO\,SUI + Household\,Income + \\RACETEXT + GENDERTEXT + marriage + MMSE + education + \\Reappraisal\,Direction|ID$$
 The predictors are scaled: converted to z-scores. 
 
-The global model with/without interation effect (income x race) is:
+The global model with/without interation effect *(income x race)* is:
 ```{r}
 # with intercation effect
 model_level12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 model_level121 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
+## failed to converge
 model_level122 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 # all optimizers
-model_level12_all <- all_fit(model_level12)
-model_level121_all <- all_fit(model_level121)
+## failed to converge
 model_level122_all <- all_fit(model_level122)
 
+anova(model_level12, model_level121)
+```
+With (income x race) interaction, only model with random effect (ReappraisalDirection|ID) and model with (Fairness_score|ID) successfully converged. The model with both interaction effect failed. Abandon?
+
+```{r}
 # without interaction effect
 model_level12_noInter1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
+## failed to converge
 model_level12_noInter11 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
+## failed to converge
 model_level12_noInter12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 # all optimizers
-model_level12_noInter1_all <- all_fit(model_level12_noInter1)
+## failed to converge
 model_level12_noInter11_all <- all_fit(model_level12_noInter11)
 model_level12_noInter12_all <- all_fit(model_level12_noInter12)
 
 # best fit models
+anova(model_level12_noInter1, model_level12, model_level121)
 
-anova(model_level12, model_level12_1, model_level12_2)
-anova(model_level12_noInter1, model_level12_noInter1_1, model_level12_noInter1_2)
-anova(model_level12, model_level12_noInter1)
 ```
+*Interaction models*
+The interaction model with two random effects (Fairness|ID) + (ReappraisalDirection|ID) failed to converge.
+
+The interaction model with (ReappraisalDirection|ID) and (Fairness|ID) are not significantly differ.
+
 The (race x income) interaction effect model is not better than the no interaction model. So use the simpler no (race x income) model.
 
 *The types of Reappraisal Direction, Fairness_score, group4, had significant influence on the acceptance.* 
 
-The global model with/without interation effect (income x gender) is:
+*No interaction model*
+Only the model with (ReappraisalDirection|ID) successfully converged. The model with (Fairness|ID) and the model with both random effect failed to converge.
+
+The model with interaction effect is no better than the no interaction effect. So choose the parsimonious model without (race x income) model.
+
+The global model with/without interation effect *(income x gender)* is:
+
 ```{r}
 model_level12_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * GENDERTEXT + RACETEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 model_level12_11 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * GENDERTEXT + RACETEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
+## failed to converge
 model_level12_12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * GENDERTEXT + RACETEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 # all optimizer
-model_level12_1_all <- all_fit(model_level12_1)
-model_level12_11_all <- all_fit(model_level12_11)
+## failed to converge
 model_level12_12_all <- all_fit(model_level12_12)
 
-summary(model_level12_1)
-summary(model_level12_noInter1)
-anova(model_level12_1, model_level12_noInter1)
+anova(model_level12_1, model_level12_11)
+anova(model_level12_noInter1, model_level12_1)
+
 ```
 The (gender x income) interaction effect model is not better than the no interaction model. So use the simpler no (gender x income) model.
 
