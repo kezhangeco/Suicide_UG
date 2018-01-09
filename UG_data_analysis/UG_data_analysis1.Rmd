@@ -1,0 +1,56 @@
+---
+title: "UG_data_analysis1"
+author: "Ke Zhang"
+date: "January 8, 2018"
+output: html_document
+---
+
+This notebook explore models without predictors "age" and "marriage"
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lme4)
+library(ggplot2)
+library(GGally)
+library(plyr)
+library(Matrix)
+library(nlme)
+library(readxl)
+library(reshape2)
+library(VIF)
+library(numDeriv)
+library(MuMIn)
+library(HLMdiag)
+library(DHARMa)
+library(bitops)
+library(nloptr)
+library(optimx)
+library(dfoptim)
+library(emmeans)
+library(afex)
+library(usdm)
+library(car)
+```
+
+
+```{r data}
+task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
+
+demoQuestion <- merge(demo, question, on = "ID")
+allData <- merge(task, demoQuestion, on = "ID")
+allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
+
+allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita", "MMSE TOTAL" = "MMSE"))
+
+allData$Fairness_score <- as.factor(allData$Fairness_score)
+allData$ID <- as.factor(allData$ID)
+allData$AcceptOffer <- as.factor(allData$AcceptOffer)
+```
+
+```{r}
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

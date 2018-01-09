@@ -5,8 +5,8 @@ output:
   html_document: default
 ---
 
-```{r setup, include=TRUE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
 library(lme4)
 library(ggplot2)
 library(GGally)
@@ -38,7 +38,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
 
 # Import and Clean data
-```{r}
+```{r, echo=FALSE, include=FALSE}
 task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
 demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
 question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
@@ -213,7 +213,7 @@ There is considerable variation in the intercept and slopes of the framing conte
 But the intercept variances by adding the framing predictor increases, compare to the null model. Worsen?
 
 ## Total stake size
-```{r}
+```{r, include=FALSE}
 m_stakeSize_intercept <- glmer(allData$AcceptOffer ~ totalStake + (1|ID), data = allData, family = binomial)
 print(summary(m_stakeSize_intercept))
 
@@ -245,12 +245,12 @@ anova(m_fair_intercept, m_fair_slope)
 ```
 The slope model is better than the intercept only model for fairness score.
 
-## Random intercept & fixed slope\predictors (Level 1 predictors only)
+## Random intercept & fixed slope (Level 1 predictors only)
 **Model**
 $$logit(accept) = Reappraisal\,Direction + total\,stake + Fairness\,score + 1|ID$$
 
 The predictors are scaled: converted to z-scores. The global model is: 
-```{r}
+```{r, include=FALSE}
 m_level1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 m_level1_all <- all_fit(m_level1)
@@ -261,7 +261,7 @@ The above model converges in optimizer: bobyqa, Nelder_Mead, optimx.nlminb. The 
 Explore all combinations of predictors, and list the alternatives by by the size of AIC from the small to large. The best model is selected by the smallest AIC.
 
 The summary of all alternative models is:
-```{r}
+```{r, echo=FALSE}
 #options(na.fail = "na.fail")
 d_m_level1 <- dredge(global.model = m_level1, rank = "AICc")
 print(d_m_level1)
@@ -274,12 +274,8 @@ Model 8: $$logit(accept) = Fairness\,score + ReappraisalDirection + scale(totalS
 
 ### Best fit model
 ```{r}
-
-print(get.models(d_m_level1, subset = delta < 2))
-
 # the smallest AIC
 d_m_level1_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-summary(d_m_level1_1)
 
 # the second smallest AIC
 d_m_level1_2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
@@ -288,14 +284,19 @@ d_m_level1_2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalSt
 anova(d_m_level1_1, d_m_level1_2)
 
 ```
-The models with/without the predictor $totalStake$ are not significantly differ. So choose the parsimonious model with the fewer predictors: Model 4 (without $totalStake$) at the level 1 only predictors.
+The models with/without the predictor $totalStake$ are not significantly differ. So choose the parsimonious model with the fewer predictors: *Model 4 (without $totalStake$)* at the level 1 only predictors.
 
-## Random intercept & random slope\predictors (Level 1 only): *Reappraisal Direction*
+```{r}
+## model 4
+summary(d_m_level1_1)
+```
+
+## Random intercept & random slope (Level 1 only): *Reappraisal Direction*
 
 **Model**
 $$logit(accept) = Reappraisal\,Direction + total\,stake + Fairness\,score + Reappraisal\,Direction|ID$$
 The global model of the random intercept and slope (Reappraisal Direction) is:
-```{r}
+```{r, include=FALSE}
 m_level1_slope1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 summary(m_level1_slope1)
@@ -303,7 +304,7 @@ summary(m_level1_slope1)
 ```
 
 The summary of all alternative models is, ranked from AICc low to high:
-```{r}
+```{r, echo=FALSE}
 m_d_level1_slope1 <- dredge(global.model = m_level1_slope1, rank = "AICc")
 print(m_d_level1_slope1)
 ```
@@ -312,15 +313,11 @@ Model 8 and 4 are both best fit model. Although Model 8 has the smallest AIC, bu
 Model 8: $$logit(accept) = Fairness\,score + Reappraisal\,Direction + scale(total\,Stake) + (Reappraisal\,Direction | ID)$$
 Model 4: $$logit(accept) = Fairness\,score + Reappraisal\,Direction + (Reappraisal\,Direction | ID)$$
 
-
+### Best fit model
 ```{r}
-print(get.models(m_d_level1_slope1, subset = delta < 2))
-
 # the smallest AIC
 m_d_level1_slope1_1 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalDirection + scale(totalStake) + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-
-summary(m_d_level1_slope1_1)
 
 # the second smallest AIC
 m_d_level1_slope1_2 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalDirection  + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -331,12 +328,17 @@ anova(m_d_level1_slope1_1, m_d_level1_slope1_2)
 ```
 The two models are not significantly different from each other. So choose the parsimonious model: model 4.
 
-## Random intercept & random slope\predictors (Level 1 only): *Fairness score*
+```{r}
+### model 4 
+summary(m_d_level1_slope1_2)
+```
+
+## Random intercept & random slope (Level 1 only): *Fairness score*
 
 **Model**
 $$logit(accept) = Reappraisal\,Direction + total\,stake + Fairness\,score + Fairness\,score|ID$$
 The global model of the random intercept and slope (fairness score) is:
-```{r}
+```{r, include=FALSE}
 m_level1_slope2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (Fairness_score|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 summary(m_level1_slope2)
@@ -344,7 +346,7 @@ summary(m_level1_slope2)
 ```
 
 The summary of all alternative models is, ranked from AICc low to high:
-```{r}
+```{r, echo=FALSE}
 m_d_level1_slope2 <- dredge(global.model = m_level1_slope2, rank = "AICc")
 print(m_d_level1_slope2)
 ```
@@ -355,8 +357,6 @@ Model 4: $$logit(accept) = Fairness\,score + ReappraisalDirection + (Fairness\,s
 Model 8: $$logit(accept) = Fairness\,score + ReappraisalDirection + scale(total\,stake) + (Fairness\,score | ID)$$
 
 ```{r}
-print(get.models(m_d_level1_slope2, subset = delta < 2))
-
 # the smallest AIC
 m_d_level1_slope2_1 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalDirection + (Fairness_score|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
@@ -365,7 +365,12 @@ m_d_level1_slope2_2 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalD
 
 anova(m_d_level1_slope2_1, m_d_level1_slope2_2)
 ```
-The two models are not significantly differ. But choose the parsimonious model: model 4.
+The two models are not significantly differ. So choose the parsimonious model: model 4.
+
+```{r}
+## model 4
+summary(m_d_level1_slope2_1)
+```
 
 ## Random intercept & random slope\predictors (Level 1 only): *Fairness score*, *reappraisal*
 
@@ -374,7 +379,7 @@ $$logit(accept) = Reappraisal\,Direction + total\,stake + Fairness\,score + Reap
 
 ```{r}
 # global models
-m_level1_slope3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
+m_level1_slope3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, nAGQ=0, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 m_level1_slope3_all <- all_fit(m_level1_slope3)
 
@@ -1161,6 +1166,7 @@ m_long_level12_inter3444 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection
 m_long_level12_inter3555 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * Fairness_score * scale(EDUCATION) + scale(MMSE) + scale(PROTECT2AGE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4, "optimx.nlminb")), na.action = "na.fail")
 
 ### group4 x [scale(EDUCATION) + scale(PROTECT2AGE) + fairness_score]
+#### optimizer = optimx.nlminb
 m_long_level12_inter3666 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * (Fairness_score + scale(EDUCATION) + scale(PROTECT2AGE)) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 ### group4 x [scale(EDUCATION) + scale(PROTECT2AGE)]
@@ -1205,10 +1211,7 @@ m_d_long_level12_inter35
 ### 2-way interaction models vs. 3-way interaction model vs. 4-way interaction vs. the no interaction model (m_long_level12_2)
 
 ```{r}
-modellist1 <- model.sel(m_long_level12_2, m_long_level12_inter2, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter6, m_long_level12_inter7, m_long_level12_inter9, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter31$bobyqa., m_long_level12_inter32, m_long_level12_inter33, m_long_level12_inter34$bobyqa., m_long_level12_inter35$bobyqa., m_long_level12_inter36, m_long_level12_inter37, m_long_level12_inter38, m_long_level12_inter39, m_long_level12_inter322, m_long_level12_inter333, m_long_level12_inter344$optimx.nlminb, m_long_level12_inter355$optimx.nlminb, m_long_level12_inter366$optimx.nlminb, m_long_level12_inter377, m_long_level12_inter388, m_long_level12_inter399, m_long_level12_inter16, m_long_level12_inter1, m_long_level12_inter2, m_long_level12_inter3, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter5, m_long_level12_inter6, m_long_level12_inter8, m_long_level12_inter9, m_long_level12_inter10, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter16, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter24, m_long_level12_inter25, m_long_level12_inter26, m_long_level12_inter27, m_long_level12_inter28, m_long_level12_inter29, m_long_level12_inter30, m_long_level12_inter3222, m_long_level12_inter3333, m_long_level12_inter3444, m_long_level12_inter3555, m_long_level12_inter3666, m_long_level12_inter3777, m_long_level12_inter3888, m_long_level12_inter3999)
-
-m_long_level12_inter3555 <- all_fit(m_long_level12_inter3555)
-m_long_level12_inter3444 <- all_fit(m_long_level12_inter3444)
+modellist1 <- model.sel(m_long_level12_2, m_long_level12_inter2, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter6, m_long_level12_inter7, m_long_level12_inter9, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter31$bobyqa., m_long_level12_inter32, m_long_level12_inter33, m_long_level12_inter34$bobyqa., m_long_level12_inter35$bobyqa., m_long_level12_inter36, m_long_level12_inter37, m_long_level12_inter38, m_long_level12_inter39, m_long_level12_inter322, m_long_level12_inter333, m_long_level12_inter344$optimx.nlminb, m_long_level12_inter355$optimx.nlminb, m_long_level12_inter366$optimx.nlminb, m_long_level12_inter377, m_long_level12_inter388, m_long_level12_inter399, m_long_level12_inter16, m_long_level12_inter1, m_long_level12_inter2, m_long_level12_inter3, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter5, m_long_level12_inter6, m_long_level12_inter8, m_long_level12_inter9, m_long_level12_inter10, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter16, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter24, m_long_level12_inter25, m_long_level12_inter26, m_long_level12_inter27, m_long_level12_inter28, m_long_level12_inter29, m_long_level12_inter30)
 
 # summary table of the alternatives
 print(modellist1)
