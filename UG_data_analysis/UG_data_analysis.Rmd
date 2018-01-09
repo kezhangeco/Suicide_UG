@@ -1160,14 +1160,16 @@ m_long_level12_inter3222 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection
 m_long_level12_inter3333 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 + Fairness_score * scale(EDUCATION) * scale(PROTECT2AGE) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 ### group4 x scale(PROTECT2AGE) x fairness_score
+#### failed to converge
 m_long_level12_inter3444 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * Fairness_score  * scale(PROTECT2AGE) + scale(EDUCATION) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 ### group4 x scale(EDUCATION) x fairness_score
+#### failed to converge 
 m_long_level12_inter3555 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * Fairness_score * scale(EDUCATION) + scale(MMSE) + scale(PROTECT2AGE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4, "optimx.nlminb")), na.action = "na.fail")
 
 ### group4 x [scale(EDUCATION) + scale(PROTECT2AGE) + fairness_score]
-#### optimizer = optimx.nlminb
 m_long_level12_inter3666 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * (Fairness_score + scale(EDUCATION) + scale(PROTECT2AGE)) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
+print(m_long_level12_inter3666)
 
 ### group4 x [scale(EDUCATION) + scale(PROTECT2AGE)]
 m_long_level12_inter3777 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + RACETEXT + group4 * (scale(EDUCATION) + scale(PROTECT2AGE)) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -1177,7 +1179,6 @@ m_long_level12_inter3888 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection
 
 ### group4 x (scale(EDUCATION) + fairness_score)
 m_long_level12_inter3999 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * (Fairness_score + scale(EDUCATION)) + scale(MMSE) + scale(PROTECT2AGE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
-
 ```
 
 ```{r}
@@ -1211,7 +1212,7 @@ m_d_long_level12_inter35
 ### 2-way interaction models vs. 3-way interaction model vs. 4-way interaction vs. the no interaction model (m_long_level12_2)
 
 ```{r}
-modellist1 <- model.sel(m_long_level12_2, m_long_level12_inter2, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter6, m_long_level12_inter7, m_long_level12_inter9, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter31$bobyqa., m_long_level12_inter32, m_long_level12_inter33, m_long_level12_inter34$bobyqa., m_long_level12_inter35$bobyqa., m_long_level12_inter36, m_long_level12_inter37, m_long_level12_inter38, m_long_level12_inter39, m_long_level12_inter322, m_long_level12_inter333, m_long_level12_inter344$optimx.nlminb, m_long_level12_inter355$optimx.nlminb, m_long_level12_inter366$optimx.nlminb, m_long_level12_inter377, m_long_level12_inter388, m_long_level12_inter399, m_long_level12_inter16, m_long_level12_inter1, m_long_level12_inter2, m_long_level12_inter3, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter5, m_long_level12_inter6, m_long_level12_inter8, m_long_level12_inter9, m_long_level12_inter10, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter16, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter24, m_long_level12_inter25, m_long_level12_inter26, m_long_level12_inter27, m_long_level12_inter28, m_long_level12_inter29, m_long_level12_inter30)
+modellist1 <- model.sel(m_long_level12_2, m_long_level12_inter2, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter6, m_long_level12_inter7, m_long_level12_inter9, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter31$bobyqa., m_long_level12_inter32, m_long_level12_inter33, m_long_level12_inter34$bobyqa., m_long_level12_inter35$bobyqa., m_long_level12_inter36, m_long_level12_inter37, m_long_level12_inter38, m_long_level12_inter39, m_long_level12_inter322, m_long_level12_inter333, m_long_level12_inter344$optimx.nlminb, m_long_level12_inter355$optimx.nlminb, m_long_level12_inter366$optimx.nlminb, m_long_level12_inter377, m_long_level12_inter388, m_long_level12_inter399, m_long_level12_inter16, m_long_level12_inter1, m_long_level12_inter2, m_long_level12_inter3, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter5, m_long_level12_inter6, m_long_level12_inter8, m_long_level12_inter9, m_long_level12_inter10, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter16, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter24, m_long_level12_inter25, m_long_level12_inter26, m_long_level12_inter27, m_long_level12_inter28, m_long_level12_inter29, m_long_level12_inter30, m_long_level12_inter3222, m_long_level12_inter3333, m_long_level12_inter3666, m_long_level12_inter3777, m_long_level12_inter3888, m_long_level12_inter3999)
 
 # summary table of the alternatives
 print(modellist1)
