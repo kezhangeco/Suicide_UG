@@ -1153,7 +1153,6 @@ m_long_level12_inter3222 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection
 ### scale(EDUCATION) x scale(PROTECT2AGE) x fairness_score
 #significantly better than the no interaction model
 m_long_level12_inter3333 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 + Fairness_score * scale(EDUCATION) * scale(PROTECT2AGE) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
-summary(m_long_level12_inter333)
 
 ### group4 x scale(PROTECT2AGE) x fairness_score
 m_long_level12_inter3444 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * Fairness_score  * scale(PROTECT2AGE) + scale(EDUCATION) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -1163,7 +1162,7 @@ m_long_level12_inter3555 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection
 
 ### group4 x [scale(EDUCATION) + scale(PROTECT2AGE) + fairness_score]
 #### optimizer = optimx.nlminb
-m_long_level12_inter3666 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * (Fairness_score + scale(EDUCATION) + scale(PROTECT2AGE)) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4), optimizer = "optimx.nlminb"), na.action = "na.fail")
+m_long_level12_inter3666 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * (Fairness_score + scale(EDUCATION) + scale(PROTECT2AGE)) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 ### group4 x [scale(EDUCATION) + scale(PROTECT2AGE)]
 m_long_level12_inter3777 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + RACETEXT + group4 * (scale(EDUCATION) + scale(PROTECT2AGE)) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
