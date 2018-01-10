@@ -406,6 +406,7 @@ m_d_level1_slope3_2 <- all_fit(m_d_level1_slope3_2)
 The best model (only converged) with two random $effects Fairness_score|ID) + (ReappraisalDirection|ID)$ is 
 
 $$logit(accept) = Reappraisal\,Direction + scale(total\, stake) + Reappraisal\,Direction|ID +\\ Fairness\, score |ID$$
+
 ```{r, echo=FALSE}
 summary(m_d_level1_slope3_2$bobyqa.)
 ```
@@ -515,7 +516,8 @@ summary(m_level12_interceptOnly)
 ## Simple Model(with only group predictor)
 **Model**
 $$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + group4$$
-```{r}
+Comparing the simple models:
+```{r, echo=FALSE}
 # group 4
 ## converged successfully
 m_level12_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -526,9 +528,9 @@ m_level12_11 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalSt
 ## converge successfully at "bobyqa." and "optimx.nlminb"
 m_level12_12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (Fairness_score|ID)+ (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4), optimizer = "bobyqa"), na.action = "na.fail")
 
-# try all optimizers
-m_level12_11_all <- all_fit(m_level12_11)
-m_level12_12_all <- all_fit(m_level12_12)
+m_level12_12.mod1 <- update(m_level12_12, .~. - scale(totalStake))
+m_level12_12.mod1 <- all_fit(m_level12_12.mod1)
+m_level12_12.mod2 <- update(m_level12_12, .~. - Fairness_score)
 
 # group5
 m_level12_2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -539,29 +541,38 @@ m_level12_22 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalSt
 ## converge at "optimx.nlminb" and "bobyqa"
 m_level12_23 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4), optimizer = "bobyqa"), na.action = "na.fail")
 
-m_level12_22_all <- all_fit(m_level12_22)
-m_level12_23_all <- all_fit(m_level12_23)
-
 # compare the models
-modellist6 <- model.sel(m_d_level1_slope3_2$bobyqa., m_level12_1, m_level12_11, m_level12_12_all$bobyqa., m_level12_2, m_level12_22, m_level12_23_all$bobyqa.)
-print(modellist6)
-```
-Group 4 or 5 does not make any difference to DV. Adding the clinical group does not influence the DV. So the model without the group predictor is better.
+modellist6 <- model.sel(m_d_level1_slope3_2$bobyqa., m_level12_1, m_level12_11, m_level12_12, m_level12_2, m_level12_22, m_level12_23, m_level12_12.mod1, m_level12_12.mod2)
 
-*Random effect*: The model with two random effect (Fairness_score|ID) + (ReappraisalDirection|ID) has significantly smaller AIC than the model with one random effect (ReappraisalDirection|ID) and the model with (Fairness_score|ID). But the model failed to converge at random effect (Fairness_score|ID). 
+print(modellist6)
+
+```
+
+Group 4 or 5 does not make any difference to the acceptance. 
+
+*Random effect*: The model with two random effect (Fairness_score|ID) + (ReappraisalDirection|ID) has significantly smaller AIC than the model with one random effect (ReappraisalDirection|ID) and the model with (Fairness_score|ID). 
 
 So the best model in the simple model is 
-$$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + group + \\Reappraisal\, Direction|ID + Fairness\, score|ID$$
+$$accept ~ Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score\\ + group4 + (Fairness\,score|ID)+ (Reappraisal\,Direction|ID)$$
+
 ```{r}
-summary(m_level12_12_all$bobyqa.)
+summary(m_level12_12)
 ```
+
+Adding the predictor $group$ does influence the model:
+
+```{r}
+anova(m_d_level1_slope3_2$bobyqa., m_level12_12)
+```
+
+
 ## Complex model (with all possible predictors)
 
 **Model**
 $$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + group4 + \\PROTECT2AGE + HRSD\,NO\,SUI + Household\,Income + \\RACETEXT + GENDERTEXT + marriage + MMSE + education + \\Reappraisal\,Direction|ID$$
 The predictors are scaled: converted to z-scores. 
 
-The global model with/without interation effect (income x race) is:
+The global model with interation effect (income x race) is:
 ```{r}
 # with intercation effect
 model_level12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
@@ -575,29 +586,13 @@ model_level12_all <- all_fit(model_level12)
 model_level121_all <- all_fit(model_level121)
 model_level122_all <- all_fit(model_level122)
 
-# without interaction effect
-model_level12_noInter1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
-model_level12_noInter11 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-
-model_level12_noInter12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-
-# all optimizers
-model_level12_noInter1_all <- all_fit(model_level12_noInter1)
-model_level12_noInter11_all <- all_fit(model_level12_noInter11)
-model_level12_noInter12_all <- all_fit(model_level12_noInter12)
-
-# best fit models
-
-anova(model_level12, model_level12_1, model_level12_2)
-anova(model_level12_noInter1, model_level12_noInter1_1, model_level12_noInter1_2)
-anova(model_level12, model_level12_noInter1)
 ```
 The (race x income) interaction effect model is not better than the no interaction model. So use the simpler no (race x income) model.
 
 *The types of Reappraisal Direction, Fairness_score, group4, had significant influence on the acceptance.* 
 
-The global model with/without interation effect (income x gender) is:
+The global model with interation effect (income x gender) is:
 ```{r}
 model_level12_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) * GENDERTEXT + RACETEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
@@ -616,10 +611,30 @@ anova(model_level12_1, model_level12_noInter1)
 ```
 The (gender x income) interaction effect model is not better than the no interaction model. So use the simpler no (gender x income) model.
 
+The global model without interation effect is:
+```{r}
+# without interaction effect
+model_level12_noInter1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+
+model_level12_noInter11 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+
+model_level12_noInter12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+
+# all optimizers
+model_level12_noInter1_all <- all_fit(model_level12_noInter1)
+model_level12_noInter11_all <- all_fit(model_level12_noInter11)
+model_level12_noInter12_all <- all_fit(model_level12_noInter12)
+
+# best fit models
+
+anova(model_level12, model_level12_1, model_level12_2)
+anova(model_level12_noInter1, model_level12_noInter1_1, model_level12_noInter1_2)
+anova(model_level12, model_level12_noInter1)
+```
 *The types of Reappraisal Direction, Fairness_score, group4, had significant influence on the acceptance.* 
 
 Maunally explore the alternative models by removing one predictor:
-```{r}
+```{r, include=FALSE}
 # the models are named by the removed predictor
 model_level12_stake <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + +scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID), data = allData, family = binomial, na.action = "na.fail", control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
@@ -646,9 +661,26 @@ The summary of all alternative models (Reappraisal Direction|ID) of the no inter
 d_model_level12 <- dredge(global.model = model_level12_noInter1, rank="AICc")
 print(d_model_level12) 
 
+d_model_level12.mod1 <- lapply(dredge(model_level12_noInter1, evaluate = FALSE), eval, subset["PROTECT2AGE", "MARITALTEXT"] == FALSE)
+
+lapply(dredge(model_level12_noInter1, evaluate = FALSE, eval, subset = delta < 2))
+
 ## Best model
 print(summary(get.models(d_model_level12,1)[[1]]))
-print(summary(get.models(d_model_level12, subset = delta < 2)))
+print(get.models(d_model_level12, subset = delta < 2))
+```
+
+All alternatives by model with random effect (Reappraisal Direction|ID) + (Fairness score|ID)
+```{r}
+# glmulti wrapper
+glmer.glmulti <- function(formula, data, random = ""){
+  glmer(paste(deparse(formula), random), data = data, REML = FALSE,  family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+}
+
+
+d_model_level12_1 <- glmulti(formula = allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + (ReappraisalDirection|ID) + (Fairness_score|ID), level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID) + (Fairness_score|ID)", method = "d", data = allData)
+
+summary(d_model_level12_1)
 ```
 
 # Longitudinal model
