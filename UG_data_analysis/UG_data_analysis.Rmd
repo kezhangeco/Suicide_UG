@@ -30,6 +30,7 @@ library(usdm)
 library(car)
 library(glmulti)
 library(rJava)
+
 ```
 
 ## R Markdown
@@ -274,7 +275,7 @@ Model 4: $$logit(accept) = Fairness\,score + ReappraisalDirection + (1 | ID)$$
 Model 8: $$logit(accept) = Fairness\,score + ReappraisalDirection + scale(totalStake) + (1 | ID)$$
 
 ### Best fit model
-```{r}
+```{r, echo=FALSE}
 # the smallest AIC
 d_m_level1_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
@@ -366,9 +367,10 @@ m_d_level1_slope2_2 <- glmer(allData$AcceptOffer ~ Fairness_score + ReappraisalD
 
 anova(m_d_level1_slope2_1, m_d_level1_slope2_2)
 ```
-The two models are not significantly differ. So choose the parsimonious model: model 4.
 
-```{r}
+The two models are not significantly differ. So choose the parsimonious model 4:
+
+```{r, echo = FALSE}
 ## model 4
 summary(m_d_level1_slope2_1)
 ```
@@ -378,41 +380,39 @@ summary(m_d_level1_slope2_1)
 **Model**
 $$logit(accept) = Reappraisal\,Direction + total\,stake + Fairness\,score + Reappraisal\,Direction|ID +\\ Fairness\, score |ID$$
 
-```{r}
+```{r, include=FAlSE}
 # global models
+## faile to converge
 m_level1_slope3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, nAGQ=0, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 m_level1_slope3_all <- all_fit(m_level1_slope3)
 
-summary(m_level1_slope3_all)
-```
-The models can't be converged by all optimizers and at the max iterations. Abandon?
+print(m_level1_slope3_all)
 
-#RUNNNNNN______________________________________
-all alternative models:
-```{r}
-m_d_level1_slope3 <- dredge(global.model = m_level1_slope3, rank = "AICc")
-print(m_d_level1_slope3)
-
-# Get best models
-print(get.models(m_d_level1_slope3, subset = delta < 2))
-
-# the smallest AIC
-m_d_level1_slope3_1 <- get.models(m_d_level1_slope3,1)[[1]]
-
-anova(m_d_level1_slope1_1, m_d_level1_slope2_1, m_d_level1_slope3_1)
+##The models can't be converged by all optimizers and at the max iterations. Abandon?
 ```
 
-## Compare level 1 models
-Random intercept & fixed slope vs. Random intercept & random slope
-```{r}
-anova(m_d_level1_slope2_1, m_d_level1_slope1_1, d_m_level1_1)
-anova(m_d_level1_slope2_1, m_d_level1_slope1_1)
+alternative models are:
+```{r, echo=FALSE}
+# failed to converge
+m_d_level1_slope3_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + Fairness_score + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-anova(m_d_level1_slope1_1, d_m_level1_1)
-anova(m_d_level1_slope2_1, d_m_level1_1)
+m_d_level1_slope3_2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + (Fairness_score|ID) + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
+print(m_d_level1_slope3_1)
+
+m_d_level1_slope3_1 <- all_fit(m_d_level1_slope3_1)
+m_d_level1_slope3_2 <- all_fit(m_d_level1_slope3_2)
 ```
-The random intercept and slope models ($fairness\,score|ID$ & $reappraisal\,direction|ID$) ware not significantly different from each other. But significantly better than the random intercept and fixed slope models.
+The best model (only converged) with two random $effects Fairness_score|ID) + (ReappraisalDirection|ID)$ is 
+
+$$logit(accept) = Reappraisal\,Direction + scale(total\, stake) + Reappraisal\,Direction|ID +\\ Fairness\, score |ID$$
+```{r, echo=FALSE}
+summary(m_d_level1_slope3_2$bobyqa.)
+```
+
+## Compare models with only level 1 predictors (different random effects)
+This model is better than others.
+$$logit(accept) = Reappraisal\,Direction + scale(total\, stake) + Reappraisal\,Direction|ID +\\ Fairness\, score |ID$$
 
 # Level 2 predictor model
 How does each level 2 predictor influence the acceptance? Are they significant variable for the offer acceptance?
@@ -421,19 +421,14 @@ How does each level 2 predictor influence the acceptance? Are they significant v
 $$logit(accept) = predictors + Reappraisal\,Direction|ID$$
 
 ## subject type (group 4)
-```{r}
+```{r, include=FALSE}
 m_group4 <- glmer(allData$AcceptOffer ~ group4 + (1|ID), data = allData, family = binomial)
 print(summary(m_group4))
-
-# plot
-ggplot(allData, aes(x = group4, y = AcceptOffer)) +
-  geom_point(shape = 1, position = position_jitter(width = 0.05, height = 0.05)) +
-  stat_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE)
 ```
 The group factor does influence the DV, because of the smaller intercept variance than the null.
 
 ## subject type (group 5)
-```{r}
+```{r, include=FALSE}
 m_group5 <- glmer(allData$AcceptOffer ~ group5 + (1|ID), data = allData, family = binomial)
 print(summary(m_group5))
 
@@ -441,32 +436,29 @@ print(summary(m_group5))
 The group factor does influence the DV, because of the smaller intercept variance than the null.
 
 ## age
-```{r}
+```{r, include=FALSE}
 m_age <- glmer(allData$AcceptOffer ~ PROTECT2AGE + (1|ID), data = allData, family = binomial)
 print(summary(m_age))
 
-# plot
-ggplot(allData, aes(x = PROTECT2AGE, y = AcceptOffer) + geom_point() +
-         stat_smooth(method = "glm"), method.args = list(family = "binomial"), se = FALSE)
 ```
 The age factor does not influence the DV, because of the larger intercept variance than the null.
 
 ## HRSD NO SUI
-```{r}
+```{r, include=FALSE}
 m_depress <- glmer(allData$AcceptOffer ~ HRSD_NO_SUI + (1|ID), data = allData, family = binomial)
 print(summary(m_depress))
 ```
 The HRSD NO SUI factor does not influence the DV, because of the larger intercept variance than the null.
 
 ## Household income
-```{r}
+```{r, include=FALSE}
 m_income1 <- glmer(allData$AcceptOffer ~ scale(HouseholdIncome) + (1|ID), data = allData, family = binomial)
 print(summary(m_income1))
 ```
 The household income factor does not influence the DV, because of the larger intercept variance than the null.
 
 ## Income per capita
-```{r}
+```{r, include=FALSE}
 m_income2 <- glmer(allData$AcceptOffer ~ scale(IncomePerCapita) + (1|ID), data = allData, family = binomial)
 print(summary(m_income2))
 
@@ -474,35 +466,35 @@ print(summary(m_income2))
 The income factor does not influence the DV, because of the larger intercept variance than the null.
 
 ## gender
-```{r}
+```{r, include=FALSE}
 m_gender <- glmer(allData$AcceptOffer ~ GENDERTEXT + (1|ID), data = allData, family = binomial)
 print(summary(m_gender))
 ```
 The gender factor does not influence the DV, because of the larger intercept variance than the null.
 
 ## race
-```{r}
+```{r, include=FALSE}
 m_race <- glmer(allData$AcceptOffer ~ RACETEXT + (1|ID), data = allData, family = binomial)
 print(summary(m_race))
 ```
 The race factor does influence the DV, because of the smaller intercept variance than the null.
 
 ## education
-```{r}
+```{r, include=FALSE}
 m_edu <- glmer(allData$AcceptOffer ~ EDUCATION + (1|ID), data = allData, family = binomial)
 print(summary(m_edu))
 ```
 The variance is larger than the null. Education doesn't influence the DV by itself.
 
 ## marriage
-```{r}
+```{r, include=FALSE}
 m_marriage <- glmer(allData$AcceptOffer ~ MARITALTEXT+ (1|ID), data = allData, family = binomial)
 print(summary(m_marriage))
 ```
 The variance is smaller than the null. Marriage does influence EV by itself.
 
 ## MMSE
-```{r}
+```{r, include=FALSE}
 m_mmse <- glmer(allData$AcceptOffer ~ MMSE+ (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 print(summary(m_mmse))
 ```
@@ -511,14 +503,15 @@ MMSE does not influence the DV by itself.
 # random intercept, fixed predictors (level 1 and 2)
 
 The global model of random intercept (1|ID) is 
-```{r}
+```{r, include=FAlSE}
 m_level12_interceptOnly <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(EDUCATION) + scale(MMSE) + MARITALTEXT + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-summary(m_level12_interceptOnly)
+m_level12_interceptOnly.mod1 <- update(m_level12_interceptOnly, .~. - MARITALTEXT - scale(PROTECT2AGE))
 
+summary(m_level12_interceptOnly)
 ```
 
-# Random intercept & random slope\predictors (Level 1 + Level 2)
+# Random intercept & random slope (Level 1 + Level 2)
 ## Simple Model(with only group predictor)
 **Model**
 $$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + group4$$
