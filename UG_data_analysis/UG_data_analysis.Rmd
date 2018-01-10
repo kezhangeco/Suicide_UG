@@ -670,6 +670,12 @@ print(summary(get.models(d_model_level12,1)[[1]]))
 print(get.models(d_model_level12, subset = delta < 2))
 ```
 
+## average the best model of the non interaction models
+$$allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID)$$
+```{r}
+summary(model.avg(d_model_level12, subset = delta < 2))
+```
+
 All alternatives by model with random effect (Reappraisal Direction|ID) + (Fairness score|ID)
 ```{r}
 # glmulti wrapper
@@ -678,7 +684,7 @@ glmer.glmulti <- function(formula, data, random = ""){
 }
 
 
-d_model_level12_1 <- glmulti(formula = allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + (ReappraisalDirection|ID) + (Fairness_score|ID), level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID) + (Fairness_score|ID)", method = "d", data = allData)
+d_model_level12_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + (ReappraisalDirection|ID) + (Fairness_score|ID), level = 1, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID) + (Fairness_score|ID)", method = "d", data = allData)
 
 summary(d_model_level12_1)
 ```
@@ -907,14 +913,13 @@ summary(m_d_long_level12_2_1)
 A single model may not representative, average alternative models estimates:
 - Delta AIC < 2:
 $$logit(accept) = Fairness\,score + Gender + group4 + Reappraisal\,Direction + total\, stake + education + race + \\MMSE + trial\, number + household\, income + age + HRSD\,NO\,SUI$$
-
 - Delta AIC < 7:
 $$delta\,AIC < 2\,model + marriage$$
 - Delta AIC < 10:
 $$delta\, AIC <2\, model + marriage$$
 
 ```{r}
-# As a rule of thumb, a ∆ i < 2 suggests substantial evidence for the model
+# As a rule of thumb,  delta aic < 2 suggests substantial evidence for the model
 m_d_long_level12_2_avg1 <- model.avg(m_d_long_level12_2, subset = delta < 2)
 summary(m_d_long_level12_2_avg1)
 
@@ -922,7 +927,7 @@ summary(m_d_long_level12_2_avg1)
 m_d_long_level12_2_avg2 <- model.avg(m_d_long_level12_2, subset = delta < 7)
 summary(m_d_long_level12_2_avg2)
 
-# whereas a ∆ i > 10 indicates that the model is very unlikely (Burnham and Anderson 2002)
+# whereas a delta aic > 10 indicates that the model is very unlikely (Burnham and Anderson 2002)
 m_d_long_level12_2_avg3 <- model.avg(m_d_long_level12_2, subset = delta < 10)
 summary(m_d_long_level12_2_avg3)
 ```
