@@ -520,7 +520,7 @@ $$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + gro
 ## converged successfully
 m_level12_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-## failed to converge
+## converge
 m_level12_11 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (Fairness_score|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 ## converge successfully at "bobyqa." and "optimx.nlminb"
@@ -530,13 +530,10 @@ m_level12_12 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalSt
 m_level12_11_all <- all_fit(m_level12_11)
 m_level12_12_all <- all_fit(m_level12_12)
 
-# best model
-anova(m_level12_1, m_level12_12_all$bobyqa.)
-
 # group5
 m_level12_2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (ReappraisalDirection|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
-## failed to converge
+## converge
 m_level12_22 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (Fairness_score|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 ## converge at "optimx.nlminb" and "bobyqa"
@@ -545,11 +542,9 @@ m_level12_23 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalSt
 m_level12_22_all <- all_fit(m_level12_22)
 m_level12_23_all <- all_fit(m_level12_23)
 
-anova(m_level12_2, m_level12_23_all$bobyqa.)
-
-# compare the model without group 4/5 predictor
-anova(m_d_level1_slope1_1, m_level12_1, m_level12_2)
-
+# compare the models
+modellist6 <- model.sel(m_d_level1_slope3_2$bobyqa., m_level12_1, m_level12_11, m_level12_12_all$bobyqa., m_level12_2, m_level12_22, m_level12_23_all$bobyqa.)
+print(modellist6)
 ```
 Group 4 or 5 does not make any difference to DV. Adding the clinical group does not influence the DV. So the model without the group predictor is better.
 
@@ -557,7 +552,9 @@ Group 4 or 5 does not make any difference to DV. Adding the clinical group does 
 
 So the best model in the simple model is 
 $$logit(accept) = Reappraisal\,Direction + total\, Stake + Fairness\,score + group + \\Reappraisal\, Direction|ID + Fairness\, score|ID$$
-
+```{r}
+summary(m_level12_12_all$bobyqa.)
+```
 ## Complex model (with all possible predictors)
 
 **Model**
