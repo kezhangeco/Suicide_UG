@@ -670,6 +670,8 @@ print(summary(get.models(d_model_level12,1)[[1]]))
 print(get.models(d_model_level12, subset = delta < 2))
 ```
 
+The summary of all alternatives by model with random effect (Reappraisal Direction|ID) + (Fairness score|ID) of no interaction model:
+
 ## average the best model of the non interaction models
 $$allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (ReappraisalDirection|ID)$$
 ```{r}
@@ -677,33 +679,29 @@ summary(model.avg(d_model_level12, subset = delta < 2))
 ```
 
 All alternatives by model with random effect (Reappraisal Direction|ID) + (Fairness score|ID)
+
 ```{r}
 # glmulti wrapper
 glmer.glmulti <- function(formula, data, random = ""){
   glmer(paste(deparse(formula), random), data = data, REML = FALSE,  family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 }
-
-
-d_model_level12_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + (ReappraisalDirection|ID) + (Fairness_score|ID), level = 1, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID) + (Fairness_score|ID)", method = "d", data = allData)
+d_model_level12_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION), level = 1, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID) + (Fairness_score|ID)", method = "g", data = allData)
 
 summary(d_model_level12_1)
 ```
 
-# Longitudinal model
+# Longitudinal models
 
 1. The predictor *reappraisalDirection* is used as the time series. Recode 2 time points: 
 baseline -> 1
 experimental -> 2
 
-Does participants change the acceptance over time (framing)?
-
-```{r}
-
+Does participants change the acceptance over time from the baseline and the framing conditions?
+```{r, echo=FALSE}
 allData$framingContext <- NA
 allData$framingContext[allData$ReappraisalDirection == "punish"] <- "framing"
 allData$framingContext[allData$ReappraisalDirection == "empathy"] <- "framing"
 allData$framingContext[allData$ReappraisalDirection == "baseline"] <- "baseline"
-
 
 # random intercept, null model
 m_time_null <- glmer(allData$AcceptOffer ~ framingContext + (1|ID), data = allData, family = binomial)
@@ -713,17 +711,15 @@ m_time1 <- glmer(allData$AcceptOffer ~ framingContext + (framingContext|ID), dat
 
 # indepedent random effect
 m_time2 <- glmer(allData$AcceptOffer ~ framingContext + (1|ID) + (0 + framingContext|ID))
-summary(m_time1)
-summary(m_time2)
 
 anova(m_time_null, m_time1, m_time2)
+summary(m_time2)
 ```
-The tendency of acceptance increases over time, or from baseline to framing context. 
+The tendency of acceptance changes from baseline to framing context. But it could be due to time series.
 
 2. Separate the framing context, use the *trial number* as the time predictor.
-
-Does time matter in the tendency of acceptance in the framing trials?
-```{r}
+Does the time matter in the tendency of acceptance in the framing trials?
+```{r, echo=FALSE}
 # in punish and empathy
 framingData <- subset(allData, allData$framingContext != "baseline")
 
@@ -739,11 +735,7 @@ m_framing_time1 <- glmer(framingData$AcceptOffer ~ scale(Trial_Number) + (Trial_
 # HLM with indepedent random effects of intercept and slope
 m_framing_time2 <- glmer(framingData$AcceptOffer ~ scale(merged_trial) + (1|ID) + (0 + merged_trial|ID), data = framingData, family = binomial)
 
-summary(m_framing_null)
-summary(m_framing_randomInter)
-summary(m_framing_time1)
-summary(m_framing_time2)
-anova(m_framing_null, m_framing_randomInter, m_framing_time1, m_framing_time2)
+modellist7(m_framing_null, m_framing_randomInter, m_framing_time1, m_framing_time2)
 ```
 The best fit model in the framing context is:
 
@@ -752,10 +744,10 @@ This logitudinal model consider a model with uncorrelated random effect between 
 1. 1|$ID$: intercept only
 2. 0 + $trial$: slope only
 
-However, participants were not significantly influenced by the time (trial number) in the framing context.
+However, *participants were not significantly influenced by the time (trial number) in the framing only context.*
 
 Does time matter in the tendency of acceptance in the baseline trials?
-```{r}
+```{r, echo=FALSE}
 baselineData <- subset(allData, allData$framingContext == "baseline")
 
 # null model
@@ -770,34 +762,26 @@ m_base_time1 <- glmer(baselineData$AcceptOffer ~ scale(merged_trial) + (merged_t
 # HLM with indepedent random effect
 m_base_time2 <- glmer(baselineData$AcceptOffer ~ scale(merged_trial) + (1|ID) + (0 + merged_trial|ID), data = baselineData, family = binomial)
 
-summary(m_base_null)
-summary(m_base_randomInter)
-summary(m_base_time1)
-summary(m_base_time2)
-
 # comparing models
-anova(m_base_null, m_base_randomInter, m_base_time1, m_base_time2)
+modellist7(m_base_null, m_base_randomInter, m_base_time1, m_base_time2)
 ```
 
 The best fit model in the baseline context is:
 $$log(accept) = scale(merged\,trial) + (1|ID) + (0 + merged\,trial|ID)$$
 This logitudinal model consider a model with uncorrelated random effect.
 
-Participants were significantly influenced by the time (trial number) in the baseline context.
+*Participants were significantly influenced by the time (trial number) in the baseline context.*
 
-Overall, because the participants were affected by time across the baseline condition, but not in the framing conditions, we need to run separate longitudinal models by framing and baseline: 
+Overall, because the participants were affected by time across the baseline condition, but not in the framing conditions, we need to run separate longitudinal models by framing and baseline trials.
 
+## Longitudinal model 1: framing only trials
+How punish and empathy influence gamble acceptance?
 *Time variable*: Trial number within the framing context (punish vs. empathy)
-   
-#*MAC only answer*      
-## Longitudinal model 1: framing
-How punish and empathy influence influence framing?
 
 The global models are:
-
-### random intercept, fixed predictors (level 1 and 2)
-
-```{r}
+$$framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT$$
+```{r, include=FALSE}
+### random intercept, fixed slope (level 1 and 2)
 m_long_level12_interceptOnly <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (1|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE), na.action = "na.fail")
 
 ## With trial number as a predictor
@@ -806,8 +790,8 @@ m_long_level12_interceptOnly_T <- glmer(framingData$AcceptOffer ~ ReappraisalDir
 anova(m_long_level12_interceptOnly, m_long_level12_interceptOnly_T)
 ```
 
+```{r, include=FALSE}
 ### random intercept, random predictors (trial number)
-```{r}
 m_long_level12_1 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
 m_long_level12_1_T <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + Trial_Number + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -815,9 +799,9 @@ m_long_level12_1_T <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + sca
 anova(m_long_level12_1, m_long_level12_1_T)
 ```
 
-### independent random intercept, random slope (trial number)
 
-```{r}
+```{r, include=FALSE}
+### independent random intercept, random slope (trial number)
 # without Trial_Number
 m_long_level12_2 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (1|ID) + (0 + Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
@@ -829,7 +813,6 @@ m_long_level12_2_M <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + sca
 
 ## without Marriage and Trial_Number
 m_long_level12_2_M1 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + (1|ID) + (0 + Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
-
 
 # without Marriage, Trial_Number, HRSD_NO_SUI
 ## no differ than m_long_level12_2_M1
@@ -860,15 +843,18 @@ anova(m_long_level12_2_M1, m_long_level12_2_H)
 anova(m_long_level12_2_G, m_long_level12_2_I)
 ```
 
+```{r, include=FALSE}
 ### fixed intercept, random slope (trial number)
-```{r}
 m_long_level12_3 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + scale(Trial_Number) + (0 + Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
-
 ```
 
 ## best model fit is:
-Compare alternatives of no interaction models, with different random effects:
-```{r}
+Compare no interaction models, with different random effects:
+1. random intercept, fixed slope $(1|ID)$
+2. random intercept and slope $(Trial\,Number|ID)$ 
+3. independent random intercept and random slope $(1|ID) + (0 + Trial\,Number|ID)$
+4. fixed intercept, random slope $(0 + Trial\, Number|ID)$
+```{r, include=FALSE}
 ## best model comparing random effects:
 modellist_noInteraction <- model.sel(m_long_level12_interceptOnly, m_long_level12_1, m_long_level12_1_T, m_long_level12_2, m_long_level12_2_T, m_long_level12_3)
 
@@ -880,22 +866,20 @@ print(modellist3)
 ```
 
 The best random effect in the no interaction effect models is:
-
 $$ (1|ID) + (0 + Trial_Number|ID)$$
 
 The models with random intercept & random slope is similiar with the model with the model with independent random slope and intercept, hence we will use the parsimonious model with *independent random effect*. The two models are better than random intercept only model and fixed intercept and random slope model.
 
-Explore all combinations of predictors of the best fit model (no interaction models), and list the alternatives by by the size of AIC from the small to large. The best model is selected by model averaging.
+Explore all combinations of predictors of the best fit model (no interaction models), and list the alternatives by by the size of AICc from the small to large. The best model is selected by *model averaging*.
 
 The summary of all alternative models of the selected global model is:
-
-```{r}
+```{r, echo=FALSE}
 m_d_long_level12_2 <- dredge(global.model = m_long_level12_2, rank = "AICc")
 print(m_d_long_level12_2)
 ```
 
 The best fit models are (delta < 2), from the smallest AIC to the largest.
-```{r}
+```{r, echo=FALSE}
 print(get.models(m_d_long_level12_2, subset = delta < 2))
 ```
 
@@ -904,12 +888,13 @@ $$logit(accept) = Fairness\,score + GENDERTEXT + group4 +
     Reappraisal\,Direction + \\scale(totalStake) + (1 | ID) + (0 +  
     Trial_Number | ID)$$
     
-```{r}
+```{r, echo=FALSE}
 # the smallest AIC
 m_d_long_level12_2_1 <- get.models(m_d_long_level12_2,1)[[1]]
 summary(m_d_long_level12_2_1)
 ```
 
+### Model averaging
 A single model may not representative, average alternative models estimates:
 - Delta AIC < 2:
 $$logit(accept) = Fairness\,score + Gender + group4 + Reappraisal\,Direction + total\, stake + education + race + \\MMSE + trial\, number + household\, income + age + HRSD\,NO\,SUI$$
@@ -932,14 +917,13 @@ m_d_long_level12_2_avg3 <- model.avg(m_d_long_level12_2, subset = delta < 10)
 summary(m_d_long_level12_2_avg3)
 ```
 
-
 ## Models with interaction effect 
 The following models are compared with this global model without interaction efffect:
 $$logit(accept) = ReappraisalDirection + scale(totalStake) + \\Fairness_score + group4 + scale(PROTECT2AGE) + scale(HRSD\,NO\,SUI) +  \\scale(HouseholdIncome) + RACETEXT + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT$$
 
 ### independent random intercept and slope
 Interaction effects between groups x predictors
-```{r}
+```{r, include=FALSE}
 ### group x race
 #### fixed-effect model matrix is rank deficient so dropping 2 columns / coefficients
 m_long_level12_inter1 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 * RACETEXT+ scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (1|ID) + (0 + Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -975,16 +959,27 @@ print(modellist4)
 anova(m_long_level12_inter1, m_long_level12_inter2)
 anova(m_long_level12_inter1, m_long_level12_inter3)
 anova(m_long_level12_inter2, m_long_level12_inter3)
-
 ```
 Group 4 and group 5 do not make significant difference. The following predictors have significant interaction effect with the group variable compared with the no interaction group:
 - race x group4
+```{r}
+summary(m_long_level12_inter1)
+```
 - education x group4 
+```{r}
+summary(m_long_level12_inter4)
+```
 - age x group4
+```{r}
+summary(m_long_level12_inter7)
+```
 - fairness_score x group4
+```{r}
+summary(m_long_level12_inter4_1)
+```
 
 ### random intercept and fixed slope
-```{r}
+```{r, include=FALSE}
 ### group x race
 #### fixed-effect model matrix is rank deficient so dropping 2 columns / coefficients
 m_long_level12_inter8 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 * RACETEXT+ scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + scale(HouseholdIncome) + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (1|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -1055,10 +1050,17 @@ m_long_level12_inter23 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection +
 anova(m_long_level12_inter1, m_long_level12_inter16)
 anova(m_long_level12_inter4_1, m_long_level12_inter19)
 ```
+The same interaction effect as above.
 
 ## Other 2 way interaction models:
-
-```{r}
+- age x education
+- HRSD x income
+- Education x income
+- gender x income
+- race x income
+- age x HRSD
+- MMSE x education
+```{r, include=FALSE}
 ### age x education
 m_long_level12_inter24 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group5 + scale(HouseholdIncome) + RACETEXT + scale(PROTECT2AGE) * scale(EDUCATION) + scale(HRSD_NO_SUI) + GENDERTEXT + scale(MMSE) +  MARITALTEXT + (1|ID) + (0 + Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 
@@ -1079,24 +1081,33 @@ m_long_level12_inter29 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection +
 
 ### MMSE x education
 m_long_level12_inter30 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group5 + scale(HouseholdIncome) + RACETEXT + scale(PROTECT2AGE) + scale(HRSD_NO_SUI) + GENDERTEXT + scale(MMSE) * scale(EDUCATION) + MARITALTEXT + (1|ID) + (0 + Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
-
 ```
 
 ### Compare interaction effect models with different random effects:
-The best random effect is 
-```{r}
+The 2 way interaction model list is:
+```{r, echo=FALSE}
 modellist5 <- model.sel(m_long_level12_2, m_long_level12_inter1, m_long_level12_inter2, m_long_level12_inter3, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter5, m_long_level12_inter6, m_long_level12_inter8, m_long_level12_inter9, m_long_level12_inter10, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter16, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter24, m_long_level12_inter25, m_long_level12_inter26, m_long_level12_inter27, m_long_level12_inter28, m_long_level12_inter29, m_long_level12_inter30)
 
 print(modellist5)
 ```
-The model the independent random effect is the best random effect. Among all 2 way interaction effect models (groups x predictor), the best fit model is *$Fairness\, score x group4$*:
+The model the independent random effect is the best random effect. Among all 2 way interaction effect models, the *best fit model is $Fairness\, score x group4$*:
 
 $$framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness\,score * group4 + scale(HouseholdIncome) + RACETEXT + scale(PROTECT2AGE) + scale(HRSD\,NO\,SUI) + GENDERTEXT + scale(MMSE) + scale(EDUCATION) + MARITALTEXT + (1|ID) + (0 + Trial_Number|ID)$$
 
-And the interaction model is better than no-interaction effect model.
+And the 2 way interaction model is better than no-interaction effect model.
 
-## multi-way interaction effect model (random intercept and fixed slope)
-```{r}
+## multi-way interaction effect model:
+- group4 x scale(EDUCATION) x scale(PROTECT2AGE) x fairness_score: failed to converge at $independent random intercept and random slope$ and $random intercept and random slope$.
+- group4 x scale(EDUCATION) x scale(PROTECT2AGE)
+- scale(EDUCATION) x scale(PROTECT2AGE) x fairness_score: failed to converge at $random intercept and random slope$.
+- group4 x scale(PROTECT2AGE) x fairness_score
+- group4 x scale(EDUCATION) x fairness_score: failed to converge at $random intercept and random slope$.
+- group4 x [scale(EDUCATION) + scale(PROTECT2AGE) + fairness_score]
+- group4 x [scale(EDUCATION) + scale(PROTECT2AGE)]
+- group4 x [scale(PROTECT2AGE) + fairness_score]
+- group4 x (scale(EDUCATION) + fairness_score)
+```{r, include=FALSE}
+## random intercept and fixed slope
 ### group4 x scale(EDUCATION) x scale(PROTECT2AGE) x fairness_score
 #### only optimizer = bobyqa
 m_long_level12_inter31 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * Fairness_score * scale(EDUCATION) * scale(PROTECT2AGE) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (1|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4), optimizer = "bobyqa"), na.action = "na.fail")
@@ -1135,8 +1146,8 @@ print(m_long_level12_inter34)
 ```
 
 
-## multi-way interaction effect model (independent random intercept and random slope)
-```{r}
+```{r, include=FALSE}
+## (independent random intercept and random slope)
 ### group4 x scale(EDUCATION) x scale(PROTECT2AGE) x fairness_score
 ### failed to converge at all optimizers
 m_long_level12_inter311 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * Fairness_score * scale(EDUCATION) * scale(PROTECT2AGE) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (1|ID)+ (0 + Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -1173,9 +1184,8 @@ m_long_level12_inter399 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection 
 
 ```
 
-
-## multi-way interaction effect model (random intercept and random slope)
-```{r}
+```{r, include=FALSE}
+## (random intercept and random slope)
 ### group4 x scale(EDUCATION) x scale(PROTECT2AGE) x fairness_score
 #### failed to converge
 m_long_level12_inter3111 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * Fairness_score * scale(EDUCATION) * scale(PROTECT2AGE) + scale(MMSE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
@@ -1209,7 +1219,8 @@ m_long_level12_inter3888 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection
 m_long_level12_inter3999 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + RACETEXT + group4 * (Fairness_score + scale(EDUCATION)) + scale(MMSE) + scale(PROTECT2AGE) + scale(HouseholdIncome) +  scale(HRSD_NO_SUI) + GENDERTEXT +  MARITALTEXT + (Trial_Number|ID), data = framingData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)), na.action = "na.fail")
 ```
 
-```{r}
+
+```{r, include=FALSE}
 ## only optimizer = optimx.nlminb
 m_long_level12_inter344 <- all_fit(m_long_level12_inter344)
 
@@ -1228,17 +1239,9 @@ m_long_level12_inter311 <- glmer(framingData$AcceptOffer ~ ReappraisalDirection 
 
 m_long_level12_inter311 <- all_fit(m_long_level12_inter311)
 
-
-### all alternatives of the selected 3 way interaction model
-
-# the best model with predictor "Trial_Number"
-m_d_long_level12_inter35
-
-
 ```
 
-### 2-way interaction models vs. 3-way interaction model vs. 4-way interaction vs. the no interaction model (m_long_level12_2)
-
+### all interaction models vs. the no interaction model (m_long_level12_2)
 ```{r}
 modellist1 <- model.sel(m_long_level12_2, m_long_level12_inter2, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter6, m_long_level12_inter7, m_long_level12_inter9, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter31$bobyqa., m_long_level12_inter32, m_long_level12_inter33, m_long_level12_inter34$bobyqa., m_long_level12_inter35$bobyqa., m_long_level12_inter36, m_long_level12_inter37, m_long_level12_inter38, m_long_level12_inter39, m_long_level12_inter322, m_long_level12_inter333, m_long_level12_inter344$optimx.nlminb, m_long_level12_inter355$optimx.nlminb, m_long_level12_inter366$optimx.nlminb, m_long_level12_inter377, m_long_level12_inter388, m_long_level12_inter399, m_long_level12_inter16, m_long_level12_inter1, m_long_level12_inter2, m_long_level12_inter3, m_long_level12_inter4_1, m_long_level12_inter4, m_long_level12_inter5, m_long_level12_inter6, m_long_level12_inter8, m_long_level12_inter9, m_long_level12_inter10, m_long_level12_inter11, m_long_level12_inter12, m_long_level12_inter14, m_long_level12_inter15, m_long_level12_inter16, m_long_level12_inter17, m_long_level12_inter19, m_long_level12_inter20, m_long_level12_inter22, m_long_level12_inter23, m_long_level12_inter24, m_long_level12_inter25, m_long_level12_inter26, m_long_level12_inter27, m_long_level12_inter28, m_long_level12_inter29, m_long_level12_inter30, m_long_level12_inter3222, m_long_level12_inter3333, m_long_level12_inter3666, m_long_level12_inter3777, m_long_level12_inter3888, m_long_level12_inter3999)
 
@@ -1248,6 +1251,7 @@ print(modellist1)
 # Get models with delta < 10:
 print(get.models(modellist1, subset = delta < 10))
 
+# the best fit model:
 summary(m_long_level12_inter31$bobyqa.)
 ```
 
