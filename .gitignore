@@ -2,7 +2,22 @@
 *.xml
 
 *.iml
+<<<<<<< HEAD
 *.RData
 *.rdb
 *.rdx
 *.pdf
+=======
+
+*.rdx
+
+*.rdb
+
+*.RData
+
+*.RData
+
+*.RData
+
+*.RData
+>>>>>>> a28c7c866071eba56f6e31177be580846605619e
