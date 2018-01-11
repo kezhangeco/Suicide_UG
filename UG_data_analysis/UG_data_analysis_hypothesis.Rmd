@@ -1,0 +1,175 @@
+---
+title: "UG suicide HLM"
+author: "Ke"
+date: '2018-01-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+
+library(lme4)
+library(ggplot2)
+library(GGally)
+library(plyr)
+library(Matrix)
+library(nlme)
+library(readxl)
+library(reshape2)
+library(VIF)
+library(numDeriv)
+library(MuMIn)
+library(HLMdiag)
+library(DHARMa)
+library(bitops)
+library(nloptr)
+library(optimx)
+library(dfoptim)
+library(emmeans)
+library(afex)
+library(usdm)
+library(car)
+library(glmulti)
+library(rJava)
+```
+
+```{r, echo=FALSE, include=FALSE}
+# Import and Clean data
+task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+#task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+#demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+#question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
+
+demoQuestion <- merge(demo, question, on = "ID")
+allData <- merge(task, demoQuestion, on = "ID")
+allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
+
+allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita", "MMSE TOTAL" = "MMSE"))
+
+allData$Fairness_score <- as.factor(allData$Fairness_score)
+allData$ID <- as.factor(allData$ID)
+allData$AcceptOffer <- as.factor(allData$AcceptOffer)
+
+#allData$group4 <- ordered(allData$group4, levels = c("attempter", "ideator", "depression", "control"))
+#allData$group5 <- ordered(allData$group5, levels = c("Control", "AttempterHL", "AttempterLL", "ideator", "depression"))
+
+# check variable types
+sapply(allData, class)
+```
+
+# Collinearity check
+```{r}
+ls = c("PROTECT2AGE", "GENDERTEXT", "MARITALTEXT", "RACETEXT", "ReappraisalDirection", "group4", "Fairness_score", "MMSE", "HouseholdIncome", "HRSD_NO_SUI", "EDUCATION", "totalStake")
+myData <- allData[ls]
+vif(myData)
+```
+No collinearity in the continous variables.
+
+# Whether HLM is needed?
+## Intercept only
+```{r}
+interceptOnly <- glm(task$AcceptOffer ~ 1, family = binomial, data = task)
+print(summary(interceptOnly))
+```
+
+## Null model: random intercept only
+```{r}
+randomInterceptOnly <- glmer(task$AcceptOffer ~ 1 + (1|ID), data = task, family = binomial)
+print(summary(randomInterceptOnly))
+```
+By adding the ID (nested), the AIC (1|D) is smaller than the AIC (1). So HLM is necessary. 
+
+The variance of the intercept in the *null model is 1.157*. That is the variance can't be explained by the random effect of ID. Compare the variance with more complicated models. If the intercept variance gets smaller, that is an indication of the additional predictors adding more explanation to the DV.
+
+##  Intraclass Correlation (ICC)
+Test if HLM is needed: whether there is variation over the level 2 variable (participant ID). If the ICC > 0, then HLM is needed.
+```{r}
+ICC_model <- function(modelName) {
+  tau_null <- as.numeric(lapply(summary(modelName)$varcor, diag))
+  sigma_null <- as.numeric(attr(summary(modelName)$varcor, "sc")^2)
+  ICC_null <- tau_null/(tau_null + sigma_null)
+  return(ICC_null)
+}
+
+cat("ICC is", ICC_model(randomInterceptOnly))
+```
+The ICC > 0, the HLM is needed.
+
+# Level 1 predictors (fairness score, stake size, context) and group 
+The models include the demographics variables are imbalanced between the clinical groups: *education*, *household income*, *MMSE*, *SSI BL CURRENT* (only for psychiatric groups).
+
+## glmulti wrapper
+```{r}
+glmer.glmulti <- function(formula, data, random = ""){
+  glmer(paste(deparse(formula), random), data = data, family = binomial, control = glmerControl(calc.derivs = FALSE))
+}
+```
+The following models are pairwise interaction:
+## Random intercept and fixed slopes
+```{r}
+m1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+m1_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+```
+## Random intercept and random slope (ReappraisalDirection|ID)
+```{r}
+m2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4, level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID)", method = "g", data = allData)
+
+m2_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID)", method = "g", data = allData)
+```
+
+## Random intercept and random slope (totalStake|ID)
+```{r}
+m3 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (totalStake|ID)", method = "g", data = allData)
+```
+
+## Random intercept and random slope (Fairness_score|ID)
+```{r}
+m4 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID)", method = "g", data = allData)
+```
+
+## Random intercept and random slope (totalStake|ID) + (ReappraisalDirection|ID)
+```{r}
+m5 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (totalStake|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+```
+
+## Random intercept and random slope (Fairness_score|ID) + (ReappraisalDirection|ID)
+```{r}
+m6 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+```
+
+## Random intercept and random slope (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID)
+```{r}
+m7 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+```
+
+The following models are higher order interactions:
+## ReappraisalDirection x scale(totalStake) x Fairness_score x group4
+```{r}
+m8 <- glmer(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+```
+
+## ReappraisalDirection x scale(totalStake) x Fairness_score
+```{r}
+m9 <- glmer(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score + group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+
+```
+## group4 x scale(totalStake) x Fairness_score 
+```{r}
+m10 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) * Fairness_score * group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+```
+
+## ReappraisalDirection x Fairness_score x group4
+```{r}
+m11 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection * Fairness_score * group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+```
+
+## ReappraisalDirection x total stake x group4
+```{r}
+m12 <- glmer(allData$AcceptOffer ~ scale(totalStake) * ReappraisalDirection * group4 + Fairness_score + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+
+```
