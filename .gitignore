@@ -2,3 +2,7 @@
 *.xml
 
 *.iml
+*.RData
+*.rdb
+*.rdx
+*.pdf
