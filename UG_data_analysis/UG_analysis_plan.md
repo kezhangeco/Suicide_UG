@@ -116,9 +116,14 @@ what types of context and groups influence one's offer acceptance?
 |         |              | **marriage**                |
 |         |              | **MMSE**                    |
 |         |              | **Education**               |
-| Level 1 | Trials       | total stake size            |
+|         |              |                             |
+|         |              |                             |
+|         |              |                             |
+| Level 1 | Trials       | Trial number                |
+|         |              | total stake size            |
 |         |              | Fairness ratio              |
 |         |              | Social framing context      |
+|         |              |                             |
 |         |              | **Offer Acceptance (DV)**   |
 
 ### HLM2

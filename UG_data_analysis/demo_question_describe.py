@@ -30,7 +30,10 @@ def demo_description():
     # add 'group' variable into demographic data: 5 levels group and 4 levels group. HH and LL attempters
     # describe demographic info, mean, median, sd...
 
-    # print(df1)
+    df1 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx')
+    book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/summary.xlsx')
+    writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/summary.xlsx', engine='openpyxl')
+    writer.book = book
 
     group5_demo = df1.groupby(['group5'])['PROTECT2AGE', 'MARITALTEXT', 'GENDERTEXT',
                                           'EDUCATION', 'RACETEXT'].describe(percentiles=None, include = 'all')
@@ -39,12 +42,11 @@ def demo_description():
 
 
 
-    writer = pd.ExcelWriter("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/demo_summary.xlsx")
+    writer = pd.ExcelWriter("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/summary.xlsx")
     group5_demo.to_excel(writer, 'group5_demo')
     group4_demo.to_excel(writer, 'group4_demo')
     writer.save()
     writer.close()
-
 
 
 def questionnaires_description():
@@ -55,16 +57,26 @@ def questionnaires_description():
     writer = pd.ExcelWriter("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/demo_summary.xlsx", engine = 'openpyxl')
     writer.book = book
 
-    question_bygroup5 = df.groupby('group5')['DEP ONSET AGE', 'HOUSEHOLD INCOME', 'HRSD NO SUI', 'MMSE TOTAL',
-    'PER CAPITA INCOME', 'SSI BL CURRENT', 'DRS'].describe(include='all')
-    question_bygroup4 = df.groupby('group4')['DEP ONSET AGE', 'HOUSEHOLD INCOME', 'HRSD NO SUI', 'MMSE TOTAL',
-    'PER CAPITA INCOME', 'SSI BL CURRENT', 'DRS'].describe(include='all')
+    # question_bygroup5 = df.groupby('group5')['DEP ONSET AGE', 'HOUSEHOLD INCOME', 'HRSD NO SUI', 'MMSE TOTAL',
+    # 'PER CAPITA INCOME', 'SSI BL CURRENT', 'DRS', 'MAX LETHALITY', 'SIS ML PLAN', 'SIS ML TOTAL', 'Anxiety Current',
+    #                                          'Anxiety Lifetime', 'Substance Current', 'Substance Lifetime',
+    #                                          'EXIT'].describe(include='all')
+    # question_bygroup4 = df.groupby('group4')['DEP ONSET AGE', 'HOUSEHOLD INCOME', 'HRSD NO SUI', 'MMSE TOTAL',
+    # 'PER CAPITA INCOME', 'SSI BL CURRENT', 'DRS', 'MAX LETHALITY', 'SIS ML PLAN', 'SIS ML TOTAL', 'Anxiety Current',
+    #                                          'Anxiety Lifetime', 'Substance Current', 'Substance Lifetime',
+    #                                          'EXIT'].describe(include='all')
+
+    question_bygroup5 = df.groupby('group5')['MAX LETHALITY', 'SIS ML PLAN', 'SIS ML TOTAL', 'Anxiety Current',
+                                             'Anxiety Lifetime', 'Substance Current', 'Substance Lifetime',
+                                             'EXIT'].describe(include='all')
+    question_bygroup4 = df.groupby('group4')['MAX LETHALITY', 'SIS ML PLAN', 'SIS ML TOTAL', 'Anxiety Current',
+                                             'Anxiety Lifetime', 'Substance Current', 'Substance Lifetime',
+                                             'EXIT'].describe(include='all')
 
     question_bygroup5.to_excel(writer, 'group5_questionnaires')
     question_bygroup4.to_excel(writer, 'group4_questionnaired')
     writer.save()
     writer.close()
-
 questionnaires_description()
 
 def demo_summ_clean():

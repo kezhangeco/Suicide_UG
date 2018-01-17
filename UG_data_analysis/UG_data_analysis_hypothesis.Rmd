@@ -13,31 +13,23 @@ library(ggplot2)
 library(GGally)
 library(plyr)
 library(Matrix)
-library(nlme)
 library(readxl)
 library(reshape2)
-library(VIF)
 library(numDeriv)
 library(MuMIn)
-library(HLMdiag)
-library(DHARMa)
-library(bitops)
-library(nloptr)
-library(optimx)
-library(dfoptim)
-library(emmeans)
-library(afex)
-library(usdm)
-library(car)
 library(glmulti)
 library(rJava)
 ```
 
 ```{r, echo=FALSE, include=FALSE}
 # Import and Clean data
-task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+#demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+#question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+task <- read.csv("/home/kzhang5/scratch/ug_all_task_data.csv")
+demo <- read_excel("/home/kzhang5/scratch/ug_demog.xlsx")
+question <- read_excel("/home/kzhang5/scratch/ug_questionnaire.xlsx")
 
 #task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
 #demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
@@ -52,21 +44,7 @@ allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SU
 allData$Fairness_score <- as.factor(allData$Fairness_score)
 allData$ID <- as.factor(allData$ID)
 allData$AcceptOffer <- as.factor(allData$AcceptOffer)
-
-#allData$group4 <- ordered(allData$group4, levels = c("attempter", "ideator", "depression", "control"))
-#allData$group5 <- ordered(allData$group5, levels = c("Control", "AttempterHL", "AttempterLL", "ideator", "depression"))
-
-# check variable types
-sapply(allData, class)
 ```
-
-# Collinearity check
-```{r}
-ls = c("PROTECT2AGE", "GENDERTEXT", "MARITALTEXT", "RACETEXT", "ReappraisalDirection", "group4", "Fairness_score", "MMSE", "HouseholdIncome", "HRSD_NO_SUI", "EDUCATION", "totalStake")
-myData <- allData[ls]
-vif(myData)
-```
-No collinearity in the continous variables.
 
 # Whether HLM is needed?
 ## Intercept only
@@ -99,7 +77,7 @@ cat("ICC is", ICC_model(randomInterceptOnly))
 The ICC > 0, the HLM is needed.
 
 # Level 1 predictors (fairness score, stake size, context) and group 
-The models include the demographics variables are imbalanced between the clinical groups: *education*, *household income*, *MMSE*, *SSI BL CURRENT* (only for psychiatric groups).
+
 
 ## glmulti wrapper
 ```{r}
@@ -107,69 +85,194 @@ glmer.glmulti <- function(formula, data, random = ""){
   glmer(paste(deparse(formula), random), data = data, family = binomial, control = glmerControl(calc.derivs = FALSE))
 }
 ```
-The following models are pairwise interaction:
+
+The following models are exhaustve screening of alternative models, which including the interaction:
 ## Random intercept and fixed slopes
 ```{r}
 m1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
 
 m1_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
 
+summary(m1)
+summary(m1_1)
 ```
 ## Random intercept and random slope (ReappraisalDirection|ID)
 ```{r}
+# fail to converge
 m2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4, level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID)", method = "g", data = allData)
 
+# fail to converge
 m2_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID)", method = "g", data = allData)
+summary(m2)
+summary(m2_1)
 ```
 
 ## Random intercept and random slope (totalStake|ID)
 ```{r}
 m3 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (totalStake|ID)", method = "g", data = allData)
+
+summary(m3)
 ```
 
-## Random intercept and random slope (Fairness_score|ID)
-```{r}
-m4 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID)", method = "g", data = allData)
-```
 
 ## Random intercept and random slope (totalStake|ID) + (ReappraisalDirection|ID)
 ```{r}
 m5 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (totalStake|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+
+summary(m5)
 ```
 
 ## Random intercept and random slope (Fairness_score|ID) + (ReappraisalDirection|ID)
 ```{r}
-m6 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+# failed
+m6 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (ReappraisalDirection|ID)", method = "d", data = allData)
+
+summary(m6)
+```
+
+
+## Random intercept and random slope (Fairness_score|ID)
+```{r}
+# fail
+m4 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID)", method = "d", data = allData)
+
+print(m4)
 ```
 
 ## Random intercept and random slope (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID)
 ```{r}
-m7 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+# fail to converge
+m7 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID)", method = "d", data = allData)
+
+summary(m7)
 ```
 
 The following models are higher order interactions:
 ## ReappraisalDirection x scale(totalStake) x Fairness_score x group4
 ```{r}
 m8 <- glmer(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+
+summary(m8)
 ```
 
 ## ReappraisalDirection x scale(totalStake) x Fairness_score
 ```{r}
 m9 <- glmer(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score + group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
 
+summary(m9)
 ```
 ## group4 x scale(totalStake) x Fairness_score 
 ```{r}
 m10 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) * Fairness_score * group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+
+summary(m10)
 ```
 
 ## ReappraisalDirection x Fairness_score x group4
 ```{r}
 m11 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection * Fairness_score * group4 + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
+
+summary(m11)
 ```
 
 ## ReappraisalDirection x total stake x group4
 ```{r}
 m12 <- glmer(allData$AcceptOffer ~ scale(totalStake) * ReappraisalDirection * group4 + Fairness_score + (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID), data = allData, family = "binomial")
 
+summary(m12)
+knit(UG_data_analysis_hypothesis.Rmd)
+```
+
+# Level 2 predictors 
+The models include the demographics variables are imbalanced between the clinical groups: *education*, *household income*, *MMSE*, *SSI BL CURRENT* (only for psychiatric groups).
+```{r}
+m13 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE), exclude = c("MMSE:HouseholdIncome"), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "d", data = allData)
+
+```
+
+## remove education
+```{r}
+m_edu <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(HouseholdIncome) * scale(MMSE), exclude = c("MMSE:HouseholdIncome"), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "d", data = allData)
+```
+
+## remove income
+```{r}
+m_income <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) *  scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "d", data = allData)
+
+```
+
+## remove MMSE
+```{r}
+m_mmse <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "d", data = allData)
+
+```
+
+# pairwise interaction effects
+```{r}
+# wrapper exclude interaction MMSE x income
+glmer.glmulti <- function(formula, data, random = ""){
+  glmer(paste(deparse(formula), random), data = data, family = binomial, control = glmerControl(calc.derivs = FALSE), exclude = c("MMSE:HouseholdIncome"))
+}
+
+m_pairInter1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+m_pairInter2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID)", method = "g", data = allData)
+
+m_pairInter3 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (totalStake|ID)", method = "g", data = allData)
+
+m_pairInter4 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID)", method = "g", data = allData)
+
+m_pairInter5 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (ReappraisalDirection|ID) + (totalStake|ID)", method = "g", data = allData)
+
+m_pairInter6 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (totalStake|ID)", method = "g", data = allData)
+
+m_pairInter7 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+
+m_pairInter8 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(HouseholdIncome) + scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (Fairness_score|ID) + (totalStake|ID) + (ReappraisalDirection|ID)", method = "g", data = allData)
+
+print(m_pairInter1)
+print(m_pairInter2)
+print(m_pairInter3)
+print(m_pairInter4)
+print(m_pairInter5)
+print(m_pairInter6)
+print(m_pairInter7)
+print(m_pairInter8)
+```
+
+# Longitudianl models
+Because trial number influence participants choice in the baseline data. Here we run longitudinal models with time variables $Trial_Number$.
+```{r baseline data}
+allData$framingContext <- NA
+allData$framingContext[allData$ReappraisalDirection == "punish"] <- "framing"
+allData$framingContext[allData$ReappraisalDirection == "empathy"] <- "framing"
+allData$framingContext[allData$ReappraisalDirection == "baseline"] <- "baseline"
+baselineData <- subset(allData, allData$framingContext == "baseline")
+```
+
+## with various random effects
+```{r}
+
+m_l1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE) + scale(merged_trial), exclude = c("MMSE:HouseholdIncome"), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+m_l2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE) + scale(merged_trial), exclude = c("MMSE:HouseholdIncome"), level = 2, fitfunction = glmer.glmulti, random = "+ (merged_trial|ID)", method = "g", data = allData)
+
+m_l3 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE) + scale(merged_trial), exclude = c("MMSE:HouseholdIncome"), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID) + (0 + merged_trial|ID)", method = "g", data = allData)
+
+m_l1_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+m_l2_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (merged_trial|ID)", method = "g", data = allData)
+
+m_l3_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID) + (0 + merged_trial|ID)", method = "g", data = allData)
+
+anova(m_l1, m_l1_1)
+anova(m_l2, m_l2_1)
+anova(m_l3, m_l3_1)
+
+print(m_l1)
+print(m_l2)
+print(m_l3)
+print(m_l1_1)
+print(m_l2_1)
+print(m_l3_1)
 ```

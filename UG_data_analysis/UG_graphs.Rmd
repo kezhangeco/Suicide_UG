@@ -12,13 +12,16 @@ library(plyr)
 library(reshape2)
 library(readxl)
 library(lme4)
-#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-#demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-#question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+library(broom)
+library(pixiedust)
 
-task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
-demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
-question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
+task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+#task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+#demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+#question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
 
 demoQuestion <- merge(demo, question, on = "ID")
 allData <- merge(task, demoQuestion, on = "ID")
@@ -76,6 +79,25 @@ ggplot(new_data5, aes(x = factor(fairness), y = fit, fill = factor(group5))) + g
   facet_wrap(~group5) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
+
 ```
 
 *Visually no group x fairnss interaction effect.*
@@ -114,6 +136,27 @@ ggplot(new_data5, aes(x = totalStake, y = fit, fill = factor(group5))) + geom_po
   facet_wrap(~group5) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
+
+
+
 ```
 
 *Visually no interaction effect.*
@@ -151,6 +194,25 @@ ggplot(new_data4, aes(x = Fairness_score, y = fit, fill = factor(group4))) + geo
 ggplot(new_data5, aes(x = Fairness_score, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
   facet_wrap(~group5) +
   ylab("Predicted probability of acceptance")
+
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
 
 ```
 
@@ -196,6 +258,24 @@ ggplot(new_data5, aes(x = OpponentProposedAmount, y = fit, fill = factor(group5)
   facet_wrap(~group5) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
 
 ```
 
@@ -237,6 +317,23 @@ ggplot(new_data5, aes(x = Gender, y = fit, fill = factor(group5))) + geom_point(
   facet_wrap(~group5) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
 
 ```
 Visually no interaction effect.
@@ -274,6 +371,24 @@ ggplot(new_data4, aes(x = HouseholdIncome, y = fit, fill = factor(group4))) + ge
 ggplot(new_data5, aes(x = HouseholdIncome, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") +
   facet_wrap(~group5) +
   ylab("Predicted probability of acceptance")
+
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
 
 
 ```
@@ -316,6 +431,24 @@ ggplot(new_data5, aes(x = RACETEXT, y = fit, fill = factor(group5))) + geom_poin
   facet_wrap(~group5) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
 
 
 ```
@@ -359,6 +492,25 @@ ggplot(new_data5, aes(x = HouseholdIncome, y = fit, fill = factor(group5))) + ge
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
+
 
 ```
 
@@ -393,6 +545,25 @@ ggplot(new_data4, aes(x = MARITALTEXT, y = fit, fill = factor(group4))) + geom_p
 
 ggplot(new_data5, aes(x = MARITALTEXT, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
+
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
 
 
 ```
@@ -429,6 +600,24 @@ ggplot(new_data4, aes(x = ReappraisalDirection, y = fit, fill = factor(group4)))
 
 ggplot(new_data5, aes(x = ReappraisalDirection, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
+
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
 
 
 ```
@@ -467,6 +656,24 @@ ggplot(new_data4, aes(x = EDUCATION, y = fit, fill = factor(group4))) + geom_poi
 ggplot(new_data5, aes(x = EDUCATION, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
 
 ```
 
@@ -503,6 +710,24 @@ ggplot(new_data4, aes(x = MMSE, y = fit, fill = factor(group4))) + geom_point() 
 
 ggplot(new_data5, aes(x = MMSE, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
+
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
 
 
 ```
@@ -541,6 +766,24 @@ ggplot(new_data4, aes(x = PROTECT2AGE, y = fit, fill = factor(group4))) + geom_p
 ggplot(new_data5, aes(x = PROTECT2AGE, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
 
 ```
 
@@ -578,6 +821,23 @@ ggplot(new_data4, aes(x = HRSD_NO_SUI, y = fit, fill = factor(group4))) + geom_p
 ggplot(new_data5, aes(x = HRSD_NO_SUI, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
 
 ```
 
@@ -615,6 +875,25 @@ ggplot(new_data4, aes(x = EXIT, y = fit, fill = factor(group4))) + geom_point() 
 ggplot(new_data5, aes(x = EXIT, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
+
 
 ```
 
@@ -649,6 +928,24 @@ ggplot(new_data4, aes(x = BIS_NONPLAN, y = fit, fill = factor(group4))) + geom_p
 
 ggplot(new_data5, aes(x = BIS_NONPLAN, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
+
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
 
 
 ```
@@ -686,6 +983,23 @@ ggplot(new_data4, aes(x = IIP15INTAMBV, y = fit, fill = factor(group4))) + geom_
 ggplot(new_data5, aes(x = IIP15INTAMBV, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ylab("Predicted probability of acceptance")
 
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
 
 
 ```

@@ -1,0 +1,100 @@
+---
+title: "UG_data_analysis1"
+author: "Ke"
+date: '2018-01-15'
+output: html_document
+
+# based on ALex's suggestion
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lme4)
+library(ggplot2)
+library(GGally)
+library(plyr)
+library(Matrix)
+library(readxl)
+library(reshape2)
+library(numDeriv)
+library(MuMIn)
+library(glmulti)
+library(rJava)
+library(mice)
+```
+
+
+```{r data, include = FALSE}
+# import data
+#task <- read.csv("/home/kzhang5/scratch/ug_all_task_data.csv")
+#demo <- read_excel("/home/kzhang5/scratch/ug_demog.xlsx")
+#question <- read_excel("/home/kzhang5/scratch/ug_questionnaire.xlsx")
+
+task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+
+demoQuestion <- merge(demo, question, on = "ID")
+allData <- merge(task, demoQuestion, on = "ID")
+allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
+allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita", "MMSE TOTAL" = "MMSE"))
+allData$Fairness_score <- as.factor(allData$Fairness_score)
+allData$ID <- as.factor(allData$ID)
+allData$AcceptOffer <- as.factor(allData$AcceptOffer)
+
+# block number
+allData$framingContext <- NA
+allData$framingContext[allData$ReappraisalDirection == "punish"] <- "framing"
+allData$framingContext[allData$ReappraisalDirection == "empathy"] <- "framing"
+allData$framingContext[allData$ReappraisalDirection == "baseline"] <- "baseline"
+
+```
+
+# predictors:
+## - Reappraisal Direction
+## - total stake
+## - Fairness score
+## - clinical groups
+## - education
+## - household income
+## - EXIT (4 missing values)
+## - trial number (within block number)
+## - block number
+## - an impulsivity measure: BIS_NONPLAN (3 missing values)
+## - an interpersonal function measure: IIP15INTAMBV (4 missing values)
+
+# complete missing values
+```{r missing values}
+# check how many percentage of data is missing in the question dataframe
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+missingVar <- c('ID', 'BIS_NONPLAN', 'IIP15INTAMBV', 'EXIT')
+missingDF <- question[, missingVar]
+apply(question[missingVar], 2, pMiss)
+print(md.pattern(question[missingVar]))
+
+# impute data
+missingDF_impute <- mice(missingDF, m = 5, meth = "pmm", maxit = 50)
+print(summary(missingDF_impute))
+missingVar_complete <- complete(missingDF_impute,1)
+
+# merge the generated values to the df
+missingVar_complete <- rename(missingVar_complete, c("BIS_NONPLAN" = "BIS_NONPLAN_full", "IIP15INTAMBV" = "IIP15INTAMBV_full", "EXIT" = "EXIT_full"))
+allData <- merge(allData, missingVar_complete, by = "ID")
+```
+
+```{r wrapper, include=FALSE}
+glmer.glmulti <- function(formula, data, random = ""){
+  glmer(paste(deparse(formula), random), data = data, family = binomial, control = glmerControl(calc.derivs = FALSE))
+}
+```
+
+# the global model with no interaction
+Random effects includes: 
+- 1|ID
+- (1|ID) + (merged_trial|framingContext)
+- (1|ID) + (0 + merged_trial|ID)
+```{r}
+md1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + totalStake + Fairness_score + group4 + EDUCATION + HouseholdIncome + EXIT_full + BIS_NONPLAN_full + IIP15INTAMBV_full + (1|ID) + (merged_trial|framingContext))
+
+```
