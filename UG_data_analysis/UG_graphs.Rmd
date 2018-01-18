@@ -1006,3 +1006,54 @@ tidy(m_attLL)
 
 *Small interaction effect may exists. Control were more likely to accept gambles as the interpersonal score increases.*
 
+# Group x urgency
+```{r}
+
+m_att <- glm(attempter$AcceptOffer ~ allData$urgency, data = attempter, family = "binomial")
+m_HC <- glm(control$AcceptOffer ~ urgency, data = control, family = "binomial")
+m_ideator <- glm(ideator$AcceptOffer ~ urgency, data = ideator, family = "binomial")
+m_dep <- glm(depression$AcceptOffer ~ urgency, data = depression, family = "binomial")
+m_attHL <- glm(attHL$AcceptOffer ~ urgency, data = attHL, family = "binomial")
+m_attLL <- glm(attLL$AcceptOffer ~ urgency, data = attLL, family = "binomial")
+
+predict_att <- as.data.frame(predict(m_att, newdata = attempter, type = "response", se = TRUE))
+predict_HC <- as.data.frame(predict(m_HC, newdata = control, type = "response", se = TRUE))
+predict_ideator <- as.data.frame(predict(m_ideator, newdata = ideator, type = "response", se = TRUE))
+predict_dep <- as.data.frame(predict(m_dep, newdata = depression, type = "response", se = TRUE))
+predict_attHL <- as.data.frame(predict(m_attHL, newdata = attHL, type = "response", se = TRUE))
+predict_attLL <- as.data.frame(predict(m_attLL, newdata = attLL, type = "response", se = TRUE))
+
+new_att <- cbind(attempter, predict_att)
+new_HC <- cbind(control, predict_HC)
+new_ideator <- cbind(ideator, predict_ideator)
+new_dep <- cbind(depression, predict_dep)
+new_attHL <- cbind(attHL, predict_attHL)
+new_attLL <- cbind(attLL, predict_attLL)
+new_data4 <- rbind.fill(new_att, new_HC, new_ideator, new_dep)
+new_data5 <- rbind(new_HC, new_ideator, new_dep, new_attHL, new_attLL)
+
+ggplot(new_data4, aes(x = IIP15INTAMBV, y = fit, fill = factor(group4))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group4) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+ggplot(new_data5, aes(x = IIP15INTAMBV, y = fit, fill = factor(group5))) + geom_point() + ylim(0, 1) + ggtitle("Predicted acceptance of gamble") + facet_wrap(~group5) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Predicted probability of acceptance")
+
+print("attempter model")
+tidy(m_attLL)
+
+print("HC model")
+tidy(m_attLL)
+
+print("ideator model")
+tidy(m_attLL)
+
+print("depression model")
+tidy(m_attLL)
+
+print("attempter HL model")
+tidy(m_attLL)
+
+print("attempter LL model")
+tidy(m_attLL)
+
+```

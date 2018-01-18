@@ -225,4 +225,14 @@ use model averaging.
 
 
 
-  
+  # Hypothesis
+
+1. more unfair offers will be rejected by suicidal group compare other groups
+
+2. as the stake size increases, the number of rejections of unfair offers will decreases in all groups but the suicide attempters.
+
+3. participants accept more unfair gambles under empathy conditions compared to others
+
+4. different groups have different acceptance rate of unfair gambles under empathy vs punish context. 
+
+   ​
