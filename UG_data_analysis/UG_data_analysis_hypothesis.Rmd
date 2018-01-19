@@ -253,7 +253,6 @@ baselineData <- subset(allData, allData$framingContext == "baseline")
 
 ## with various random effects
 ```{r}
-
 m_l1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE) + scale(merged_trial), exclude = c("MMSE:HouseholdIncome"), level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
 
 m_l2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 * scale(EDUCATION) * scale(HouseholdIncome) * scale(MMSE) + scale(merged_trial), exclude = c("MMSE:HouseholdIncome"), level = 2, fitfunction = glmer.glmulti, random = "+ (merged_trial|ID)", method = "g", data = allData)
