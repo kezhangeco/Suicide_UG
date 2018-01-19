@@ -21,6 +21,19 @@ library(MuMIn)
 library(glmulti)
 library(rJava)
 library(mice)
+library(readxl)
+library(VIF)
+library(numDeriv)
+library(MuMIn)
+library(DHARMa)
+library(bitops)
+library(nloptr)
+library(optimx)
+library(dfoptim)
+library(emmeans)
+library(afex)
+library(usdm)
+library(broom)
 ```
 
 
@@ -30,9 +43,13 @@ library(mice)
 #demo <- read_excel("/home/kzhang5/scratch/ug_demog.xlsx")
 #question <- read_excel("/home/kzhang5/scratch/ug_questionnaire.xlsx")
 
-task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+#demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+#question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
 
 question <- rename(question, c("UPPSP NEG URGENCY" = "urgency"))
 demoQuestion <- merge(demo, question, on = "ID")
@@ -122,38 +139,66 @@ glmer.glmulti <- function(formula, data, random = ""){
 
 # Level 1 model
 ## Random intercept and fixed slopes with random effect (1|ID)
-Level 1 model without interaction effect.
-```{r}
 
+$$
+AcceptOffer = ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID)
+$$
+
+## Level 1 model without interaction effect 
+All the alternative models are:
+```{r}
+m1_level1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData, confsetsize = 8)
+
+m1_models <- weightable(m1_level1)
+print(m1_models)
 ```
 
-Screening the alternative models of the level 1 predictors. The models include all interaction effect.
+The best model of the no interaction model is:
 ```{r}
-m1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "d", data = allData)
+m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
 
-summary(m1)
+summary(m0)
+```
+
+## Level 1 model with interaction effect 
+```{r}
+m1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
 
 # look at the models
 m1_models <- weightable(m1)
 print(m1_models)
-m1_models <- m1_models[m1_models$aicc <= min(m1_models$aicc),]
+
 ```
 
 # Level 1 model with $group$ predictor
-4 way interaction effect, and see if the model is significant. If not, drop this interaction
+
+## No interaction model
+```{r}
+m3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (1|ID), family = binomial, data = allData)
+summary(m3)
+```
+
+## Interaction models:
+$ReappraisalDirection * scale(totalStake) * Fairness_score * group4$ 4 way interaction effect, and see if the model is significant. If not, drop this interaction
 ```{r}
 m2_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial, glmerControl(optCtrl = list(maxfun = 100000)))
 
-outputs <- load("m2_4interaction.RData")
 summary(m2_4interaction)
 ```
+
+The 4 way interaction is not significant.
 
 Screening all alternative models of the level 1 + group models
 ```{r}
 m2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
 
 m2_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group5, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+m2_models <- weightable(m2)
+print(m2_models)
 ```
+
+
 
 # correlation matrix 
 ```{r corr}
@@ -172,22 +217,34 @@ The following variables are moderately/highly correlated:
 - urgency x BIS nonplan
 - **urgency x interpersonal**
 
-# Level 1 model + subject level variables
+# Level 1 model + individual subject level variable
+# 
+$$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + VAR + (1|ID)$$
 
 ```{r}
-m3 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+m_education <- update(m0, .~. + scale(EDUCATION))
+m_income <- update(m0, .~. + scale(IncomePerCapita))
+m_exit <- update(m0, .~. + scale(EXIT))
+m_mmse <- update(m0, .~. + scale(MMSE))
+m_nonplan <- update(m0, .~. + scale(BIS_NONPLAN))
+m_urgency <- update(m0, .~. + scale(urgency))
+m_interpersonal <- update(m0, .~. + scale(IIP15INTAMBV))
+
+summary(m_exit)
+summary(m_mmse)
+summary(m_education)
+summary(m_income)
+summary(m_nonplan)
+summary(m_urgency)
+summary(m_interpersonal)
 ```
 
-## Education
+The following predictor does not have significant influence on the model:
+education, income per capita, m_nonplan, m_urgency, interpersonal
+
+EXIT is a better predictor than MMSE.
+
 ```{r}
-m_edu <- glmer(allData$AcceptOffer ~ EDUCATION + (1|ID), data = allData, family = binomial)
-m_education <- glmer(allData$AcceptOffer ~ )
+
 ```
 
-## - education
-## - IncomePerCapita
-## - EXIT (4 missing values)
-## - trial number (within block number)
-## - block number
-## - an impulsivity measure: BIS_NONPLAN (3 missing values)/UPPS negative urgency
-## - an interpersonal function measure: IIP15INTAMBV (4 missing values)
