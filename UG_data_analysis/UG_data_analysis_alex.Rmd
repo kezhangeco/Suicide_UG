@@ -51,7 +51,7 @@ allData$AcceptOffer <- as.factor(allData$AcceptOffer)
 # block number
 allData$block <- NA
 allData$block <- ifelse(allData$merged_trial < 27, "1", ifelse((allData$merged_trial > 26) & (allData$merged_trial < 53), "2", "3" ))
-
+print(allData$block)
 ```
 
 
@@ -205,7 +205,7 @@ print(m2)
 Fit specific interaction models. From higher order to lower.
 1.  $ReappraisalDirection x scale(totalStake) x Fairness_score x group4$ four way interaction effect, and see if the model is significant. If not, drop this interaction
 ```{r}
-m2_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial)
+m2_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 summary(m2_4interaction)
 ```
@@ -239,34 +239,61 @@ m2_2interaction2 <- glmer(allData$AcceptOffer ~ scale(totalStake) + Fairness_sco
 summary(m2_2interaction2)
 ```
 
-Select the best model from the no interaction and interaction models:
+Select the best model among the interaction models:
 ```{r}
-modellist1 <- model.sel(m3, m2_4interaction, m2_3interaction1, m2_3interaction2, m2_2interaction1, m2_2interaction2)
+modellist1 <- model.sel(m2_3interaction1, m2_3interaction2, m2_2interaction1, m2_2interaction2)
 print(modellist1)
+```
+The best interaction model is:
+```{r}
+summary(m2_3interaction1)
 ```
 
 ### the (best) interaction model with the subject level variable
 ```{r}
-m_education1 <- update(m3, .~. + scale(EDUCATION))
-m_income1 <- update(m3, .~. + scale(IncomePerCapita))
-m_exit1 <- update(m3, .~. + scale(EXIT))
-m_mmse1 <- update(m3, .~. + scale(MMSE))
-m_nonplan1 <- update(m3, .~. + scale(BIS_NONPLAN))
-m_urgency1 <- update(m3, .~. + scale(urgency))
-m_interpersonal1 <- update(m3, .~. + scale(IIP15INTAMBV))
+m_education1 <- update(m2_3interaction1, .~. + scale(EDUCATION))
+m_income1 <- update(m2_3interaction1, .~. + scale(IncomePerCapita))
+m_exit1 <- update(m2_3interaction1, .~. + scale(EXIT))
+m_mmse1 <- update(m2_3interaction1, .~. + scale(MMSE))
+m_nonplan1 <- update(m2_3interaction1, .~. + scale(BIS_NONPLAN))
+m_urgency1 <- update(m2_3interaction1, .~. + scale(urgency))
+m_interpersonal1 <- update(m2_3interaction1, .~. + scale(IIP15INTAMBV))
 
-summary(m_education1)
-summary(m_income1)
 summary(m_exit1)
-summary(m_mmse1)
-summary(m_nonplan1)
-summary(m_urgency1)
-summary(m_interpersonal1)
+# failed
+#summary(m_education1)
+#summary(m_income1)
+#summary(m_mmse1)
+#summary(m_nonplan1)
+#summary(m_urgency1)
+#summary(m_interpersonal1)
 
 ```
+Only the model with $EXIT$ converges. The other models can't converge at 3 way interaction effect. $ReappraisalDirection x Fairness_score x group4$
 
+2 way interaction model with subject level vars:
+```{r}
+m_education4 <- update(m2_2interaction2, .~. + scale(EDUCATION))
+m_income4 <- update(m2_2interaction2, .~. + scale(IncomePerCapita))
+m_exit4 <- update(m2_2interaction2, .~. + scale(EXIT))
+m_mmse4 <- update(m2_2interaction2, .~. + scale(MMSE))
+m_nonplan4 <- update(m2_2interaction2, .~. + scale(BIS_NONPLAN))
+m_urgency4 <- update(m2_2interaction2, .~. + scale(urgency))
+m_interpersonal4 <- update(m2_2interaction2, .~. + scale(IIP15INTAMBV))
 
-The following codes is for the random effect (block|ID), they are using the same procedure with above model with random effect (1|ID)
+summary(m_education4)
+summary(m_income4)
+summary(m_exit4)
+summary(m_mmse4)
+summary(m_nonplan4)
+summary(m_urgency4)
+summary(m_interpersonal4)
+
+```
+The following variable has significant influence in this interaction model:
+$EXIT$
+
+The following codes is for the random effect (block|ID), they are using the same procedure with above model with random effect (1|ID).
 
 # Level 1 model (Random intercept and random slopes with random effect (block|ID))
 ## No interaction model
@@ -372,5 +399,4 @@ summary(m_mmse3)
 summary(m_nonplan3)
 summary(m_urgency3)
 summary(m_interpersonal3)
-
 ```
