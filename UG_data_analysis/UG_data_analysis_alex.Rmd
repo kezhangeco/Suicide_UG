@@ -29,10 +29,15 @@ library(mice)
 #task <- read.csv("/home/kzhang5/scratch/ug_all_task_data.csv")
 #demo <- read_excel("/home/kzhang5/scratch/ug_demog.xlsx")
 #question <- read_excel("/home/kzhang5/scratch/ug_questionnaire.xlsx")
+#
+task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
 
-task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
-demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
-question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+
+#task <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data.csv")
+#demo <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx")
+#question <- read_excel("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
 
 question <- rename(question, c("UPPSP NEG URGENCY" = "urgency"))
 demoQuestion <- merge(demo, question, on = "ID")
@@ -45,14 +50,12 @@ allData$AcceptOffer <- as.factor(allData$AcceptOffer)
 
 # block number
 allData$block <- NA
-allData$block[allData$ReappraisalDirection == "punish"] <- "framing"
-allData$framingContext[allData$ReappraisalDirection == "empathy"] <- "framing"
-allData$framingContext[allData$ReappraisalDirection == "baseline"] <- "baseline"
+allData$block <- ifelse(allData$merged_trial < 27, "1", ifelse((allData$merged_trial > 26) & (allData$merged_trial < 53), "2", "3" ))
 
 ```
 
 
-# predictors:
+# variables in the models:
 ## - Reappraisal Direction
 ## - total stake
 ## - Fairness score
@@ -114,82 +117,7 @@ cat("ICC is", ICC_model(randomInterceptOnly))
 ```
 The ICC > 0, the HLM is needed.
 
-```{r wrapper, include=FALSE}
-glmer.glmulti <- function(formula, data, random = ""){
-  glmer(paste(deparse(formula), random), data = data, family = binomial, control = glmerControl(calc.derivs = FALSE))
-}
-```
-
-# Level 1 model (Random intercept and fixed slopes with random effect (1|ID))
-## No interaction model
-```{r}
-m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), family = binomial, data = allData)
-```
-
-## Interaction models
-Screening the alternative models of the level 1 predictors. The models include all interaction effect.
-```{r}
-m1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData, confsetsize = 8)
-
-summary(m1)
-
-# look at the models
-m1_models <- weightable(m1)
-m1_models <- m1_models[m1_models$aicc <= min(m1_models$aicc) + 2,]
-```
-
-# Level 1 model with $group$ predictor (random effect (1|ID))
-## No interaction effect
-```{r}
-m3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (1|ID), family = binomial, data = allData)
-
-```
-
-### the model with the subject individual level variable
-```{r}
-m_education <- update(m3, .~. + scale(EDUCATION))
-m_income <- update(m3, .~. + scale(IncomePerCapita))
-m_exit <- update(m3, .~. + scale(EXIT))
-m_nonplan <- update(m3, .~. + scale(BIS_NONPLAN))
-m_urgency <- update(m3, .~. + scale(urgency))
-m_interpersonal <- update(m3, .~. + scale(IIP15INTAMBV))
-
-summary(m_education)
-summary(m_income)
-summary(m_exit)
-summary(m_nonplan)
-summary(m_urgency)
-summary(m_interpersonal)
-```
-None of the subject level variable has significant influence on the gamble acceptance.
-
-## models with interaction effect
-Screening all alternative models of the level 1 + group models
-```{r}
-m2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
-
-m2_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group5, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
-```
-
-1. 4 way interaction effect, and see if the model is significant. If not, drop this interaction
-```{r}
-m2_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial)
-
-summary(m2_4interaction)
-```
-2. $ReappraisalDirection x Fairness_score x group4$ three way interaction
-```{r}
-m2_3interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * Fairness_score * group4 + (1|ID), data = allData, family = binomial)
-```
-
-3. $ReappraisalDirection x scale(totalStake) x group4$ three way interaction
-```{r}
-m2_3interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial)
-
-```
-
-
-# correlation matrix 
+# correlation matrix of the subject level variables
 ```{r corr}
 corrMatrix <- ggpairs(demoQuestion[, c("PER CAPITA INCOME", "HRSD NO SUI", "DRS", "EDUCATION", "EXIT", "BIS_NONPLAN", "IIP15INTAMBV", "urgency")])
 ```
@@ -206,9 +134,243 @@ The following variables are moderately/highly correlated:
 - urgency x BIS nonplan
 - **urgency x interpersonal**
 
-# Level 1 model + subject level variables
+```{r wrapper, include=FALSE}
+glmer.glmulti <- function(formula, data, random = ""){
+  glmer(paste(deparse(formula), random), data = data, family = binomial, control = glmerControl(calc.derivs = FALSE))
+}
+```
+
+# Level 1 model (Random intercept and fixed slopes with random effect (1|ID))
+## No interaction model
 ```{r}
-m3 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), family = binomial, data = allData)
+```
+
+## Interaction models
+Screening the alternative models of the level 1 predictors. The models include all interaction effect.
+```{r}
+m1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData, confsetsize = 8)
+
+summary(m1)
+
+# look at the models
+m1_models <- weightable(m1)
+print(m1_models)
+```
+
+# Level 1 model with $group$ predictor (random effect (1|ID))
+## No interaction effect
+```{r}
+m3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (1|ID), family = binomial, data = allData)
 
 ```
 
+### the model with the subject individual level variable
+$$Accept\,Offer ~ Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + group4 + VAR + (1|ID)$$
+```{r}
+m_education <- update(m3, .~. + scale(EDUCATION))
+m_income <- update(m3, .~. + scale(IncomePerCapita))
+m_exit <- update(m3, .~. + scale(EXIT))
+m_mmse <- update(m3, .~. + scale(MMSE))
+m_nonplan <- update(m3, .~. + scale(BIS_NONPLAN))
+m_urgency <- update(m3, .~. + scale(urgency))
+m_interpersonal <- update(m3, .~. + scale(IIP15INTAMBV))
+
+summary(m_education)
+summary(m_income)
+summary(m_exit)
+summary(m_mmse)
+summary(m_nonplan)
+summary(m_urgency)
+summary(m_interpersonal)
+```
+None of the subject level variable has significant influence on the gamble acceptance.
+
+Model exploration with all variables in the no interaction effect models
+```{r}
+m4 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + EDUCATION + allData$IncomePerCapita + allData$EXIT + allData$urgency + allData$IIP15INTAMBV, random = "1|ID", level = 1, fitfunction = glmer.glmulti, data = allData)
+
+```
+
+## models with interaction effect
+Screening all alternative models of the level 1 + group models
+```{r}
+m2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+m2_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group5, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
+
+print(m2)
+```
+
+Fit specific interaction models. From higher order to lower.
+1.  $ReappraisalDirection x scale(totalStake) x Fairness_score x group4$ four way interaction effect, and see if the model is significant. If not, drop this interaction
+```{r}
+m2_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial)
+
+summary(m2_4interaction)
+```
+failed to converge at 4 way interaction
+
+2. $ReappraisalDirection x Fairness_score x group4$ three way interaction
+```{r}
+m2_3interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * Fairness_score * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+
+summary(m2_3interaction1)
+```
+$ReappraisalDirection x Fairness_score x group4$ is not significant.
+
+3. $ReappraisalDirection x scale(totalStake) x group4$ three way interaction
+```{r}
+m2_3interaction2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
+
+summary(m2_3interaction2)
+```
+$ReappraisalDirection x scale(totalStake) x group4$ has weak significant influence on gamble acceptance.
+
+4. $fairness\, score x group4$ two way interaction
+```{r}
+m2_2interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
+summary(m2_2interaction1)
+```
+
+5. $reappraisal\, direction x group4$ two way interaction
+```{r}
+m2_2interaction2 <- glmer(allData$AcceptOffer ~ scale(totalStake) + Fairness_score + ReappraisalDirection * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
+summary(m2_2interaction2)
+```
+
+Select the best model from the no interaction and interaction models:
+```{r}
+modellist1 <- model.sel(m3, m2_4interaction, m2_3interaction1, m2_3interaction2, m2_2interaction1, m2_2interaction2)
+print(modellist1)
+```
+
+### the (best) interaction model with the subject level variable
+```{r}
+m_education1 <- update(m3, .~. + scale(EDUCATION))
+m_income1 <- update(m3, .~. + scale(IncomePerCapita))
+m_exit1 <- update(m3, .~. + scale(EXIT))
+m_mmse1 <- update(m3, .~. + scale(MMSE))
+m_nonplan1 <- update(m3, .~. + scale(BIS_NONPLAN))
+m_urgency1 <- update(m3, .~. + scale(urgency))
+m_interpersonal1 <- update(m3, .~. + scale(IIP15INTAMBV))
+
+summary(m_education1)
+summary(m_income1)
+summary(m_exit1)
+summary(m_mmse1)
+summary(m_nonplan1)
+summary(m_urgency1)
+summary(m_interpersonal1)
+
+```
+
+
+The following codes is for the random effect (block|ID), they are using the same procedure with above model with random effect (1|ID)
+
+# Level 1 model (Random intercept and random slopes with random effect (block|ID))
+## No interaction model
+```{r}
+m5 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (block|ID), family = binomial, data = allData)
+```
+
+## Interaction models
+Screening the alternative models of the level 1 predictors. The models include all interaction effect.
+```{r}
+m6 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 2, fitfunction = glmer.glmulti, random = "+ (block|ID)", method = "g", data = allData)
+
+summary(m6)
+
+# look at the models
+m6_models <- weightable(m6)
+print(m6_models)
+```
+
+# Level 1 model with $group$ predictor (random effect (block|ID))
+## No interaction effect
+```{r}
+m7 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (block|ID), family = binomial, data = allData)
+
+```
+
+### the model with the subject individual level variable
+$$Accept\,Offer ~ Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + group4 + VAR + (block|ID)$$
+```{r}
+m_education2 <- update(m7, .~. + scale(EDUCATION))
+m_income2 <- update(m7, .~. + scale(IncomePerCapita))
+m_exit2 <- update(m7, .~. + scale(EXIT))
+m_mmse2 <- update(m7, .~. + scale(MMSE))
+m_nonplan2 <- update(m7, .~. + scale(BIS_NONPLAN))
+m_urgency2 <- update(m7, .~. + scale(urgency))
+m_interpersonal2 <- update(m7, .~. + scale(IIP15INTAMBV))
+
+summary(m_education2)
+summary(m_income2)
+summary(m_exit2)
+summary(m_mmse2)
+summary(m_nonplan2)
+summary(m_urgency2)
+summary(m_interpersonal2)
+```
+
+
+## models with interaction effect
+Screening all alternative models of the level 1 + group models
+```{r}
+m8 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 1, fitfunction = glmer.glmulti, random = "+ (block|ID)", method = "g", data = allData)
+
+m8_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group5, level = 1, fitfunction = glmer.glmulti, random = "+ (block|ID)", method = "g", data = allData)
+
+print(m8)
+```
+
+Fit specific interaction models. From higher order to lower.
+1.  $ReappraisalDirection x scale(totalStake) x Fairness_score x group4$ four way interaction effect, and see if the model is significant. If not, drop this interaction
+```{r}
+m9_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (block|ID), data = allData, family = binomial)
+
+summary(m9_4interaction)
+```
+failed to converge at 4 way interaction
+
+2. $ReappraisalDirection x Fairness_score x group4$ three way interaction
+```{r}
+m9_3interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * Fairness_score * group4 + (block|ID), data = allData, family = binomial)
+```
+
+3. $ReappraisalDirection x scale(totalStake) x group4$ three way interaction
+```{r}
+m9_3interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * group4 + (block|ID), data = allData, family = binomial)
+
+```
+
+4. $fairness\, score x group4$ two way interaction
+```{r}
+m9_2interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score * group4 + (block|ID), data = allData, family = binomial)
+```
+
+5. $reappraisal\, direction x group4$ two way interaction
+```{r}
+m9_2interaction2 <- glmer(allData$AcceptOffer ~ scale(totalStake) + Fairness_score + ReappraisalDirection * group4 + (block|ID), data = allData, family = binomial)
+```
+
+
+### the (best) interaction model with the subject level variable
+```{r}
+m_education3 <- update(m3, .~. + scale(EDUCATION))
+m_income3 <- update(m3, .~. + scale(IncomePerCapita))
+m_exit3 <- update(m3, .~. + scale(EXIT))
+m_mmse3 <- update(m3, .~. + scale(MMSE))
+m_nonplan3 <- update(m3, .~. + scale(BIS_NONPLAN))
+m_urgency3 <- update(m3, .~. + scale(urgency))
+m_interpersonal3 <- update(m3, .~. + scale(IIP15INTAMBV))
+
+summary(m_education3)
+summary(m_income3)
+summary(m_exit3)
+summary(m_mmse3)
+summary(m_nonplan3)
+summary(m_urgency3)
+summary(m_interpersonal3)
+
+```
