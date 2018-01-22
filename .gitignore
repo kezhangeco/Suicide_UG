@@ -32,3 +32,11 @@ UG_data_analysis/.RDataTmp
 *.xml
 
 *.back
+
+UG_data_analysis/UG_data_analysis_alex_knit_cache/latex/__packages
+
+*.log
+
+*.tex
+
+UG_data_analysis/UG_data_analysis_alex_knit_cache/docx/__packages
