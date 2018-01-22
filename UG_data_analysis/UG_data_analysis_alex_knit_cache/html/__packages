@@ -1,0 +1,15 @@
+base
+Matrix
+lme4
+ggplot2
+GGally
+plyr
+readxl
+reshape2
+numDeriv
+MuMIn
+rJava
+glmulti
+lattice
+mice
+stargazer

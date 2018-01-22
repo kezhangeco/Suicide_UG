@@ -30,3 +30,5 @@ UG_data_analysis/.RDataTmp
 
 *.png
 *.xml
+
+*.back
