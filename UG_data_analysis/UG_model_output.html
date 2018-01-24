@@ -319,6 +319,7 @@ $(document).ready(function () {
 <div id="intercept-only" class="section level2">
 <h2>Intercept only</h2>
 <p><span class="math display">\[Accept\,Offer = 1\]</span></p>
+<pre><code>## [1] &quot;logit&quot;</code></pre>
 <pre><code>## 
 ## =============================================
 ##                       Dependent variable:    
@@ -334,10 +335,18 @@ $(document).ready(function () {
 ## Akaike Inf. Crit.         12,956.750         
 ## =============================================
 ## Note:             *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability&quot;</code></pre>
+<pre><code>## 
+## ===========
+## (Intercept)
+## -----------
+##    0.658   
+## -----------</code></pre>
 </div>
 <div id="null-model-random-intercept-only" class="section level2">
 <h2>Null model: random intercept only</h2>
 <p><span class="math display">\[Accept\,Offer = 1 + (1|ID)\]</span></p>
+<pre><code>## [1] &quot;logit coefficients&quot;</code></pre>
 <pre><code>## 
 ## ===============================================
 ##                         Dependent variable:    
@@ -354,6 +363,9 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.         11,761.990         
 ## ===============================================
 ## Note:               *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##   probability
+## 1   0.6976155</code></pre>
 <p>By adding the ID (nested), the AIC (1|D) is smaller than the AIC (1). So HLM is necessary.</p>
 <p>The variance of the intercept in the <em>null model is 1.157</em>. That is the variance can’t be explained by the random effect of ID. Compare the variance with more complicated models. If the intercept variance gets smaller, that is an indication of the additional predictors adding more explanation to the DV.</p>
 </div>
@@ -439,6 +451,7 @@ $(document).ready(function () {
 <div id="no-interaction-model" class="section level2">
 <h2>No interaction model</h2>
 <p><span class="math display">\[Accept\,Offer = Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + (1|ID)\]</span></p>
+<pre><code>## [1] &quot;logit coefficients&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
 ##                                 Dependent variable:    
@@ -476,6 +489,16 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 10,983.670         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                   0.9109944
+## ReappraisalDirectionempathy   0.9036522
+## ReappraisalDirectionpunish    0.2590189
+## scale(totalStake)             0.5085680
+## Fairness_score2               0.4559524
+## Fairness_score3               0.2916322
+## Fairness_score4               0.1200855
+## Fairness_score5               0.0713073</code></pre>
 </div>
 </div>
 <div id="level-1-model-with-group-predictor-random-effect-1id" class="section level1">
@@ -530,6 +553,19 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 11,006.770         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.90064923
+## ReappraisalDirectionempathy  0.90360619
+## ReappraisalDirectionpunish   0.25899134
+## scale(totalStake)            0.50856677
+## Fairness_score2              0.45596500
+## Fairness_score3              0.29166694
+## Fairness_score4              0.12010626
+## Fairness_score5              0.07131654
+## group4attempter              0.44188785
+## group4depression             0.65519874
+## group4ideator                0.57284002</code></pre>
 <pre><code>## [1] &quot;model with 5 groups&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -580,6 +616,20 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 11,016.200         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.90065559
+## ReappraisalDirectionempathy  0.90360071
+## ReappraisalDirectionpunish   0.25898448
+## scale(totalStake)            0.50856646
+## Fairness_score2              0.45596416
+## Fairness_score3              0.29166806
+## Fairness_score4              0.12010666
+## Fairness_score5              0.07131647
+## group5AttempterHL            0.43225756
+## group5AttempterLL            0.45108849
+## group5depression             0.65517762
+## group5ideator                0.57283041</code></pre>
 <p>Clinically groups are not significantly different from HC in terms of gamble acceptance.</p>
 <div id="the-model-with-an-individual-subject-level-variable" class="section level3">
 <h3>The model with an individual subject level variable</h3>
@@ -634,6 +684,20 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 11,015.230         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.89817141
+## ReappraisalDirectionempathy  0.90361838
+## ReappraisalDirectionpunish   0.25901153
+## scale(totalStake)            0.50856700
+## Fairness_score2              0.45596331
+## Fairness_score3              0.29166141
+## Fairness_score4              0.12009990
+## Fairness_score5              0.07131269
+## group4attempter              0.46788119
+## group4depression             0.65942578
+## group4ideator                0.58006359
+## scale(EDUCATION)             0.53378159</code></pre>
 <pre><code>## [1] &quot;income&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -684,6 +748,20 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 11,016.090         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.89754503
+## ReappraisalDirectionempathy  0.90359049
+## ReappraisalDirectionpunish   0.25896918
+## scale(totalStake)            0.50856637
+## Fairness_score2              0.45596669
+## Fairness_score3              0.29167231
+## Fairness_score4              0.12010743
+## Fairness_score5              0.07131646
+## group4attempter              0.45392859
+## group4depression             0.66178148
+## group4ideator                0.58171609
+## scale(IncomePerCapita)       0.51269140</code></pre>
 <pre><code>## [1] &quot;EXIT&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -712,28 +790,42 @@ $(document).ready(function () {
 ## Fairness_score5                      -2.567***         
 ##                                       (0.115)          
 ##                                                        
-## group4attempter                       -0.099           
-##                                       (0.378)          
+## group4attempter                       -0.058           
+##                                       (0.376)          
 ##                                                        
-## group4depression                       0.622           
-##                                       (0.409)          
+## group4depression                       0.612           
+##                                       (0.406)          
 ##                                                        
-## group4ideator                          0.335           
-##                                       (0.424)          
+## group4ideator                          0.354           
+##                                       (0.421)          
 ##                                                        
-## scale(EXIT)                           -0.220           
-##                                       (0.137)          
+## scale(EXIT)                          -0.273**          
+##                                       (0.136)          
 ##                                                        
-## Constant                             2.207***          
-##                                       (0.296)          
+## Constant                             2.204***          
+##                                       (0.294)          
 ##                                                        
 ## -------------------------------------------------------
 ## Observations                          12,740           
-## Log Likelihood                      -5,445.395         
-## Akaike Inf. Crit.                   10,916.790         
-## Bayesian Inf. Crit.                 11,013.670         
+## Log Likelihood                      -5,444.691         
+## Akaike Inf. Crit.                   10,915.380         
+## Bayesian Inf. Crit.                 11,012.260         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.90056367
+## ReappraisalDirectionempathy  0.90365063
+## ReappraisalDirectionpunish   0.25898403
+## scale(totalStake)            0.50856561
+## Fairness_score2              0.45594667
+## Fairness_score3              0.29160638
+## Fairness_score4              0.12006712
+## Fairness_score5              0.07130031
+## group4attempter              0.48542974
+## group4depression             0.64836027
+## group4ideator                0.58768407
+## scale(EXIT)                  0.43211429</code></pre>
 <pre><code>## [1] &quot;MMSE&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -784,6 +876,20 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 11,014.370         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.89593189
+## ReappraisalDirectionempathy  0.90363303
+## ReappraisalDirectionpunish   0.25902166
+## scale(totalStake)            0.50856620
+## Fairness_score2              0.45595826
+## Fairness_score3              0.29164449
+## Fairness_score4              0.12008971
+## Fairness_score5              0.07130887
+## group4attempter              0.48192721
+## group4depression             0.66177340
+## group4ideator                0.58293953
+## scale(MMSE)                  0.54377366</code></pre>
 <pre><code>## [1] &quot;UPPSP NEG URGENCY&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -806,34 +912,48 @@ $(document).ready(function () {
 ## Fairness_score3                      -0.887***         
 ##                                       (0.114)          
 ##                                                        
-## Fairness_score4                      -1.991***         
+## Fairness_score4                      -1.992***         
 ##                                       (0.114)          
 ##                                                        
 ## Fairness_score5                      -2.567***         
 ##                                       (0.115)          
 ##                                                        
-## group4attempter                       -0.064           
-##                                       (0.421)          
+## group4attempter                        0.023           
+##                                       (0.433)          
 ##                                                        
-## group4depression                      0.747*           
-##                                       (0.431)          
+## group4depression                      0.804*           
+##                                       (0.435)          
 ##                                                        
-## group4ideator                          0.441           
+## group4ideator                          0.495           
 ##                                       (0.461)          
 ##                                                        
-## scale(urgency)                        -0.143           
-##                                       (0.166)          
+## scale(urgency)                        -0.194           
+##                                       (0.168)          
 ##                                                        
-## Constant                             2.057***          
-##                                       (0.343)          
+## Constant                             1.994***          
+##                                       (0.349)          
 ##                                                        
 ## -------------------------------------------------------
 ## Observations                          12,740           
-## Log Likelihood                      -5,446.298         
-## Akaike Inf. Crit.                   10,918.600         
-## Bayesian Inf. Crit.                 11,015.480         
+## Log Likelihood                      -5,446.008         
+## Akaike Inf. Crit.                   10,918.020         
+## Bayesian Inf. Crit.                 11,014.900         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.88012458
+## ReappraisalDirectionempathy  0.90363433
+## ReappraisalDirectionpunish   0.25902276
+## scale(totalStake)            0.50856814
+## Fairness_score2              0.45596135
+## Fairness_score3              0.29165650
+## Fairness_score4              0.12009797
+## Fairness_score5              0.07131221
+## group4attempter              0.50573137
+## group4depression             0.69081524
+## group4ideator                0.62128752
+## scale(urgency)               0.45158524</code></pre>
 <pre><code>## [1] &quot;IIP15INTAMBV, interpersonal&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -844,7 +964,7 @@ $(document).ready(function () {
 ## ReappraisalDirectionempathy          2.238***          
 ##                                       (0.074)          
 ##                                                        
-## ReappraisalDirectionpunish           -1.051***         
+## ReappraisalDirectionpunish           -1.052***         
 ##                                       (0.059)          
 ##                                                        
 ## scale(totalStake)                      0.034           
@@ -862,28 +982,42 @@ $(document).ready(function () {
 ## Fairness_score5                      -2.567***         
 ##                                       (0.115)          
 ##                                                        
-## group4attempter                       -0.134           
-##                                       (0.388)          
+## group4attempter                       -0.117           
+##                                       (0.387)          
 ##                                                        
-## group4depression                      0.689*           
-##                                       (0.416)          
+## group4depression                      0.697*           
+##                                       (0.415)          
 ##                                                        
-## group4ideator                          0.376           
+## group4ideator                          0.395           
 ##                                       (0.437)          
 ##                                                        
-## scale(IIP15INTAMBV)                   -0.124           
-##                                       (0.137)          
+## scale(IIP15INTAMBV)                   -0.145           
+##                                       (0.136)          
 ##                                                        
-## Constant                             2.129***          
+## Constant                             2.117***          
 ##                                       (0.309)          
 ##                                                        
 ## -------------------------------------------------------
 ## Observations                          12,740           
-## Log Likelihood                      -5,446.262         
-## Akaike Inf. Crit.                   10,918.520         
-## Bayesian Inf. Crit.                 11,015.410         
+## Log Likelihood                      -5,446.103         
+## Akaike Inf. Crit.                   10,918.210         
+## Bayesian Inf. Crit.                 11,015.090         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.89251091
+## ReappraisalDirectionempathy  0.90359051
+## ReappraisalDirectionpunish   0.25891961
+## scale(totalStake)            0.50856982
+## Fairness_score2              0.45596397
+## Fairness_score3              0.29166281
+## Fairness_score4              0.12010385
+## Fairness_score5              0.07131546
+## group4attempter              0.47082238
+## group4depression             0.66747851
+## group4ideator                0.59754041
+## scale(IIP15INTAMBV)          0.46375472</code></pre>
 <pre><code>## [1] &quot;nonplan&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -912,28 +1046,42 @@ $(document).ready(function () {
 ## Fairness_score5                      -2.567***         
 ##                                       (0.115)          
 ##                                                        
-## group4attempter                       -0.073           
-##                                       (0.423)          
+## group4attempter                        0.005           
+##                                       (0.426)          
 ##                                                        
-## group4depression                      0.757*           
-##                                       (0.438)          
+## group4depression                      0.815*           
+##                                       (0.439)          
 ##                                                        
-## group4ideator                          0.431           
-##                                       (0.461)          
+## group4ideator                          0.470           
+##                                       (0.454)          
 ##                                                        
-## scale(BIS_NONPLAN)                    -0.155           
-##                                       (0.193)          
+## scale(BIS_NONPLAN)                    -0.222           
+##                                       (0.195)          
 ##                                                        
-## Constant                             2.047***          
-##                                       (0.357)          
+## Constant                             1.978***          
+##                                       (0.358)          
 ##                                                        
 ## -------------------------------------------------------
 ## Observations                          12,740           
-## Log Likelihood                      -5,446.349         
-## Akaike Inf. Crit.                   10,918.700         
-## Bayesian Inf. Crit.                 11,015.580         
+## Log Likelihood                      -5,446.029         
+## Akaike Inf. Crit.                   10,918.060         
+## Bayesian Inf. Crit.                 11,014.940         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.87842911
+## ReappraisalDirectionempathy  0.90359347
+## ReappraisalDirectionpunish   0.25896904
+## scale(totalStake)            0.50856611
+## Fairness_score2              0.45596569
+## Fairness_score3              0.29166960
+## Fairness_score4              0.12010291
+## Fairness_score5              0.07131338
+## group4attempter              0.50115831
+## group4depression             0.69324994
+## group4ideator                0.61536470
+## scale(BIS_NONPLAN)           0.44476097</code></pre>
 <p><span class="math inline">\(EXIT\)</span> is the only subject level variable has significant influence on the gamble acceptance.</p>
 </div>
 </div>
@@ -1049,6 +1197,36 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                                                    10,918.350         
 ## ==========================================================================================
 ## Note:                                                          *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                                                probability
+## (Intercept)                                                     0.91417810
+## ReappraisalDirectionempathy                                     0.88687507
+## ReappraisalDirectionpunish                                      0.23132221
+## scale(totalStake)                                               0.45933918
+## Fairness_score2                                                 0.43736368
+## Fairness_score3                                                 0.29005159
+## Fairness_score4                                                 0.11285209
+## Fairness_score5                                                 0.06748712
+## group4attempter                                                 0.53571266
+## group4depression                                                0.51478750
+## group4ideator                                                   0.58037481
+## ReappraisalDirectionempathy:scale(totalStake)                   0.47966752
+## ReappraisalDirectionpunish:scale(totalStake)                    0.56248104
+## ReappraisalDirectionempathy:group4attempter                     0.28594453
+## ReappraisalDirectionpunish:group4attempter                      0.40162010
+## ReappraisalDirectionempathy:group4depression                    0.80707921
+## ReappraisalDirectionpunish:group4depression                     0.68368142
+## ReappraisalDirectionempathy:group4ideator                       0.52293835
+## ReappraisalDirectionpunish:group4ideator                        0.47484974
+## scale(totalStake):group4attempter                               0.51884397
+## scale(totalStake):group4depression                              0.47968442
+## scale(totalStake):group4ideator                                 0.49241462
+## ReappraisalDirectionempathy:scale(totalStake):group4attempter   0.59140104
+## ReappraisalDirectionpunish:scale(totalStake):group4attempter    0.52138136
+## ReappraisalDirectionempathy:scale(totalStake):group4depression  0.56046385
+## ReappraisalDirectionpunish:scale(totalStake):group4depression   0.57424932
+## ReappraisalDirectionempathy:scale(totalStake):group4ideator     0.56399782
+## ReappraisalDirectionpunish:scale(totalStake):group4ideator      0.55648275</code></pre>
 <p><span class="math inline">\(Reappraisal\,Direction\)</span> x <span class="math inline">\(scale(total\,Stake)\)</span> x <span class="math inline">\(group4\)</span> has weak significant influence on gamble acceptance.</p>
 <ol start="4" style="list-style-type: decimal">
 <li><span class="math inline">\(fairness\, score\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -1135,6 +1313,31 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                      11,010.110         
 ## ============================================================
 ## Note:                            *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                  probability
+## (Intercept)                       0.93426616
+## ReappraisalDirectionempathy       0.90628880
+## ReappraisalDirectionpunish        0.25764202
+## scale(totalStake)                 0.50860064
+## Fairness_score2                   0.41644204
+## Fairness_score3                   0.23250159
+## Fairness_score4                   0.08104522
+## Fairness_score5                   0.03587247
+## group4attempter                   0.54729182
+## group4depression                  0.37899530
+## group4ideator                     0.47516822
+## Fairness_score2:group4attempter   0.29627305
+## Fairness_score3:group4attempter   0.34807599
+## Fairness_score4:group4attempter   0.43120253
+## Fairness_score5:group4attempter   0.41318210
+## Fairness_score2:group4depression  0.65373884
+## Fairness_score3:group4depression  0.69611590
+## Fairness_score4:group4depression  0.73533637
+## Fairness_score5:group4depression  0.85485942
+## Fairness_score2:group4ideator     0.64684265
+## Fairness_score3:group4ideator     0.64961216
+## Fairness_score4:group4ideator     0.56368085
+## Fairness_score5:group4ideator     0.60008242</code></pre>
 <p>Fairness score and group has significant interaction.</p>
 <ol start="5" style="list-style-type: decimal">
 <li><span class="math inline">\(reappraisal\, direction\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -1203,6 +1406,25 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                                  10,886.080         
 ## ========================================================================
 ## Note:                                        *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                              probability
+## (Intercept)                                   0.90991484
+## scale(totalStake)                             0.50887317
+## Fairness_score2                               0.45599495
+## Fairness_score3                               0.29120912
+## Fairness_score4                               0.11849918
+## Fairness_score5                               0.06931631
+## ReappraisalDirectionempathy                   0.89034119
+## ReappraisalDirectionpunish                    0.23513444
+## group4attempter                               0.53689850
+## group4depression                              0.51344756
+## group4ideator                                 0.57858451
+## ReappraisalDirectionempathy:group4attempter   0.27443285
+## ReappraisalDirectionpunish:group4attempter    0.40276728
+## ReappraisalDirectionempathy:group4depression  0.80497478
+## ReappraisalDirectionpunish:group4depression   0.68461521
+## ReappraisalDirectionempathy:group4ideator     0.52044458
+## ReappraisalDirectionpunish:group4ideator      0.47854629</code></pre>
 <p>reappraisal direction x group4 has significant interaction.</p>
 <ol start="6" style="list-style-type: decimal">
 <li><span class="math inline">\(fairness\, score\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -1289,6 +1511,31 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                      11,010.110         
 ## ============================================================
 ## Note:                            *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                  probability
+## (Intercept)                       0.93426648
+## scale(totalStake)                 0.50860046
+## ReappraisalDirectionempathy       0.90628876
+## ReappraisalDirectionpunish        0.25764194
+## Fairness_score2                   0.41644584
+## Fairness_score3                   0.23250060
+## Fairness_score4                   0.08104548
+## Fairness_score5                   0.03587260
+## group4attempter                   0.54730620
+## group4depression                  0.37900307
+## group4ideator                     0.47515864
+## Fairness_score2:group4attempter   0.29625647
+## Fairness_score3:group4attempter   0.34806406
+## Fairness_score4:group4attempter   0.43118783
+## Fairness_score5:group4attempter   0.41316764
+## Fairness_score2:group4depression  0.65373341
+## Fairness_score3:group4depression  0.69611605
+## Fairness_score4:group4depression  0.73533384
+## Fairness_score5:group4depression  0.85485786
+## Fairness_score2:group4ideator     0.64684335
+## Fairness_score3:group4ideator     0.64961986
+## Fairness_score4:group4ideator     0.56368610
+## Fairness_score5:group4ideator     0.60008643</code></pre>
 <p>fairness score x group4 has significant interaction.</p>
 <ol start="7" style="list-style-type: decimal">
 <li><span class="math inline">\(total\, stake\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -1348,6 +1595,22 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                        11,024.580         
 ## ==============================================================
 ## Note:                              *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                    probability
+## (Intercept)                         0.90103396
+## scale(totalStake)                   0.47828715
+## ReappraisalDirectionempathy         0.90384427
+## ReappraisalDirectionpunish          0.25888779
+## Fairness_score2                     0.45621339
+## Fairness_score3                     0.29142911
+## Fairness_score4                     0.11982011
+## Fairness_score5                     0.07103468
+## group4attempter                     0.44125380
+## group4depression                    0.65485041
+## group4ideator                       0.57241269
+## scale(totalStake):group4attempter   0.55688222
+## scale(totalStake):group4depression  0.52918583
+## scale(totalStake):group4ideator     0.52915168</code></pre>
 <p>total stake x group4 has significant interaction.</p>
 <ol start="8" style="list-style-type: decimal">
 <li><span class="math inline">\(total\, stake\)</span> x <span class="math inline">\(fairness\, score\)</span> two way interaction</li>
@@ -1410,6 +1673,23 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                       10,991.340         
 ## =============================================================
 ## Note:                             *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                   probability
+## (Intercept)                        0.91773252
+## scale(totalStake)                  0.39099762
+## ReappraisalDirectionempathy        0.90689307
+## ReappraisalDirectionpunish         0.25858095
+## Fairness_score2                    0.40761402
+## Fairness_score3                    0.24834072
+## Fairness_score4                    0.10005770
+## Fairness_score5                    0.05827175
+## group4attempter                    0.44157078
+## group4depression                   0.65586063
+## group4ideator                      0.57314248
+## scale(totalStake):Fairness_score2  0.51729420
+## scale(totalStake):Fairness_score3  0.60704058
+## scale(totalStake):Fairness_score4  0.65843029
+## scale(totalStake):Fairness_score5  0.61387276</code></pre>
 <p>total stake x fairness score has significant interaction.</p>
 <p><strong>Select the best model among the interaction models:</strong></p>
 <pre><code>## Model selection table 
@@ -1558,10 +1838,10 @@ $(document).ready(function () {
 ##                                                                ---------------------------
 ##                                                                        AcceptOffer        
 ## ------------------------------------------------------------------------------------------
-## ReappraisalDirectionempathy                                             2.059***          
+## ReappraisalDirectionempathy                                             2.058***          
 ##                                                                          (0.150)          
 ##                                                                                           
-## ReappraisalDirectionpunish                                              -1.200***         
+## ReappraisalDirectionpunish                                              -1.201***         
 ##                                                                          (0.129)          
 ##                                                                                           
 ## scale(totalStake)                                                        -0.163*          
@@ -1579,40 +1859,40 @@ $(document).ready(function () {
 ## Fairness_score5                                                         -2.626***         
 ##                                                                          (0.115)          
 ##                                                                                           
-## group4attempter                                                           0.283           
-##                                                                          (0.399)          
+## group4attempter                                                           0.327           
+##                                                                          (0.397)          
 ##                                                                                           
-## group4depression                                                          0.037           
-##                                                                          (0.428)          
+## group4depression                                                          0.027           
+##                                                                          (0.425)          
 ##                                                                                           
-## group4ideator                                                             0.366           
-##                                                                          (0.450)          
+## group4ideator                                                             0.386           
+##                                                                          (0.447)          
 ##                                                                                           
-## scale(EXIT)                                                              -0.228           
-##                                                                          (0.139)          
+## scale(EXIT)                                                             -0.285**          
+##                                                                          (0.138)          
 ##                                                                                           
-## ReappraisalDirectionempathy:scale(totalStake)                            -0.081           
+## ReappraisalDirectionempathy:scale(totalStake)                            -0.082           
 ##                                                                          (0.135)          
 ##                                                                                           
 ## ReappraisalDirectionpunish:scale(totalStake)                             0.251**          
 ##                                                                          (0.123)          
 ##                                                                                           
-## ReappraisalDirectionempathy:group4attempter                             -0.915***         
+## ReappraisalDirectionempathy:group4attempter                             -0.914***         
 ##                                                                          (0.195)          
 ##                                                                                           
 ## ReappraisalDirectionpunish:group4attempter                              -0.401**          
 ##                                                                          (0.171)          
 ##                                                                                           
-## ReappraisalDirectionempathy:group4depression                            1.433***          
+## ReappraisalDirectionempathy:group4depression                            1.434***          
 ##                                                                          (0.206)          
 ##                                                                                           
-## ReappraisalDirectionpunish:group4depression                             0.771***          
+## ReappraisalDirectionpunish:group4depression                             0.772***          
 ##                                                                          (0.162)          
 ##                                                                                           
-## ReappraisalDirectionempathy:group4ideator                                 0.094           
+## ReappraisalDirectionempathy:group4ideator                                 0.095           
 ##                                                                          (0.249)          
 ##                                                                                           
-## ReappraisalDirectionpunish:group4ideator                                 -0.100           
+## ReappraisalDirectionpunish:group4ideator                                 -0.099           
 ##                                                                          (0.205)          
 ##                                                                                           
 ## scale(totalStake):group4attempter                                         0.075           
@@ -1642,16 +1922,47 @@ $(document).ready(function () {
 ## ReappraisalDirectionpunish:scale(totalStake):group4ideator                0.227           
 ##                                                                          (0.196)          
 ##                                                                                           
-## Constant                                                                2.369***          
-##                                                                          (0.309)          
+## Constant                                                                2.365***          
+##                                                                          (0.307)          
 ##                                                                                           
 ## ------------------------------------------------------------------------------------------
 ## Observations                                                             12,740           
-## Log Likelihood                                                         -5,320.783         
-## Akaike Inf. Crit.                                                      10,701.570         
-## Bayesian Inf. Crit.                                                    10,925.140         
+## Log Likelihood                                                         -5,320.031         
+## Akaike Inf. Crit.                                                      10,700.060         
+## Bayesian Inf. Crit.                                                    10,923.640         
 ## ==========================================================================================
 ## Note:                                                          *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                                                probability
+## (Intercept)                                                     0.91410779
+## ReappraisalDirectionempathy                                     0.88676672
+## ReappraisalDirectionpunish                                      0.23131016
+## scale(totalStake)                                               0.45939423
+## Fairness_score2                                                 0.43735566
+## Fairness_score3                                                 0.29001487
+## Fairness_score4                                                 0.11283472
+## Fairness_score5                                                 0.06748185
+## group4attempter                                                 0.58091771
+## group4depression                                                0.50668558
+## group4ideator                                                   0.59538579
+## scale(EXIT)                                                     0.42928744
+## ReappraisalDirectionempathy:scale(totalStake)                   0.47961223
+## ReappraisalDirectionpunish:scale(totalStake)                    0.56243946
+## ReappraisalDirectionempathy:group4attempter                     0.28617621
+## ReappraisalDirectionpunish:group4attempter                      0.40109289
+## ReappraisalDirectionempathy:group4depression                    0.80757529
+## ReappraisalDirectionpunish:group4depression                     0.68388905
+## ReappraisalDirectionempathy:group4ideator                       0.52366213
+## ReappraisalDirectionpunish:group4ideator                        0.47534104
+## scale(totalStake):group4attempter                               0.51870967
+## scale(totalStake):group4depression                              0.47964866
+## scale(totalStake):group4ideator                                 0.49239344
+## ReappraisalDirectionempathy:scale(totalStake):group4attempter   0.59155063
+## ReappraisalDirectionpunish:scale(totalStake):group4attempter    0.52151761
+## ReappraisalDirectionempathy:scale(totalStake):group4depression  0.56047605
+## ReappraisalDirectionpunish:scale(totalStake):group4depression   0.57424188
+## ReappraisalDirectionempathy:scale(totalStake):group4ideator     0.56401607
+## ReappraisalDirectionpunish:scale(totalStake):group4ideator      0.55647694</code></pre>
 <p>Only <span class="math inline">\(EXIT\)</span>, among all the subject level variable has significant influence in the gamble acceptance.</p>
 <p><strong>2 way interaction model <span class="math inline">\(reappraisal\, direction\)</span> x <span class="math inline">\(group4\)</span> with subject level vars:</strong></p>
 <pre><code>## [1] &quot;EXIT is the only significant var.&quot;</code></pre>
@@ -1676,52 +1987,72 @@ $(document).ready(function () {
 ## Fairness_score5                                       -2.597***         
 ##                                                        (0.115)          
 ##                                                                         
-## ReappraisalDirectionempathy                           2.094***          
+## ReappraisalDirectionempathy                           2.093***          
 ##                                                        (0.149)          
 ##                                                                         
-## ReappraisalDirectionpunish                            -1.179***         
+## ReappraisalDirectionpunish                            -1.180***         
 ##                                                        (0.128)          
 ##                                                                         
-## group4attempter                                         0.287           
-##                                                        (0.395)          
+## group4attempter                                         0.330           
+##                                                        (0.393)          
 ##                                                                         
-## group4depression                                        0.032           
-##                                                        (0.424)          
+## group4depression                                        0.021           
+##                                                        (0.421)          
 ##                                                                         
-## group4ideator                                           0.359           
-##                                                        (0.446)          
+## group4ideator                                           0.378           
+##                                                        (0.443)          
 ##                                                                         
-## scale(EXIT)                                            -0.227*          
-##                                                        (0.138)          
+## scale(EXIT)                                           -0.283**          
+##                                                        (0.137)          
 ##                                                                         
-## ReappraisalDirectionempathy:group4attempter           -0.972***         
+## ReappraisalDirectionempathy:group4attempter           -0.971***         
 ##                                                        (0.192)          
 ##                                                                         
 ## ReappraisalDirectionpunish:group4attempter            -0.396**          
 ##                                                        (0.169)          
 ##                                                                         
-## ReappraisalDirectionempathy:group4depression          1.420***          
+## ReappraisalDirectionempathy:group4depression          1.421***          
 ##                                                        (0.205)          
 ##                                                                         
-## ReappraisalDirectionpunish:group4depression           0.775***          
+## ReappraisalDirectionpunish:group4depression           0.776***          
 ##                                                        (0.161)          
 ##                                                                         
-## ReappraisalDirectionempathy:group4ideator               0.084           
+## ReappraisalDirectionempathy:group4ideator               0.085           
 ##                                                        (0.247)          
 ##                                                                         
-## ReappraisalDirectionpunish:group4ideator               -0.085           
+## ReappraisalDirectionpunish:group4ideator               -0.084           
 ##                                                        (0.203)          
 ##                                                                         
-## Constant                                              2.315***          
-##                                                        (0.307)          
+## Constant                                              2.312***          
+##                                                        (0.305)          
 ##                                                                         
 ## ------------------------------------------------------------------------
 ## Observations                                           12,740           
-## Log Likelihood                                       -5,356.630         
-## Akaike Inf. Crit.                                    10,751.260         
-## Bayesian Inf. Crit.                                  10,892.860         
+## Log Likelihood                                       -5,355.879         
+## Akaike Inf. Crit.                                    10,749.760         
+## Bayesian Inf. Crit.                                  10,891.360         
 ## ========================================================================
 ## Note:                                        *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                              probability
+## (Intercept)                                   0.90984726
+## scale(totalStake)                             0.50887435
+## Fairness_score2                               0.45598038
+## Fairness_score3                               0.29117096
+## Fairness_score4                               0.11847889
+## Fairness_score5                               0.06930957
+## ReappraisalDirectionempathy                   0.89023573
+## ReappraisalDirectionpunish                    0.23512236
+## group4attempter                               0.58174910
+## group4depression                              0.50535340
+## group4ideator                                 0.59349641
+## scale(EXIT)                                   0.42978861
+## ReappraisalDirectionempathy:group4attempter   0.27466097
+## ReappraisalDirectionpunish:group4attempter    0.40224912
+## ReappraisalDirectionempathy:group4depression  0.80548578
+## ReappraisalDirectionpunish:group4depression   0.68482923
+## ReappraisalDirectionempathy:group4ideator     0.52117029
+## ReappraisalDirectionpunish:group4ideator      0.47904423</code></pre>
 <p>The following variable has significant influence in this interaction model: <span class="math inline">\(EXIT\)</span>.</p>
 <p>The following codes is for the random effect (block|ID), they are using the same procedure with above model with random effect (1|ID).</p>
 </div>
@@ -1768,6 +2099,16 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 10,607.910         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.89004944
+## ReappraisalDirectionempathy  0.96517292
+## ReappraisalDirectionpunish   0.46080118
+## scale(totalStake)            0.50915312
+## Fairness_score2              0.45210257
+## Fairness_score3              0.28147230
+## Fairness_score4              0.10808566
+## Fairness_score5              0.06033312</code></pre>
 </div>
 </div>
 <div id="level-1-model-with-group-predictor-random-effect-blockid" class="section level1">
@@ -1822,6 +2163,19 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 10,630.850         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.86706824
+## ReappraisalDirectionempathy  0.96526907
+## ReappraisalDirectionpunish   0.46163118
+## scale(totalStake)            0.50914397
+## Fairness_score2              0.45207857
+## Fairness_score3              0.28147297
+## Fairness_score4              0.10807554
+## Fairness_score5              0.06032225
+## group4attempter              0.46742740
+## group4depression             0.70187358
+## group4ideator                0.57615850</code></pre>
 <pre><code>## [1] &quot;model with 5 groups&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -1872,6 +2226,20 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                 10,640.250         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.86719648
+## ReappraisalDirectionempathy  0.96525540
+## ReappraisalDirectionpunish   0.46150434
+## scale(totalStake)            0.50914299
+## Fairness_score2              0.45208616
+## Fairness_score3              0.28147887
+## Fairness_score4              0.10807749
+## Fairness_score5              0.06032417
+## group5AttempterHL            0.45178138
+## group5AttempterLL            0.48344868
+## group5depression             0.70213560
+## group5ideator                0.57628254</code></pre>
 <p>Clinically groups is not significantly influence the gamble acceptance compared to HC in model with no interaction effect. And <span class="math inline">\(group4\)</span> and <span class="math inline">\(group5\)</span> have the same influence.</p>
 <div id="the-model-with-the-an-individual-subject-level-variable" class="section level3">
 <h3>the model with the an individual subject level variable</h3>
@@ -1883,10 +2251,10 @@ $(document).ready(function () {
 ##                             ---------------------------
 ##                                     AcceptOffer        
 ## -------------------------------------------------------
-## ReappraisalDirectionempathy          3.322***          
+## ReappraisalDirectionempathy          3.318***          
 ##                                       (0.172)          
 ##                                                        
-## ReappraisalDirectionpunish            -0.158           
+## ReappraisalDirectionpunish            -0.162           
 ##                                       (0.160)          
 ##                                                        
 ## scale(totalStake)                      0.037           
@@ -1904,28 +2272,42 @@ $(document).ready(function () {
 ## Fairness_score5                      -2.746***         
 ##                                       (0.119)          
 ##                                                        
-## group4attempter                        0.065           
-##                                       (0.432)          
+## group4attempter                        0.117           
+##                                       (0.430)          
 ##                                                        
-## group4depression                      0.842*           
-##                                       (0.458)          
+## group4depression                      0.834*           
+##                                       (0.454)          
 ##                                                        
-## group4ideator                          0.364           
-##                                       (0.470)          
+## group4ideator                          0.388           
+##                                       (0.467)          
 ##                                                        
-## scale(EXIT)                           -0.281*          
-##                                       (0.155)          
+## scale(EXIT)                          -0.339**          
+##                                       (0.154)          
 ##                                                        
-## Constant                             1.920***          
-##                                       (0.347)          
+## Constant                             1.927***          
+##                                       (0.344)          
 ##                                                        
 ## -------------------------------------------------------
 ## Observations                          12,740           
-## Log Likelihood                      -5,233.475         
-## Akaike Inf. Crit.                   10,502.950         
-## Bayesian Inf. Crit.                 10,637.100         
+## Log Likelihood                      -5,232.735         
+## Akaike Inf. Crit.                   10,501.470         
+## Bayesian Inf. Crit.                 10,635.610         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.87290469
+## ReappraisalDirectionempathy  0.96505660
+## ReappraisalDirectionpunish   0.45958449
+## scale(totalStake)            0.50918808
+## Fairness_score2              0.45205308
+## Fairness_score3              0.28135820
+## Fairness_score4              0.10806700
+## Fairness_score5              0.06033372
+## group4attempter              0.52910233
+## group4depression             0.69712062
+## group4ideator                0.59577710
+## scale(EXIT)                  0.41601013</code></pre>
 <pre><code>## [1] &quot;NONPLAN model&quot;</code></pre>
 <pre><code>## 
 ## =======================================================
@@ -1933,10 +2315,10 @@ $(document).ready(function () {
 ##                             ---------------------------
 ##                                     AcceptOffer        
 ## -------------------------------------------------------
-## ReappraisalDirectionempathy          3.325***          
+## ReappraisalDirectionempathy          3.323***          
 ##                                       (0.172)          
 ##                                                        
-## ReappraisalDirectionpunish            -0.154           
+## ReappraisalDirectionpunish            -0.155           
 ##                                       (0.161)          
 ##                                                        
 ## scale(totalStake)                      0.037           
@@ -1954,28 +2336,42 @@ $(document).ready(function () {
 ## Fairness_score5                      -2.746***         
 ##                                       (0.119)          
 ##                                                        
-## group4attempter                        0.085           
-##                                       (0.482)          
+## group4attempter                        0.146           
+##                                       (0.485)          
 ##                                                        
-## group4depression                      1.009**          
-##                                       (0.492)          
+## group4depression                      1.056**          
+##                                       (0.494)          
 ##                                                        
-## group4ideator                          0.488           
-##                                       (0.513)          
+## group4ideator                          0.511           
+##                                       (0.506)          
 ##                                                        
-## scale(BIS_NONPLAN)                    -0.204           
-##                                       (0.215)          
+## scale(BIS_NONPLAN)                    -0.257           
+##                                       (0.218)          
 ##                                                        
-## Constant                             1.675***          
-##                                       (0.412)          
+## Constant                             1.617***          
+##                                       (0.416)          
 ##                                                        
 ## -------------------------------------------------------
 ## Observations                          12,740           
-## Log Likelihood                      -5,234.634         
-## Akaike Inf. Crit.                   10,505.270         
-## Bayesian Inf. Crit.                 10,639.410         
+## Log Likelihood                      -5,234.389         
+## Akaike Inf. Crit.                   10,504.780         
+## Bayesian Inf. Crit.                 10,638.920         
 ## =======================================================
 ## Note:                       *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                             probability
+## (Intercept)                  0.83437264
+## ReappraisalDirectionempathy  0.96522198
+## ReappraisalDirectionpunish   0.46132890
+## scale(totalStake)            0.50914666
+## Fairness_score2              0.45209201
+## Fairness_score3              0.28149652
+## Fairness_score4              0.10809509
+## Fairness_score5              0.06033662
+## group4attempter              0.53640855
+## group4depression             0.74199036
+## group4ideator                0.62498511
+## scale(BIS_NONPLAN)           0.43615341</code></pre>
 <p><span class="math inline">\(EXIT\)</span> is the only significant subject level variable.</p>
 <p>In the model with <span class="math inline">\(nonplan\)</span> variable, the depression group is different to accept gamble compared to the HC.</p>
 </div>
@@ -2092,6 +2488,36 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                                                    10,569.110         
 ## ==========================================================================================
 ## Note:                                                          *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                                                probability
+## (Intercept)                                                     0.94206112
+## ReappraisalDirectionempathy                                     0.86081355
+## ReappraisalDirectionpunish                                      0.17262104
+## scale(totalStake)                                               0.45411051
+## Fairness_score2                                                 0.42841058
+## Fairness_score3                                                 0.27932201
+## Fairness_score4                                                 0.10087347
+## Fairness_score5                                                 0.05679563
+## group4attempter                                                 0.48737506
+## group4depression                                                0.38224342
+## group4ideator                                                   0.55931210
+## ReappraisalDirectionempathy:scale(totalStake)                   0.48250960
+## ReappraisalDirectionpunish:scale(totalStake)                    0.56823098
+## ReappraisalDirectionempathy:group4attempter                     0.34113640
+## ReappraisalDirectionpunish:group4attempter                      0.47557240
+## ReappraisalDirectionempathy:group4depression                    0.94897951
+## ReappraisalDirectionpunish:group4depression                     0.88740876
+## ReappraisalDirectionempathy:group4ideator                       0.56022317
+## ReappraisalDirectionpunish:group4ideator                        0.50289747
+## scale(totalStake):group4attempter                               0.51513141
+## scale(totalStake):group4depression                              0.46598931
+## scale(totalStake):group4ideator                                 0.49592683
+## ReappraisalDirectionempathy:scale(totalStake):group4attempter   0.59812724
+## ReappraisalDirectionpunish:scale(totalStake):group4attempter    0.52834674
+## ReappraisalDirectionempathy:scale(totalStake):group4depression  0.57470696
+## ReappraisalDirectionpunish:scale(totalStake):group4depression   0.59280589
+## ReappraisalDirectionempathy:scale(totalStake):group4ideator     0.56237163
+## ReappraisalDirectionpunish:scale(totalStake):group4ideator      0.55898613</code></pre>
 <p>Reappraisal Direction x totalStake x group4 is marginally significant.</p>
 <ol start="4" style="list-style-type: decimal">
 <li><span class="math inline">\(fairness\, score\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -2178,6 +2604,31 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                      10,620.920         
 ## ============================================================
 ## Note:                            *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                  probability
+## (Intercept)                       0.91205728
+## ReappraisalDirectionempathy       0.96585560
+## ReappraisalDirectionpunish        0.44912976
+## scale(totalStake)                 0.50923950
+## Fairness_score2                   0.41510667
+## Fairness_score3                   0.22761584
+## Fairness_score4                   0.07299750
+## Fairness_score5                   0.02924567
+## group4attempter                   0.60227208
+## group4depression                  0.41477246
+## group4ideator                     0.48325475
+## Fairness_score2:group4attempter   0.27609297
+## Fairness_score3:group4attempter   0.31913793
+## Fairness_score4:group4attempter   0.39742209
+## Fairness_score5:group4attempter   0.37435941
+## Fairness_score2:group4depression  0.65615535
+## Fairness_score3:group4depression  0.69599561
+## Fairness_score4:group4depression  0.74279059
+## Fairness_score5:group4depression  0.87049100
+## Fairness_score2:group4ideator     0.64382425
+## Fairness_score3:group4ideator     0.64366896
+## Fairness_score4:group4ideator     0.55314049
+## Fairness_score5:group4ideator     0.60148304</code></pre>
 <p>Fairness score x group has significant interaction effect.</p>
 <ol start="5" style="list-style-type: decimal">
 <li><span class="math inline">\(reappraisal\, direction\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -2246,6 +2697,25 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                                  10,547.170         
 ## ========================================================================
 ## Note:                                        *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                              probability
+## (Intercept)                                   0.93756493
+## scale(totalStake)                             0.50876533
+## Fairness_score2                               0.45093165
+## Fairness_score3                               0.28258140
+## Fairness_score4                               0.10752105
+## Fairness_score5                               0.05930074
+## ReappraisalDirectionempathy                   0.86641543
+## ReappraisalDirectionpunish                    0.17738714
+## group4attempter                               0.49086958
+## group4depression                              0.38589555
+## group4ideator                                 0.55540701
+## ReappraisalDirectionempathy:group4attempter   0.32444611
+## ReappraisalDirectionpunish:group4attempter    0.47322974
+## ReappraisalDirectionempathy:group4depression  0.94870091
+## ReappraisalDirectionpunish:group4depression   0.88902046
+## ReappraisalDirectionempathy:group4ideator     0.55754309
+## ReappraisalDirectionpunish:group4ideator      0.50725417</code></pre>
 <p>reappraisal direction x group4 has significant influence.</p>
 <ol start="6" style="list-style-type: decimal">
 <li><span class="math inline">\(fairness\, score\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -2332,6 +2802,31 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                      10,620.910         
 ## ============================================================
 ## Note:                            *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                  probability
+## (Intercept)                       0.91292528
+## scale(totalStake)                 0.50932516
+## ReappraisalDirectionempathy       0.96585798
+## ReappraisalDirectionpunish        0.44918346
+## Fairness_score2                   0.40962214
+## Fairness_score3                   0.22457854
+## Fairness_score4                   0.07163980
+## Fairness_score5                   0.02865825
+## group4attempter                   0.59900068
+## group4depression                  0.41204538
+## group4ideator                     0.48208204
+## Fairness_score2:group4attempter   0.28224489
+## Fairness_score3:group4attempter   0.32414516
+## Fairness_score4:group4attempter   0.40381687
+## Fairness_score5:group4attempter   0.38059493
+## Fairness_score2:group4depression  0.66217454
+## Fairness_score3:group4depression  0.70022823
+## Fairness_score4:group4depression  0.74731285
+## Fairness_score5:group4depression  0.87324337
+## Fairness_score2:group4ideator     0.64811472
+## Fairness_score3:group4ideator     0.64658434
+## Fairness_score4:group4ideator     0.55696970
+## Fairness_score5:group4ideator     0.60541790</code></pre>
 <p>fairness score x group4 has significant influence.</p>
 <ol start="7" style="list-style-type: decimal">
 <li><span class="math inline">\(total\, stake\)</span> x <span class="math inline">\(group4\)</span> two way interaction</li>
@@ -2391,6 +2886,22 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                        10,649.270         
 ## ==============================================================
 ## Note:                              *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                    probability
+## (Intercept)                         0.86761598
+## scale(totalStake)                   0.47557993
+## ReappraisalDirectionempathy         0.96541149
+## ReappraisalDirectionpunish          0.46176940
+## Fairness_score2                     0.45182242
+## Fairness_score3                     0.28107276
+## Fairness_score4                     0.10774045
+## Fairness_score5                     0.06003657
+## group4attempter                     0.46609606
+## group4depression                    0.70108804
+## group4ideator                       0.57530780
+## scale(totalStake):group4attempter   0.55774768
+## scale(totalStake):group4depression  0.53637683
+## scale(totalStake):group4ideator     0.53333552</code></pre>
 <p>total stake x group4 has significant influence.</p>
 <ol start="8" style="list-style-type: decimal">
 <li><span class="math inline">\(total\, stake\)</span> x <span class="math inline">\(fairness\, score\)</span> two way interaction</li>
@@ -2453,6 +2964,23 @@ $(document).ready(function () {
 ## Bayesian Inf. Crit.                       10,611.600         
 ## =============================================================
 ## Note:                             *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                   probability
+## (Intercept)                        0.88759813
+## scale(totalStake)                  0.38510823
+## ReappraisalDirectionempathy        0.96800268
+## ReappraisalDirectionpunish         0.47135859
+## Fairness_score2                    0.40052658
+## Fairness_score3                    0.23668342
+## Fairness_score4                    0.08845440
+## Fairness_score5                    0.04837858
+## group4attempter                    0.46641003
+## group4depression                   0.70379782
+## group4ideator                      0.57677958
+## scale(totalStake):Fairness_score2  0.51886005
+## scale(totalStake):Fairness_score3  0.61372913
+## scale(totalStake):Fairness_score4  0.66879619
+## scale(totalStake):Fairness_score5  0.61869231</code></pre>
 <p>total stake x fairness score has significant influence.</p>
 <p><strong>which interaction model is the best model among all the interaction models:</strong></p>
 <pre><code>## Model selection table 
@@ -2498,118 +3026,149 @@ $(document).ready(function () {
 ##                                                                ---------------------------
 ##                                                                        AcceptOffer        
 ## ------------------------------------------------------------------------------------------
-## ReappraisalDirectionempathy                                             1.834***          
+## ReappraisalDirectionempathy                                             1.826***          
 ##                                                                          (0.327)          
 ##                                                                                           
-## ReappraisalDirectionpunish                                              -1.555***         
+## ReappraisalDirectionpunish                                              -1.565***         
 ##                                                                          (0.317)          
 ##                                                                                           
-## scale(totalStake)                                                       -0.186**          
-##                                                                          (0.094)          
+## scale(totalStake)                                                        -0.183*          
+##                                                                          (0.093)          
 ##                                                                                           
-## Fairness_score2                                                         -0.283**          
+## Fairness_score2                                                         -0.290**          
 ##                                                                          (0.134)          
 ##                                                                                           
-## Fairness_score3                                                         -0.943***         
+## Fairness_score3                                                         -0.949***         
 ##                                                                          (0.117)          
 ##                                                                                           
-## Fairness_score4                                                         -2.182***         
+## Fairness_score4                                                         -2.188***         
 ##                                                                          (0.117)          
 ##                                                                                           
-## Fairness_score5                                                         -2.806***         
+## Fairness_score5                                                         -2.810***         
 ##                                                                          (0.119)          
 ##                                                                                           
-## group4attempter                                                           0.141           
-##                                                                          (0.489)          
+## group4attempter                                                           0.189           
+##                                                                          (0.482)          
 ##                                                                                           
-## group4depression                                                         -0.389           
-##                                                                          (0.498)          
+## group4depression                                                         -0.365           
+##                                                                          (0.492)          
 ##                                                                                           
-## group4ideator                                                             0.282           
-##                                                                          (0.562)          
+## group4ideator                                                             0.294           
+##                                                                          (0.553)          
 ##                                                                                           
-## scale(EXIT)                                                              -0.297*          
-##                                                                          (0.152)          
+## scale(EXIT)                                                             -0.370**          
+##                                                                          (0.151)          
 ##                                                                                           
-## ReappraisalDirectionempathy:scale(totalStake)                            -0.069           
+## ReappraisalDirectionempathy:scale(totalStake)                            -0.072           
 ##                                                                          (0.140)          
 ##                                                                                           
-## ReappraisalDirectionpunish:scale(totalStake)                             0.276**          
+## ReappraisalDirectionpunish:scale(totalStake)                             0.274**          
 ##                                                                          (0.128)          
 ##                                                                                           
-## ReappraisalDirectionempathy:group4attempter                              -0.672           
+## ReappraisalDirectionempathy:group4attempter                              -0.668           
 ##                                                                          (0.477)          
 ##                                                                                           
-## ReappraisalDirectionpunish:group4attempter                               -0.113           
+## ReappraisalDirectionpunish:group4attempter                               -0.108           
 ##                                                                          (0.467)          
 ##                                                                                           
-## ReappraisalDirectionempathy:group4depression                            2.918***          
-##                                                                          (0.392)          
+## ReappraisalDirectionempathy:group4depression                            2.927***          
+##                                                                          (0.391)          
 ##                                                                                           
-## ReappraisalDirectionpunish:group4depression                             2.056***          
-##                                                                          (0.363)          
+## ReappraisalDirectionpunish:group4depression                             2.066***          
+##                                                                          (0.362)          
 ##                                                                                           
-## ReappraisalDirectionempathy:group4ideator                                 0.270           
-##                                                                          (0.582)          
+## ReappraisalDirectionempathy:group4ideator                                 0.292           
+##                                                                          (0.581)          
 ##                                                                                           
-## ReappraisalDirectionpunish:group4ideator                                  0.037           
-##                                                                          (0.560)          
+## ReappraisalDirectionpunish:group4ideator                                  0.060           
+##                                                                          (0.559)          
 ##                                                                                           
-## scale(totalStake):group4attempter                                         0.062           
+## scale(totalStake):group4attempter                                         0.060           
 ##                                                                          (0.123)          
 ##                                                                                           
-## scale(totalStake):group4depression                                       -0.133           
+## scale(totalStake):group4depression                                       -0.136           
 ##                                                                          (0.124)          
 ##                                                                                           
-## scale(totalStake):group4ideator                                          -0.011           
-##                                                                          (0.145)          
+## scale(totalStake):group4ideator                                          -0.016           
+##                                                                          (0.144)          
 ##                                                                                           
-## ReappraisalDirectionempathy:scale(totalStake):group4attempter            0.397**          
+## ReappraisalDirectionempathy:scale(totalStake):group4attempter            0.400**          
 ##                                                                          (0.187)          
 ##                                                                                           
-## ReappraisalDirectionpunish:scale(totalStake):group4attempter              0.112           
+## ReappraisalDirectionpunish:scale(totalStake):group4attempter              0.113           
 ##                                                                          (0.171)          
 ##                                                                                           
-## ReappraisalDirectionempathy:scale(totalStake):group4depression            0.298           
+## ReappraisalDirectionempathy:scale(totalStake):group4depression            0.303           
 ##                                                                          (0.202)          
 ##                                                                                           
-## ReappraisalDirectionpunish:scale(totalStake):group4depression            0.373**          
+## ReappraisalDirectionpunish:scale(totalStake):group4depression            0.374**          
 ##                                                                          (0.164)          
 ##                                                                                           
-## ReappraisalDirectionempathy:scale(totalStake):group4ideator               0.250           
+## ReappraisalDirectionempathy:scale(totalStake):group4ideator               0.254           
 ##                                                                          (0.235)          
 ##                                                                                           
-## ReappraisalDirectionpunish:scale(totalStake):group4ideator                0.234           
-##                                                                          (0.202)          
+## ReappraisalDirectionpunish:scale(totalStake):group4ideator                0.236           
+##                                                                          (0.201)          
 ##                                                                                           
-## Constant                                                                2.779***          
-##                                                                          (0.370)          
+## Constant                                                                2.780***          
+##                                                                          (0.365)          
 ##                                                                                           
 ## ------------------------------------------------------------------------------------------
 ## Observations                                                             12,740           
-## Log Likelihood                                                         -5,122.113         
-## Akaike Inf. Crit.                                                      10,314.230         
-## Bayesian Inf. Crit.                                                    10,575.060         
+## Log Likelihood                                                         -5,121.179         
+## Akaike Inf. Crit.                                                      10,312.360         
+## Bayesian Inf. Crit.                                                    10,573.190         
 ## ==========================================================================================
 ## Note:                                                          *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre><code>## [1] &quot;probability coefficients&quot;</code></pre>
+<pre><code>##                                                                probability
+## (Intercept)                                                      0.9415940
+## ReappraisalDirectionempathy                                      0.8613383
+## ReappraisalDirectionpunish                                       0.1729834
+## scale(totalStake)                                                0.4544054
+## Fairness_score2                                                  0.4279651
+## Fairness_score3                                                  0.2790449
+## Fairness_score4                                                  0.1008128
+## Fairness_score5                                                  0.0567704
+## group4attempter                                                  0.5470309
+## group4depression                                                 0.4097769
+## group4ideator                                                    0.5729728
+## scale(EXIT)                                                      0.4084810
+## ReappraisalDirectionempathy:scale(totalStake)                    0.4818903
+## ReappraisalDirectionpunish:scale(totalStake)                     0.5680914
+## ReappraisalDirectionempathy:group4attempter                      0.3388617
+## ReappraisalDirectionpunish:group4attempter                       0.4731486
+## ReappraisalDirectionempathy:group4depression                     0.9491673
+## ReappraisalDirectionpunish:group4depression                      0.8875173
+## ReappraisalDirectionempathy:group4ideator                        0.5724846
+## ReappraisalDirectionpunish:group4ideator                         0.5150666
+## scale(totalStake):group4attempter                                0.5150037
+## scale(totalStake):group4depression                               0.4659439
+## scale(totalStake):group4ideator                                  0.4960265
+## ReappraisalDirectionempathy:scale(totalStake):group4attempter    0.5985987
+## ReappraisalDirectionpunish:scale(totalStake):group4attempter     0.5282489
+## ReappraisalDirectionempathy:scale(totalStake):group4depression   0.5752185
+## ReappraisalDirectionpunish:scale(totalStake):group4depression    0.5925233
+## ReappraisalDirectionempathy:scale(totalStake):group4ideator      0.5630593
+## ReappraisalDirectionpunish:scale(totalStake):group4ideator       0.5586985</code></pre>
 <p>Only <span class="math inline">\(EXIT\)</span> has significant influence.</p>
 <p>Compare (1|ID) and (block|ID) <span class="math inline">\(EXIT\)</span> models:</p>
 <pre><code>## Model selection table 
 ##         (Int) Frn_scr gr4 RpD scl(EXI) scl(ttS) gr4:RpD gr4:scl(ttS)
-## m_exit3 2.779       +   +   +  -0.2969 -0.18590       +            +
-## m_exit2 1.920       +   +   +  -0.2806  0.03670                     
-## m_exit1 2.369       +   +   +  -0.2280 -0.16290       +            +
-## m_exit  2.207       +   +   +  -0.2196  0.03427                     
+## m_exit3 2.780       +   +   +  -0.3702 -0.18290       +            +
+## m_exit2 1.927       +   +   +  -0.3392  0.03676                     
+## m_exit1 2.365       +   +   +  -0.2848 -0.16280       +            +
+## m_exit  2.204       +   +   +  -0.2732  0.03427                     
 ##         RpD:scl(ttS) gr4:RpD:scl(ttS)         control random df    logLik
-## m_exit3            +                + g(c.F,l(20000))    b|I 35 -5122.113
-## m_exit2                                          g(b)    b|I 18 -5233.475
-## m_exit1            +                +            g(b)      I 30 -5320.783
-## m_exit                                           g(b)      I 13 -5445.395
+## m_exit3            +                + g(c.F,l(20000))    b|I 35 -5121.179
+## m_exit2                                          g(b)    b|I 18 -5232.735
+## m_exit1            +                +            g(b)      I 30 -5320.031
+## m_exit                                           g(b)      I 13 -5444.691
 ##            AICc  delta weight
-## m_exit3 10314.4   0.00      1
-## m_exit2 10503.0 188.58      0
-## m_exit1 10701.7 387.29      0
-## m_exit  10916.8 602.39      0
+## m_exit3 10312.6   0.00      1
+## m_exit2 10501.5 188.97      0
+## m_exit1 10700.2 387.65      0
+## m_exit  10915.4 602.85      0
 ## Abbreviations:
 ## control: g(b) = 'glmerControl(bobyqa)', 
 ##          g(c.F,l(20000)) = 'glmerControl(calc.FALSE,list(20000))'
