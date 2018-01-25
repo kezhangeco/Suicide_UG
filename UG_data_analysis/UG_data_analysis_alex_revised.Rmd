@@ -138,10 +138,9 @@ car::Anova(m1)
 anova(m0r,m1)
 
 
-m1g <-
-  glmer(
+m1g <-glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + (1 |
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 |
   ID/block),
   family = binomial,
   data = allData,
@@ -150,6 +149,8 @@ m1g <-
 car::Anova(m1g)
 anova(m1,m1g)
 lsm <- lsmeans(m1g, "ReappraisalDirection", by = "group4")
+plot(lsm, horiz = F)
+lsm <- lsmeans(m1g, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F)
 lsm <- lsmeans(m1g, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F)
