@@ -20,6 +20,10 @@ library(glmulti)
 library(rJava)
 library(mice)
 library(stargazer)
+library(lsmeans)
+library(effects)
+library(psych)
+library(compareGroups)
 ```
 
 
@@ -40,6 +44,11 @@ question <- read_excel("~/code/Suicide_UG/ug_questionnaire.xlsx")
 
 question <- rename(question, c("UPPSP NEG URGENCY" = "urgency"))
 demoQuestion <- merge(demo, question, on = "ID")
+
+c1 <- demoQuestion[,c(2,3,15,49,93,129,78,79)]
+c2 <- compareGroups(c1,demoQuestion$group4)
+t1 <- createTable(c2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+
 allData <- merge(task, demoQuestion, on = "ID")
 allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
 allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita", "MMSE TOTAL" = "MMSE"))
@@ -48,13 +57,18 @@ allData$ID <- as.factor(allData$ID)
 allData$AcceptOffer <- as.factor(allData$AcceptOffer)
 
 # reference group = control
-allData <- within(allData, group4 <- relevel(group4, ref = "control"))
-allData <- within(allData, group5 <- relevel(group5, ref = "control"))
+allData <- within(allData, group4 <- relevel(group4, ref = "attempter"))
+allData <- within(allData, group5 <- relevel(group5, ref = "AttempterHL"))
 
 # block number
 allData$block <- NA
 allData$block <- ifelse(allData$merged_trial < 27, "1", ifelse((allData$merged_trial > 26) & (allData$merged_trial < 53), "2", "3" ))
 print(allData$block)
+
+allData$fairLR <- log(allData$PlayerProposedAmount/allData$OpponentProposedAmount)
+allData$fairR <- (allData$PlayerProposedAmount/allData$OpponentProposedAmount)
+
+df <- allData
 ```
 
 variables in the models:
@@ -87,38 +101,8 @@ missingVar_complete <- complete(missingDF_impute,1)
 # merge the generated values to the df
 missingVar_complete <- rename(missingVar_complete, c("BIS_NONPLAN" = "BIS_NONPLAN_full", "IIP15INTAMBV" = "IIP15INTAMBV_full", "EXIT" = "EXIT_full", "urgency" = "urgency_full"))
 allData <- merge(allData, missingVar_complete, by = "ID")
+df <- allData
 ```
-
-# Whether HLM is needed?
-## Intercept only
-```{r}
-interceptOnly <- glm(task$AcceptOffer ~ 1, family = binomial, data = task)
-summary(interceptOnly)
-```
-
-## Null model: random intercept only
-```{r}
-randomInterceptOnly <- glmer(task$AcceptOffer ~ 1 + (1|ID), data = task, family = binomial)
-summary(randomInterceptOnly)
-```
-By adding the ID (nested), the AIC (1|D) is smaller than the AIC (1). So HLM is necessary. 
-
-The variance of the intercept in the *null model is 1.157*. That is the variance can't be explained by the random effect of ID. Compare the variance with more complicated models. If the intercept variance gets smaller, that is an indication of the additional predictors adding more explanation to the DV.
-
-##  Intraclass Correlation (ICC)
-Test if HLM is needed: whether there is variation over the level 2 variable (participant ID). If the ICC > 0, then HLM is needed.
-```{r, echo=FALSE}
-ICC_model <- function(modelName) {
-  tau_null <- as.numeric(lapply(summary(modelName)$varcor, diag))
-  sigma_null <- as.numeric(attr(summary(modelName)$varcor, "sc")^2)
-  ICC_null <- tau_null/(tau_null + sigma_null)
-  return(ICC_null)
-}
-
-cat("ICC is", ICC_model(randomInterceptOnly))
-```
-The ICC > 0, the HLM is needed.
-
 # correlation matrix of the subject level variables
 ```{r corr, echo=FALSE}
 corrMatrix <- ggpairs(demoQuestion[, c("PER CAPITA INCOME", "HRSD NO SUI", "DRS", "EDUCATION", "EXIT", "BIS_NONPLAN", "IIP15INTAMBV", "urgency")])
@@ -136,18 +120,83 @@ The following variables are moderately/highly correlated:
 - urgency x BIS nonplan
 - **urgency x interpersonal**
 
-```{r wrapper, include=FALSE}
-glmer.glmulti <- function(formula, data, random = ""){
-  glmer(paste(deparse(formula), random), data = data, family = binomial, control = glmerControl(calc.derivs = FALSE))
-}
-```
-
-# Level 1 model (Random intercept and fixed slopes with random effect (1|ID))
-## No interaction model
 ```{r}
 m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), family = binomial, data = allData)
 summary(m0)
-```
+# convergence problems with Fairness_score
+
+m0r <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + fairLR + (1|ID), family = binomial, data = allData)
+summary(m0r)
+lsm <- lsmeans(m0r, "ReappraisalDirection")
+plot(lsm, horiz = F)
+plot(Effect("totalStake",m0r))
+plot(Effect("fairLR",m0r))
+
+m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection*fairLR*scale(totalStake) + (1|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
+summary(m1)
+car::Anova(m1)
+anova(m0r,m1)
+
+
+m1g <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1g)
+car::Anova(m1g)
+anova(m1,m1g)
+lsm <- lsmeans(m1g, "ReappraisalDirection", by = "group4")
+plot(lsm, horiz = F)
+lsm <- lsmeans(m1g, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm, horiz = F)
+
+lsm <- lsmeans(m1g, "totalStake", by = "group4", at = list(totalStake = c(8, 13,18)))
+plot(lsm, horiz = F)
+
+# control for ed
+m1ge <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+      ReappraisalDirection*EDUCATION + (1 |
+  ID),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1ge)
+car::Anova(m1ge)
+
+# control for MMSE
+m1gm <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+      ReappraisalDirection*MMSE + (1 |
+  ID),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1gm)
+car::Anova(m1gm)
+
+
+# does not converge
+m1gl <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + (1 |
+  ID),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1gl)
+car::Anova(m1gl)
+anova(m1g,m1gl)
+````
 
 ## Interaction models
 Screening the alternative models of the level 1 predictors. The models include all interaction effect.
