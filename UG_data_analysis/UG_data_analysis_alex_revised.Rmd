@@ -69,6 +69,8 @@ allData$fairLR <- log(allData$PlayerProposedAmount/allData$OpponentProposedAmoun
 allData$fairR <- (allData$PlayerProposedAmount/allData$OpponentProposedAmount)
 
 df <- allData
+save(list = ls(all.names = TRUE), file = "UG1.RData")
+
 ```
 
 variables in the models:
@@ -205,40 +207,10 @@ pdf("UGcontext*MMSE.pdf", width=8, height=6)
 lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,28,30)))
 plot(lsm, horiz = F)
 dev.off()
+```
 
-
-
-## general predictor script
-setwd("~/code/Suicide_UG/predictor_plots")
-
-vars <- c("NEUROTICISM","EXTRAVERSION" , "CONSCIENTIOUSNESS", "AGREEABLENESS", "OPENNESS" )
-
-for(i in 1:length(vars))
-{varname <- vars[i]
-print(varname)
-allData$predictor <- as.numeric(as.matrix(allData[,varname]))
-
-# control for ed
-m_pred <-
-  glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(predictor) + (1 |
-  ID/block),
-  family = binomial,
-  data = allData,
-  nAGQ = 0,  
-  control = glmerControl(optimizer = "bobyqa"))
-  summary(m_pred)
-car::Anova(m_pred)
-q <- quantile(allData$predictor, na.rm = TRUE,probs = seq(0,1,0.1))
-filename <- paste0(varname,"_context_UG.pdf")
-pdf(file = filename,width = 12, height = 6)
-lsm <- lsmeans(m_pred, "ReappraisalDirection", by = "predictor", at = list(predictor = c(q[2],q[6],q[10])))
-plot(lsm, horiz = F)
-dev.off()
-}
-
+```{r}
+```
 # control for MMSE
 m1gm <-
   glmer(
