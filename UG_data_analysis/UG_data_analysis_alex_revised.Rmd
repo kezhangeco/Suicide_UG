@@ -142,6 +142,10 @@ control = glmerControl(optimizer = "bobyqa"))
 summary(m1)
 car::Anova(m1)
 anova(m0r,m1)
+lsm <- lsmeans(m1, "ReappraisalDirection", by = "totalStake", at = list(totalStake = c(8, 13,18)))
+plot(lsm, horiz = F)
+lsm <- lsmeans(m1, "fairLR", by = "totalStake", at = list(totalStake = c(8, 13,18), fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm, horiz = F)
 
 
 # Group
@@ -169,6 +173,7 @@ lsm <- lsmeans(m1g, "totalStake", by = "group4", at = list(totalStake = c(8, 13,
 plot(lsm, horiz = F)
 dev.off()
 
+
 # NB: there are RT outliers up to 430s (??).  Try without the top 5%:
 m1g_cens <- glmer(
   AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
@@ -182,22 +187,22 @@ m1g_cens <- glmer(
 car::Anova(m1g_cens)
 # results are not sensitive to that
 
-# add context*fair*Group -- too complex, would not bother including
-m1g1 <-glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + scale(fairLR) * ReappraisalDirection *
-  group4 + scale(totalStake) * group4 +  (1 |
-  ID/block),
-  family = binomial,
-  data = allData,
-  
-  control = glmerControl(optimizer = "bobyqa"))
-  summary(m1g1)
-car::Anova(m1g1, type = 'III')
-anova(m1g,m1g1)
-pdf("UGfair*context*group.pdf", width=10, height=16)
-lsm <- lsmeans(m1g, "fairLR", by = c("group4","ReappraisalDirection"), at = list(fairLR = c(-2.66,-1.22,0.22)))
-plot(lsm)
-dev.off()
+## add context*fair*Group -- too complex, would not bother including
+# m1g1 <-glmer(
+#   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + scale(fairLR) * ReappraisalDirection *
+#   group4 + scale(totalStake) * group4 +  (1 |
+#   ID/block),
+#   family = binomial,
+#   data = allData,
+#   
+#   control = glmerControl(optimizer = "bobyqa"))
+#   summary(m1g1)
+# car::Anova(m1g1, type = 'III')
+# anova(m1g,m1g1)
+# pdf("UGfair*context*group.pdf", width=10, height=16)
+# lsm <- lsmeans(m1g, "fairLR", by = c("group4","ReappraisalDirection"), at = list(fairLR = c(-2.66,-1.22,0.22)))
+# plot(lsm)
+# dev.off()
 
 
 # control for ed
@@ -254,6 +259,26 @@ pdf("UGfair*groupLeth.pdf", width=10, height=6)
 lsm <- lsmeans(m1gl, "fairLR", by = "group5", at = list(fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F)
 dev.off()
+
+# try to replicate previous UG paper
+m1gl1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + scale(fairLR) * scale(totalStake) * group5 + (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+   nAGQ = 0,
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1gl1)
+car::Anova(m1gl1)
+anova(m1gl,m1gl1)
+
+pdf("UGfair*stake*groupLeth.pdf", width=14, height=6)
+lsm <- lsmeans::lsmeans(m1gl, "fairLR", by = c("totalStake", "group5"), at = list(fairLR = c(-2.66,0.22),totalStake = c(8,18)))
+plot(lsm, horiz = F)
+dev.off()
+
 
 ```
 
