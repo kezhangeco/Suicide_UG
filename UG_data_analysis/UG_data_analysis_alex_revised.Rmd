@@ -9,15 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(lme4)
 library(ggplot2)
-library(GGally)
+# library(GGally)
 library(plyr)
 library(Matrix)
 library(readxl)
 library(reshape2)
 library(numDeriv)
 library(MuMIn)
-library(glmulti)
-library(rJava)
+# library(glmulti)
+# library(rJava)
 library(mice)
 library(stargazer)
 library(lsmeans)
@@ -121,52 +121,95 @@ The following variables are moderately/highly correlated:
 - **urgency x interpersonal**
 
 ```{r}
-m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), family = binomial, data = allData)
+m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID/block), family = binomial, data = allData,  
+  control = glmerControl(optimizer = "bobyqa"))
+
 summary(m0)
 # convergence problems with Fairness_score
-
-m0r <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + fairLR + (1|ID), family = binomial, data = allData)
+plot(df$Fairness_score, df$fairLR)
+m0r <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + fairLR + (1|ID/block), family = binomial, data = allData, 
+  control = glmerControl(optimizer = "bobyqa"))
 summary(m0r)
+car::Anova(m0r)
+anova(m0,m0r)
 lsm <- lsmeans(m0r, "ReappraisalDirection")
 plot(lsm, horiz = F)
 plot(Effect("totalStake",m0r))
 plot(Effect("fairLR",m0r))
 
-m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection*fairLR*scale(totalStake) + (1|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
+m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection*fairLR*scale(totalStake) + (1|ID/block), family = binomial, data = allData,   
+control = glmerControl(optimizer = "bobyqa"))
 summary(m1)
 car::Anova(m1)
 anova(m0r,m1)
 
 
+# Group
 m1g <-glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 |
   ID/block),
   family = binomial,
   data = allData,
+  
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1g)
 car::Anova(m1g)
 anova(m1,m1g)
+pdf("UGcontext*group.pdf", width=8, height=6)
 lsm <- lsmeans(m1g, "ReappraisalDirection", by = "group4")
 plot(lsm, horiz = F)
+dev.off()
+pdf("UGfair*group.pdf", width=8, height=6)
 lsm <- lsmeans(m1g, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F)
-lsm <- lsmeans(m1g, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
-plot(lsm, horiz = F)
-
+dev.off()
+pdf("UGstake*group.pdf", width=8, height=6)
 lsm <- lsmeans(m1g, "totalStake", by = "group4", at = list(totalStake = c(8, 13,18)))
 plot(lsm, horiz = F)
+dev.off()
+
+# NB: there are RT outliers up to 430s (??).  Try without the top 5%:
+m1g_cens <- glmer(
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 |
+  ID/block),
+  family = binomial,
+  data = allData[allData$Stimuli_RT<5823,],
+  
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1g_cens)
+car::Anova(m1g_cens)
+# results are not sensitive to that
+
+# add context*fair*Group -- too complex, would not bother including
+m1g1 <-glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + scale(fairLR) * ReappraisalDirection *
+  group4 + scale(totalStake) * group4 +  (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+  
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1g1)
+car::Anova(m1g1, type = 'III')
+anova(m1g,m1g1)
+pdf("UGfair*context*group.pdf", width=10, height=16)
+lsm <- lsmeans(m1g, "fairLR", by = c("group4","ReappraisalDirection"), at = list(fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm)
+dev.off()
+
 
 # control for ed
 m1ge <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*EDUCATION + (1 |
+      ReappraisalDirection*scale(EDUCATION) + (1 |
   ID),
   family = binomial,
   data = allData,
+  
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1ge)
 car::Anova(m1ge)
@@ -176,343 +219,69 @@ m1gm <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*MMSE + (1 |
+      ReappraisalDirection*scale(MMSE) + (1 |
   ID),
   family = binomial,
   data = allData,
+    
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1gm)
-car::Anova(m1gm)
+car::Anova(m1gm, type = 'III')
+pdf("UGcontext*MMSE.pdf", width=8, height=6)
+lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,28,30)))
+plot(lsm, horiz = F)
+dev.off()
 
 
-# does not converge
+# with lethality
 m1gl <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + (1 |
-  ID),
+  ID/block),
   family = binomial,
   data = allData,
+   
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1gl)
 car::Anova(m1gl)
 anova(m1g,m1gl)
-````
+pdf("UGcontext*groupLeth.pdf", width=10, height=6)
+lsm <- lsmeans(m1gl, "ReappraisalDirection", by = "group5")
+plot(lsm, horiz = F)
+dev.off()
+pdf("UGfair*groupLeth.pdf", width=10, height=6)
+lsm <- lsmeans(m1gl, "fairLR", by = "group5", at = list(fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm, horiz = F)
+dev.off()
 
-## Interaction models
+```
+
+## RT analyses
 Screening the alternative models of the level 1 predictors. The models include all interaction effect.
 ```{r}
-m1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 2, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData, confsetsize = 8)
+rt1 <- lmer(
+  Stimuli_RT ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 |
+  ID/block),
+  data = allData[allData$Stimuli_RT<5823 & allData$Stimuli_RT>250,])
+  summary(rt1)
+car::Anova(rt1)
 
-summary(m1)
+pdf("RTcontext*group.pdf", width=8, height=6)
+lsm <- lsmeans::lsmeans(rt1, "ReappraisalDirection", by = "group4")
+plot(lsm, horiz = F)
+dev.off()
+pdf("RTfair*group.pdf", width=8, height=6)
+lsm <- lsmeans::lsmeans(rt1, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm, horiz = F)
+dev.off()
+pdf("RTstake*group.pdf", width=8, height=6)
+lsm <- lsmeans::lsmeans(rt1, "totalStake", by = "group4", at = list(totalStake = c(8, 13,18)))
+plot(lsm, horiz = F)
+dev.off()
 
-# look at the models
-m1_models <- weightable(m1)
-print(m1_models)
 ```
-
-# Level 1 model with $group$ predictor (random effect (1|ID))
-## No interaction effect
-```{r}
-m3 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (1|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
-
-m3_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group5 + (1|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
-
-summary(m3)
-summary(m3_1)
-```
-Clinically groups are not significantly different from HC in terms of gamble acceptance.
-
-### the model with the subject individual level variable
-$$Accept\,Offer ~ Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + group4 + VAR + (1|ID)$$
-```{r}
-m_education <- update(m3, .~. + scale(EDUCATION))
-m_income <- update(m3, .~. + scale(IncomePerCapita))
-m_exit <- update(m3, .~. + scale(EXIT))
-m_mmse <- update(m3, .~. + scale(MMSE))
-m_nonplan <- update(m3, .~. + scale(BIS_NONPLAN))
-m_urgency <- update(m3, .~. + scale(urgency))
-m_interpersonal <- update(m3, .~. + scale(IIP15INTAMBV))
-
-summary(m_education)
-summary(m_income)
-summary(m_exit)
-summary(m_mmse)
-summary(m_nonplan)
-summary(m_urgency)
-summary(m_interpersonal)
-```
-None of the subject level variable has significant influence on the gamble acceptance.
-
-In the model with $nonplan$ variable, the depression group is marginally different to accept gamble compared to the HC. 
-
-Model exploration with all variables in the no interaction effect models
-```{r}
-m4 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + scale(EDUCATION) + scale(IncomePerCapita) + scale(EXIT) + scale(urgency) + scale(IIP15INTAMBV), random = "1|ID", level = 1, fitfunction = glmer.glmulti, data = allData)
-```
-
-## models with interaction effect
-Screening all alternative models of the level 1 + group models
-```{r}
-m2 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
-
-m2_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group5, level = 1, fitfunction = glmer.glmulti, random = "+ (1|ID)", method = "g", data = allData)
-
-print(m2)
-```
-
-Fit specific interaction models. From higher order to lower.
-1.  $ReappraisalDirection x scale(totalStake) x Fairness_score x group4$ four way interaction effect, and see if the model is significant. If not, drop this interaction
-```{r}
-m2_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-
-summary(m2_4interaction)
-```
-failed to converge at 4 way interaction
-
-2. $ReappraisalDirection x Fairness_score x group4$ three way interaction
-```{r}
-m2_3interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * Fairness_score * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-
-summary(m2_3interaction1)
-```
-Failed to converge.
-
-3. $ReappraisalDirection x scale(totalStake) x group4$ three way interaction
-```{r}
-m2_3interaction2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-
-summary(m2_3interaction2)
-```
-$ReappraisalDirection x scale(totalStake) x group4$ has weak significant influence on gamble acceptance.
-
-4. $fairness\, score x group4$ two way interaction
-```{r}
-m2_2interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction1)
-```
-Fairness score and group has significant interaction.
-
-5. $reappraisal\, direction x group4$ two way interaction
-```{r}
-m2_2interaction2 <- glmer(allData$AcceptOffer ~ scale(totalStake) + Fairness_score + ReappraisalDirection * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction2)
-```
-reappraisal direction x group4 has significant interaction.
-
-6. $fairness\, score x group4$ two way interaction
-```{r}
-m2_2interaction3 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score  * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction3)
-```
-fairness score x group4 has significant interaction.
-
-7. $total\, stake x group4$ two way interaction
-```{r}
-m2_2interaction4 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score + group4 + scale(totalStake) * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction4)
-```
-total stake x group4 has significant interaction.
-
-8. $total\, stake x fairness\, score$ two way interaction
-```{r}
-m2_2interaction5 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score + group4 + scale(totalStake) * Fairness_score + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction5)
-```
-total stake x fairness score has significant interaction.
-
-Select the best model among the interaction models:
-```{r}
-modellist1 <- model.sel(m2_3interaction2, m2_2interaction1, m2_2interaction2, m2_2interaction3, m2_2interaction4, m2_2interaction5)
-print(modellist1)
-
-anova(m2_3interaction2, m2_2interaction2)
-```
-The 3 way interaction is no significantly better than the 2 way interaction.
-
-The best interaction model is:
-```{r}
-summary(m2_3interaction2)
-```
-
-### the (best) interaction model with the subject level variable
-```{r}
-m_education1 <- update(m2_3interaction2, .~. + scale(EDUCATION))
-m_income1 <- update(m2_3interaction2, .~. + scale(IncomePerCapita))
-m_exit1 <- update(m2_3interaction2, .~. + scale(EXIT))
-m_mmse1 <- update(m2_3interaction2, .~. + scale(MMSE))
-m_nonplan1 <- update(m2_3interaction2, .~. + scale(BIS_NONPLAN))
-m_urgency1 <- update(m2_3interaction2, .~. + scale(urgency))
-m_interpersonal1 <- update(m2_3interaction2, .~. + scale(IIP15INTAMBV))
-
-summary(m_exit1)
-summary(m_education1)
-summary(m_income1)
-summary(m_mmse1)
-summary(m_nonplan1)
-summary(m_urgency1)
-summary(m_interpersonal1)
-```
-The following subject level variable has significant influence in the gamble acceptance: $EXIT$.
-
-2 way interaction model with subject level vars:
-```{r}
-m_education4 <- update(m2_2interaction2, .~. + scale(EDUCATION))
-m_income4 <- update(m2_2interaction2, .~. + scale(IncomePerCapita))
-m_exit4 <- update(m2_2interaction2, .~. + scale(EXIT))
-m_mmse4 <- update(m2_2interaction2, .~. + scale(MMSE))
-m_nonplan4 <- update(m2_2interaction2, .~. + scale(BIS_NONPLAN))
-m_urgency4 <- update(m2_2interaction2, .~. + scale(urgency))
-m_interpersonal4 <- update(m2_2interaction2, .~. + scale(IIP15INTAMBV))
-
-summary(m_education4)
-summary(m_income4)
-summary(m_exit4)
-summary(m_mmse4)
-summary(m_nonplan4)
-summary(m_urgency4)
-summary(m_interpersonal4)
-```
-The following variable has significant influence in this interaction model:
-$EXIT$.
-
-The following codes is for the random effect (block|ID), they are using the same procedure with above model with random effect (1|ID).
-
-# Level 1 model (Random intercept and random slopes with random effect (block|ID))
-## No interaction model
-```{r}
-m5 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (block|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
-
-summary(m5)
-```
-
-## Interaction models
-Screening the alternative models of the level 1 predictors. The models include all interaction effect.
-```{r}
-m6 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score, level = 2, fitfunction = glmer.glmulti, random = "+ (block|ID)", method = "g", data = allData)
-
-summary(m6)
-
-# look at the models
-m6_models <- weightable(m6)
-print(m6_models)
-```
-
-# Level 1 model with $group$ predictor (random effect (block|ID))
-## No interaction effect
-```{r}
-m7 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + (block|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
-
-m7_1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group5 + (block|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
-
-summary(m7)
-summary(m7_1)
-```
-Clinically groups is not significantly influence the gamble acceptance compared to HC in model with no interaction effect. And $group4$ and $group5$ have the same influence.
-
-### the model with the subject individual level variable
-$$Accept\,Offer ~ Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + group4 + VAR + (block|ID)$$
-```{r}
-m_education2 <- update(m7, .~. + scale(EDUCATION))
-m_income2 <- update(m7, .~. + scale(IncomePerCapita))
-m_exit2 <- update(m7, .~. + scale(EXIT))
-m_mmse2 <- update(m7, .~. + scale(MMSE))
-m_nonplan2 <- update(m7, .~. + scale(BIS_NONPLAN))
-m_urgency2 <- update(m7, .~. + scale(urgency))
-m_interpersonal2 <- update(m7, .~. + scale(IIP15INTAMBV))
-
-summary(m_education2)
-summary(m_income2)
-summary(m_exit2)
-summary(m_mmse2)
-summary(m_nonplan2)
-summary(m_urgency2)
-summary(m_interpersonal2)
-```
-$EXIT$ is the only significant subject level variable.
-
-In the model with $nonplan$ variable, the depression group is different to accept gamble compared to the HC. 
-
-## models with interaction effect
-Screening all alternative models of the level 1 + group models
-```{r}
-m8 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group4, level = 1, fitfunction = glmer.glmulti, random = "+ (block|ID)", method = "g", data = allData)
-
-m8_1 <- glmulti(allData$AcceptOffer ~ ReappraisalDirection * scale(totalStake) * Fairness_score * group5, level = 1, fitfunction = glmer.glmulti, random = "+ (block|ID)", method = "g", data = allData)
-
-print(m8)
-```
-
-Fit specific interaction models. From higher order to lower.
-1.  $ReappraisalDirection x scale(totalStake) x Fairness_score x group4$ four way interaction effect, and see if the model is significant. If not, drop this interaction
-```{r}
-m9_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (block|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-
-summary(m9_4interaction)
-```
-failed to converge at 4 way interaction
-
-2. $ReappraisalDirection x Fairness_score x group4$ three way interaction
-```{r}
-m9_3interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * Fairness_score * group4 + (block|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-```
-failed to converge.
-
-3. $ReappraisalDirection x scale(totalStake) x group4$ three way interaction
-```{r}
-m9_3interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * group4 + (block|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-summary(m9_3interaction)
-```
-Reappraisal Direction x totalStake x group4 is significant.
-
-4. $fairness\, score x group4$ two way interaction
-```{r}
-m9_2interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score * group4 + (block|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
-
-summary(m9_2interaction1)
-```
-Fairness score x group has significant interaction effect.
-
-5. $reappraisal\, direction x group4$ two way interaction
-```{r}
-m9_2interaction2 <- glmer(allData$AcceptOffer ~ scale(totalStake) + Fairness_score + ReappraisalDirection * group4 + (block|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-
-summary(m9_2interaction2)
-```
-reappraisal direction x group4 has significant influence.
-
-6. $fairness\, score x group4$ two way interaction
-```{r}
-m9_2interaction3 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score  * group4 + (block|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction3)
-
-summary(m9_2interaction3)
-```
-fairness score x group4 has significant influence.
-
-7. $total\, stake x group4$ two way interaction
-```{r}
-m9_2interaction4 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score + group4 + scale(totalStake) * group4 + (block|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction4)
-```
-total stake x group4 has significant influence.
-
-8. $total\, stake x fairness\, score$ two way interaction
-```{r}
-m9_2interaction5 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score + group4 + scale(totalStake) * Fairness_score + (block|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
-summary(m2_2interaction5)
-```
-total stake x fairness score has significant influence.
-
-
-Select the best model among the interaction models:
-```{r}
-modellist2 <- model.sel(m9_3interaction, m9_2interaction1, m9_2interaction2, m9_2interaction3, m9_2interaction4, m9_2interaction5)
-print(modellist2)
-```
-The best interaction model is $ReappraisalDirection x scale(totalStake) x group4$ 3 way interaction.
-
-### the (best) interaction model with the subject level variable
 ```{r}
 m_education3 <- update(m9_3interaction, .~. + scale(EDUCATION))
 m_income3 <- update(m9_3interaction, .~. + scale(IncomePerCapita))
