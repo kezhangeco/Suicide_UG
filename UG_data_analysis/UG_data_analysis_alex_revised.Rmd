@@ -261,6 +261,24 @@ lsm <- lsmeans(m1gi, "ReappraisalDirection", by = "group4")
 plot(lsm, horiz = F)
 dev.off()
 
+m1ga <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+      ReappraisalDirection*scale(IIP15AGRESS) + (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1ga)
+car::Anova(m1ga, type = 'III')
+pdf("UGcontext*IIPaggr.pdf", width=12, height=6)
+lsm <- lsmeans(m1ga, "ReappraisalDirection", by = "IIP15AGRESS", at = list(IIP15AGRESS = c(0,4,11)))
+plot(lsm, horiz = F)
+dev.off()
+
+
 
 # with lethality
 m1gl <-
