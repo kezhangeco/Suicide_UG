@@ -187,37 +187,57 @@ m1g_cens <- glmer(
 car::Anova(m1g_cens)
 # results are not sensitive to that
 
-## add context*fair*Group -- too complex, would not bother including
-# m1g1 <-glmer(
-#   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + scale(fairLR) * ReappraisalDirection *
-#   group4 + scale(totalStake) * group4 +  (1 |
-#   ID/block),
-#   family = binomial,
-#   data = allData,
-#   
-#   control = glmerControl(optimizer = "bobyqa"))
-#   summary(m1g1)
-# car::Anova(m1g1, type = 'III')
-# anova(m1g,m1g1)
-# pdf("UGfair*context*group.pdf", width=10, height=16)
-# lsm <- lsmeans(m1g, "fairLR", by = c("group4","ReappraisalDirection"), at = list(fairLR = c(-2.66,-1.22,0.22)))
-# plot(lsm)
-# dev.off()
-
-
-# control for ed
-m1ge <-
+## tried context*fair*Group -- too complex, would not bother including
+# control for MMSE
+m1gm <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(EDUCATION) + (1 |
+      ReappraisalDirection*scale(MMSE) + (1 |
   ID),
   family = binomial,
   data = allData,
-  
+    
   control = glmerControl(optimizer = "bobyqa"))
-  summary(m1ge)
-car::Anova(m1ge)
+  summary(m1gm)
+car::Anova(m1gm, type = 'III')
+pdf("UGcontext*MMSE.pdf", width=8, height=6)
+lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,28,30)))
+plot(lsm, horiz = F)
+dev.off()
+
+
+
+## general predictor script
+setwd("~/code/Suicide_UG/predictor_plots")
+
+vars <- c("NEUROTICISM","EXTRAVERSION" , "CONSCIENTIOUSNESS", "AGREEABLENESS", "OPENNESS" )
+
+for(i in 1:length(vars))
+{varname <- vars[i]
+print(varname)
+allData$predictor <- as.numeric(as.matrix(allData[,varname]))
+
+# control for ed
+m_pred <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+      ReappraisalDirection*scale(predictor) + (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m_pred)
+car::Anova(m_pred)
+q <- quantile(allData$predictor, na.rm = TRUE,probs = seq(0,1,0.1))
+filename <- paste0(varname,"_context_UG.pdf")
+pdf(file = filename,width = 12, height = 6)
+lsm <- lsmeans(m_pred, "ReappraisalDirection", by = "predictor", at = list(predictor = c(q[2],q[6],q[10])))
+plot(lsm, horiz = F)
+dev.off()
+}
 
 # control for MMSE
 m1gm <-
@@ -261,6 +281,7 @@ lsm <- lsmeans(m1gi, "ReappraisalDirection", by = "group4")
 plot(lsm, horiz = F)
 dev.off()
 
+# Interpersonal aggression and sensitivity
 m1ga <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
@@ -275,6 +296,40 @@ m1ga <-
 car::Anova(m1ga, type = 'III')
 pdf("UGcontext*IIPaggr.pdf", width=12, height=6)
 lsm <- lsmeans(m1ga, "ReappraisalDirection", by = "IIP15AGRESS", at = list(IIP15AGRESS = c(0,4,11)))
+plot(lsm, horiz = F)
+dev.off()
+
+m1gs <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+      ReappraisalDirection*scale(IIP15INTSEN) + (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1ga)
+car::Anova(m1ga, type = 'III')
+pdf("UGcontext*IIPsens.pdf", width=12, height=6)
+lsm <- lsmeans(m1gs, "ReappraisalDirection", by = "IIP15INTSEN", at = list(IIP15INTSEN = c(0,4,11)))
+plot(lsm, horiz = F)
+dev.off()
+
+m1gex <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+      ReappraisalDirection*scale(IIP15INTSEN) + (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1ga)
+car::Anova(m1ga, type = 'III')
+pdf("UGcontext*EXIT.pdf", width=12, height=6)
+lsm <- lsmeans(m1gs, "ReappraisalDirection", by = "IIP15INTSEN", at = list(IIP15INTSEN = c(3,5,10)))
 plot(lsm, horiz = F)
 dev.off()
 
