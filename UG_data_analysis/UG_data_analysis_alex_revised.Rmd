@@ -237,6 +237,30 @@ lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,
 plot(lsm, horiz = F)
 dev.off()
 
+# IRI_EMPATHETIC_CONCERN
+
+m1gi <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+      ReappraisalDirection*scale(IRI_EMPATHETIC_CONCERN) + (1 |
+  ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+  summary(m1gi)
+car::Anova(m1gi, type = 'III')
+pdf("UGcontext*IRIemp.pdf", width=12, height=6)
+lsm <- lsmeans(m1gi, "ReappraisalDirection", by = "IRI_EMPATHETIC_CONCERN", at = list(IRI_EMPATHETIC_CONCERN = c(8,20,25)))
+plot(lsm, horiz = F)
+dev.off()
+
+pdf("UGcontext*group_adjusted_IRIemp.pdf", width=8, height=6)
+lsm <- lsmeans(m1gi, "ReappraisalDirection", by = "group4")
+plot(lsm, horiz = F)
+dev.off()
+
 
 # with lethality
 m1gl <-
