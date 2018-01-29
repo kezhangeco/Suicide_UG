@@ -2,7 +2,11 @@
 load(file = "~/code/Suicide_UG/UG1.Rdata")
 setwd("~/code/Suicide_UG/predictor_plots")
 
-vars <- c("NEUROTICISM","EXTRAVERSION" , "CONSCIENTIOUSNESS", "AGREEABLENESS", "OPENNESS", "PAIBOR TOTAL" , "WTARSS", "EXIT_full", "IIP15AGRESS","IIP15INTAMBV", "IIP15INTSEN"  )
+# vars <- c("NEUROTICISM","EXTRAVERSION" , "CONSCIENTIOUSNESS", "AGREEABLENESS", "OPENNESS", "PAIBOR TOTAL" , "WTARSS", "EXIT_full", "IIP15AGRESS","IIP15INTAMBV", "IIP15INTSEN"  )
+vars <- c( "Anxiety Lifetime" , "Substance Lifetime" ,"ARSTOTAL" ,"BIS_NONPLAN" ,"HouseholdIncome", 
+           "IRI_EMPATHETIC_CONCERN" ,"IRI_FANTASY_SCALE",  "IRI_PERSONAL_DISTRESS","IRI_PERSPECTIVE_TAKING",
+           "UPPSP LACK OF PERSEV" ,  "UPPSP LACK OF PREMED" ,  "urgency"  , "UPPSP POS URGENCY",
+           "isela", "iselb", "iselse", "iselt")
 
 for(i in 1:length(vars))
 {varname <- vars[i]
