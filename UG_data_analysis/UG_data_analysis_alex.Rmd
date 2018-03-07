@@ -21,6 +21,12 @@ library(rJava)
 library(mice)
 library(stargazer)
 library(margins)
+library(effects)
+library(mfx)
+library(magrittr)
+library(ggpubr)
+library(lattice)
+library(gridExtra)
 ```
 
 
@@ -113,7 +119,7 @@ logit2OR <- function(logit){
 # Whether HLM is needed?
 ## Intercept only
 $$Accept\,Offer = 1$$
-```{r}
+```{r, echo=FALSE}
 interceptOnly <- glm(task$AcceptOffer ~ 1, family = binomial, data = task)
 p_interceptOnly = logit2prob(coef(interceptOnly))
 
@@ -125,7 +131,7 @@ stargazer(p_interceptOnly, type = "text")
 
 ## Null model: random intercept only
 $$Accept\,Offer = 1 + (1|ID)$$
-```{r}
+```{r, echo=FALSE}
 randomInterceptOnly <- glmer(task$AcceptOffer ~ 1 + (1|id), data = task, family = binomial)
 p_randomInterceptOnly = logit2prob(summary(randomInterceptOnly)$coefficients)
 
@@ -136,7 +142,6 @@ cf <- data.frame(summary(randomInterceptOnly)$coefficients[, 1])
 colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
-
 ```
 By adding the ID (nested), the AIC (1|D) is smaller than the AIC (1). So HLM is necessary. 
 
@@ -167,7 +172,7 @@ DRS x income, **education x income**, **EXIT x education**, **BIS nonplan x inco
 ## No interaction model
 
 $$Accept\,Offer = Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + (1|ID)$$
-```{r level1Var}
+```{r level1Var1, echo=FALSE}
 m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
 
 print("logit coefficients")
@@ -178,10 +183,6 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
-# avg marginal effects
-m <- marginal_effects(summary(m0)$coefficients)
-summary(m)
-plot(m)
 ```
 
 # Level 1 model with $group$ predictor (random effect (1|ID))
@@ -201,14 +202,22 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
-print("model with 5 groups")
-stargazer(m3_1, type = "text")
+# interaction effect and main effect
+eff.m <- allEffects(m3)
 
-cf1 <- data.frame(summary(m3_1)$coefficients[, 1])
-colnames(cf1) <- c("probability")
-print("probability coefficients")
-print(logit2prob(cf1))
+plot(eff.m$ReappraisalDirection , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(totalStake)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$Fairness_score , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$group4 , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
+
+#print("model with 5 groups")
+#stargazer(m3_1, type = "text")
+
+#cf1 <- data.frame(summary(m3_1)$coefficients[, 1])
+#colnames(cf1) <- c("probability")
+#print("probability coefficients")
+#print(logit2prob(cf1))
 ```
 Clinically groups are not significantly different from HC in terms of gamble acceptance.
 
@@ -229,6 +238,9 @@ cf3 <- data.frame(summary(m_exit)$coefficients[, 1])
 colnames(cf3) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf3))
+# interaction effect and main effect
+eff.m <- allEffects(m_exit)
+plot(eff.m$`scale(EXIT)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 print("Education")
 stargazer(m_education, type = "text")
@@ -236,7 +248,9 @@ cf1 <- data.frame(summary(m_education)$coefficients[, 1])
 colnames(cf1) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf1))
-
+# interaction effect and main effect
+eff.m <- allEffects(m_education)
+plot(eff.m$`scale(EDUCATION)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 print("income")
 stargazer(m_income, type = "text")
@@ -244,7 +258,9 @@ cf2 <- data.frame(summary(m_income)$coefficients[, 1])
 colnames(cf2) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf2))
-
+# interaction effect and main effect
+eff.m <- allEffects(m_income)
+plot(eff.m$`scale(IncomePerCapita)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 print("MMSE")
 stargazer(m_mmse, type = "text")
@@ -252,7 +268,9 @@ cf4 <- data.frame(summary(m_mmse)$coefficients[, 1])
 colnames(cf4) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf4))
-
+# interaction effect and main effect
+eff.m <- allEffects(m_mmse)
+plot(eff.m$`scale(MMSE)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 print("UPPSP NEG URGENCY")
 stargazer(m_urgency, type = "text")
@@ -260,6 +278,9 @@ cf5 <- data.frame(summary(m_urgency)$coefficients[, 1])
 colnames(cf5) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf5))
+# interaction effect and main effect
+eff.m <- allEffects(m_urgency)
+plot(eff.m$`scale(urgency)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 
 print("IIP15INTAMBV, interpersonal")
@@ -268,6 +289,9 @@ cf6 <- data.frame(summary(m_interpersonal)$coefficients[, 1])
 colnames(cf6) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf6))
+# interaction effect and main effect
+eff.m <- allEffects(m_interpersonal)
+plot(eff.m$`scale(IIP15INTAMBV)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 
 print("nonplan")
@@ -276,10 +300,35 @@ cf7 <- data.frame(summary(m_nonplan)$coefficients[, 1])
 colnames(cf7) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf7))
+# interaction effect and main effect
+eff.m <- allEffects(m_nonplan)
+plot(eff.m$`scale(BIS_NONPLAN)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 
 ```
 $EXIT$ is the only subject level variable has significant influence on the gamble acceptance. Controlling $EXIT$, depression group is more likely to accept gamble compared to the HC.
+
+### The no interaction model with all individual subject level variable
+$$Accept\,Offer = Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + group4 + income + EXIT + BIS_NONPLAN + interpersonal + (1|ID)$$
+```{r all subject level var1, echo=FALSE}
+m3_all <- update(m3, .~. + scale(IncomePerCapita) + scale(EXIT) + scale(BIS_NONPLAN) + scale(IIP15INTAMBV))
+stargazer(m3_all, type = "text")
+cf <- data.frame(summary(m3_all)$coefficients[, 1])
+colnames(cf) <- c("probability")
+print("probability coefficients")
+print(logit2prob(cf))
+
+# main effect
+eff.m <- allEffects(m3_all)
+plot(eff.m$ReappraisalDirection , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = )
+plot(eff.m$`scale(totalStake)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$Fairness_score , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(IncomePerCapita)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(EXIT)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(BIS_NONPLAN)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(IIP15INTAMBV)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+
+```
 
 ## Interaction effect models
 Fit specific interaction models. From higher order to lower.
@@ -287,8 +336,7 @@ Fit specific interaction models. From higher order to lower.
 $$Accept\,Offer = Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + group4 + INTERACTION + (1|ID)$$
 
 1.  $Reappraisal\,Direction$ x $scale(total\,Stake)$ x $Fairness\,score$ x $group4$ four way interaction effect, and see if the model is significant. If not, drop this interaction.
-
-```{r 4way interaction, include = FALSE}
+```{r 4way interaction1, include = FALSE}
 m2_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (1|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 stargazer(m2_4interaction, type = "text")
@@ -296,12 +344,11 @@ cf <- data.frame(summary(m2_4interaction)$coefficients[, 1])
 colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
-
 ```
 It failed to converge at 4 way interaction
 
 2. $ReappraisalDirection$ x $Fairness_score$ x $group4$ three way interaction
-```{r 3way interaction, include = FALSE}
+```{r 3way interaction2, include = FALSE}
 m2_3interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * Fairness_score * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 stargazer(m2_3interaction1, type = "text")
@@ -309,7 +356,7 @@ stargazer(m2_3interaction1, type = "text")
 It failed to converge.
 
 3. $Reappraisal\,Direction$ x $scale(total\,Stake)$ x $group4$ three way interaction
-```{r pairwise, echo=FALSE}
+```{r 3way interaction3, echo=FALSE}
 m2_3interaction2 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
 
 stargazer(m2_3interaction2, type = "text")
@@ -319,6 +366,17 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# interaction effect and main effect
+eff.m <- allEffects(m2_3interaction2)
+print(eff.m)
+plot(eff.m$`ReappraisalDirection:scale(totalStake):group4` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+
+plot(eff.m$Fairness_score , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("group4", m2_3interaction2), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("ReappraisalDirection", m2_3interaction2), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("ReappraisalDirection * scale(totalStake)", m2_3interaction2), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("ReappraisalDirection * group4", m2_3interaction2), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("scale(totalStake) * group4", m2_3interaction2), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 ```
 $Reappraisal\,Direction$ x $scale(total\,Stake)$ x $group4$ has weak significant influence on gamble acceptance. $Reappraisal\,Directionempathy$ x $scale(total\,Stake)$ x $group4attempter$ is more likely to accept gamble.
 
@@ -331,13 +389,16 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
-print(logit2OR(cf))
-
+# main effect and interaction effect
+eff.m <- allEffects(m2_2interaction1)
+plot(eff.m$`Fairness_score:group4` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE)
+plot(effect("Fairness_score", m2_2interaction1) , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE)
+plot(effect("group4", m2_2interaction1) , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE)
 ```
 Fairness score and group has significant interaction. The depression group is more likely to accept gambles as the unfairness increases, compared to the HC. The attempter is less likely to accept gambles as the unfairness increases.
 
 5. $reappraisal\, direction$ x $group4$ two way interaction
-```{r, echo=FALSE}
+```{r, echo=FALSE, include=FALSE}
 m2_2interaction2 <- glmer(allData$AcceptOffer ~ scale(totalStake) + Fairness_score + ReappraisalDirection * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
 stargazer(m2_2interaction2, type = "text")
 cf <- data.frame(summary(m2_2interaction2)$coefficients[, 1])
@@ -346,11 +407,15 @@ print("probability coefficients")
 print(logit2prob(cf))
 print(logit2OR(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m2_2interaction2)
+plot(eff.m$`ReappraisalDirection:group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1)), x = list(rotate = 90)), multiline = TRUE)
+
 ```
 reappraisal direction x group4 has significant interaction. The attempter is less likely to accept the gambles in both empathy and punish context than HC. The depression is more likely to accept the gambles in both empathy and punish context.
 
 6. $total\, stake$ x $group4$ two way interaction
-```{r, echo=FALSE}
+```{r, echo=FALSE, include=FALSE}
 m2_2interaction4 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score + group4 + scale(totalStake) * group4 + (1|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
 stargazer(m2_2interaction4, type = "text")
 cf <- data.frame(summary(m2_2interaction4)$coefficients[, 1])
@@ -358,6 +423,10 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m2_2interaction4)
+plot(eff.m$`scale(totalStake):group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$ReappraisalDirection, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), rug = FALSE)
 ```
 total stake x group4 has significant interaction. The attempter is less likely to accept the gambles as the stake size increases compared to HC, the depression group is more likely.
 
@@ -370,19 +439,27 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m2_2interaction5)
+plot(eff.m$`scale(totalStake):Fairness_score`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$group4, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), rug = FALSE)
+plot(effect("scale(totalStake)", m2_2interaction5), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), rug = FALSE)
+
 ```
 total stake x fairness score has significant interaction. The participants are more likely to accept the gambles as the total stake size increases, event the unfairness increase as well.
 
 **Select the best model among the interaction models:**
-```{r best interaction model, echo=FALSE}
+```{r best interaction model1, echo=FALSE}
 modellist1 <- model.sel(m2_3interaction2, m2_2interaction1, m2_2interaction2, m2_2interaction3, m2_2interaction4, m2_2interaction5)
 print(modellist1)
 
-anova(m2_3interaction2, m2_2interaction2)
+# the best interaction model is better than the no interaction model?
+anova(m2_3interaction2, m3)
+# yes
 ```
-The 3 way interaction is no significantly better than the 2 way interaction. Hence, The best interaction model is $Reappraisal\,Direction$ x $scale(total\,Stake) x group4$:
 
-```{r, echo=FALSE}
+The 3 way interaction is no significantly better than the 2 way interaction. Hence, The best interaction model is $Reappraisal\,Direction$ x $scale(total\,Stake) x group4$:
+```{r, echo=FALSE, include=FALSE}
 stargazer(m2_3interaction2, type = "text")
 cf <- data.frame(summary(m2_3interaction2)$coefficients[, 1])
 colnames(cf) <- c("probability")
@@ -408,9 +485,19 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m_exit1)
+plot(eff.m$`ReappraisalDirection:scale(totalStake):group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Reappraisal Direction * total Stake * group4 controlling EXIT in (1|ID)")
+plot(eff.m$`scale(EXIT)`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), rug = FALSE)
 ```
-
 Only $EXIT$, among all the subject level variable has significant influence in the gamble acceptance. The depression group accept more gambles as the stake size increases, regardless of the context.
+
+### The best interaction model with all individual subject level variable
+$$Accept\,Offer = Fairness\,score + Reappraisal\,Direction * scale(total\,Stake) * group4 + income + EXIT + BIS_NONPLAN + interpersonal + (1|ID)$$
+```{r all subject level variable, echo=FALSE, include=FALSE}
+m2_3interaction2_all <- update(m2_3interaction2, .~. + scale(IncomePerCapita) + scale(EXIT) + scale(BIS_NONPLAN) + scale(IIP15INTAMBV), glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
+```
+Too iteration exceeds max to converge.
 
 **2 way interaction model $reappraisal\, direction$ x $group4$ with subject level vars:**
 ```{r, echo=FALSE}
@@ -430,6 +517,9 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m_exit4)
+plot(eff.m$`ReappraisalDirection:group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Reappraisal Direction * group4 controlling EXIT")
 ```
 The following variable has significant influence in this interaction model:
 $EXIT$.
@@ -438,9 +528,8 @@ The following codes is for the random effect (block|ID), they are using the same
 
 # Level 1 model (Random intercept and random slopes with random effect (block|ID))
 ## No interaction model
-
 $$Accept\,Offer = Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + (block|ID)$$
-```{r level1Var, echo=FALSE}
+```{r level1Var2, echo=FALSE}
 m5 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (block|ID), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"))
 
 stargazer(m5, type = "text")
@@ -448,6 +537,12 @@ cf <- data.frame(summary(m5)$coefficients[, 1])
 colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
+
+# main effect and interaction effect
+eff.m <- allEffects(m5)
+plot(eff.m$ReappraisalDirection, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Reappraisal Direction in (block|ID)")
+plot(eff.m$`scale(totalStake)`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "total stake in (block|ID)")
+plot(eff.m$Fairness_score, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Fairness score in (block|ID)")
 
 ```
 
@@ -466,13 +561,17 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect
+eff.m <- allEffects(m7)
+plot(eff.m$group4, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "group effect in (block|ID)")
 
-print("model with 5 groups")
-stargazer(m7_1, type = "text")
-cf1 <- data.frame(summary(m7_1)$coefficients[, 1])
-colnames(cf1) <- c("probability")
-print("probability coefficients")
-print(logit2prob(cf1))
+
+#print("model with 5 groups")
+#stargazer(m7_1, type = "text")
+#cf1 <- data.frame(summary(m7_1)$coefficients[, 1])
+#colnames(cf1) <- c("probability")
+#print("probability coefficients")
+#print(logit2prob(cf1))
 
 ```
 Clinically groups is marginally significantly influence the gamble acceptance compared to HC in model with no interaction effect: the depression group is more likely to accept the gambles. The effect does not exist when use the random effect (1|ID).
@@ -497,6 +596,10 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect 
+eff.m <- allEffects(m_exit2)
+plot(eff.m$`scale(EXIT)`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "EXIT in (block|ID)")
+
 
 print("NONPLAN model")
 stargazer(m_nonplan2, type = "text")
@@ -505,11 +608,34 @@ colnames(cf1) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf1))
 
+# main effect and interaction effect
+eff.m <- allEffects(m_nonplan2)
+plot(eff.m$`scale(BIS_NONPLAN)`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "non-plan in (block|ID)")
 
 ```
 $EXIT$ is the only significant subject level variable. The higher $EXIT$, less likely to accept the gambles.
-
 Controlling the $nonplan$ variable, the depression group is more significantly likely to accept gamble compared to the HC. 
+
+### The no interaction model with all individual subject level variable
+$$Accept\,Offer = Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score + group4 + income + EXIT + BIS_NONPLAN + interpersonal + (block|ID)$$
+```{r all subject level variable1, echo=FALSE}
+m7_all <- update(m7, .~. + scale(IncomePerCapita) + scale(EXIT) + scale(BIS_NONPLAN) + scale(IIP15INTAMBV))
+stargazer(m7_all, type = "text")
+cf <- data.frame(summary(m7_all)$coefficients[, 1])
+colnames(cf) <- c("probability")
+print("probability coefficients")
+print(logit2prob(cf))
+
+# main effect
+eff.m <- allEffects(m7_all)
+plot(eff.m$ReappraisalDirection , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = )
+plot(eff.m$`scale(totalStake)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$Fairness_score , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(IncomePerCapita)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(EXIT)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(BIS_NONPLAN)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(eff.m$`scale(IIP15INTAMBV)` , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+```
 
 ## models with interaction effect
 Fit specific interaction models. From higher order to lower.
@@ -518,7 +644,7 @@ $$Accept\,Offer = Reappraisal\,Direction + scale(total\,Stake) + Fairness\,score
 
 1.  $ReappraisalDirection$ x $scale(totalStake)$ x $Fairness\,score$ x $group4$ four way interaction effect, and see if the model is significant. If not, drop this interaction.
 
-```{r 4way interaction, include=FALSE}
+```{r 4way interaction2, include=FALSE}
 m9_4interaction <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * scale(totalStake) * Fairness_score * group4 + (block|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 
 stargazer(m9_4interaction)
@@ -531,7 +657,7 @@ print(logit2prob(cf))
 It failed to converge at 4 way interaction
 
 2. $ReappraisalDirection$ x $Fairness\,score$ x $group4$ three way interaction
-```{r 3way interaction, include=FALSE}
+```{r 3way interaction1, include=FALSE}
 m9_3interaction1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + group4 + ReappraisalDirection * Fairness_score * group4 + (block|ID), data = allData, family = binomial, glmerControl(calc.derivs = FALSE, optCtrl = list(maxfun = 2e4)))
 ```
 It failed to converge.
@@ -546,6 +672,18 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+
+# main effect and interaction effect
+eff.m <- allEffects(m9_3interaction)
+plot(eff.m$`ReappraisalDirection:scale(totalStake):group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Reappraisal Direction * totalStake * group4 in (block|ID)")
+
+plot(eff.m$Fairness_score , axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("group4", m9_3interaction), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("ReappraisalDirection", m9_3interaction), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("ReappraisalDirection * scale(totalStake)", m9_3interaction), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(effect("ReappraisalDirection * group4", m9_3interaction), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+
+plot(effect("scale(totalStake) * group4", m9_3interaction), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 ```
 Reappraisal Direction x totalStake x group4 is marginally significant. The attempter is more likely to accept the gambles under empathy context, but the depression is more likely to accept the gambles under the punish context, as the total stake size increases.
 
@@ -559,11 +697,15 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m9_2interaction1)
+plot(eff.m$`Fairness_score:group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Fairness score * group4 in (block|ID)")
+
 ```
 Fairness score x group has significant interaction effect. The attempter is less likely to accept gambles as the unfairness increases, the depression is more likely.
 
 5. $reappraisal\, direction$ x $group4$ two way interaction
-```{r, echo=FALSE}
+```{r, echo=FALSE, include=FALSE}
 m9_2interaction2 <- glmer(allData$AcceptOffer ~ scale(totalStake) + Fairness_score + ReappraisalDirection * group4 + (block|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
 
 stargazer(m9_2interaction2, type = "text")
@@ -572,11 +714,14 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m9_2interaction2)
+plot(eff.m$`ReappraisalDirection:group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Reappraisal Direction * group4 in (block|ID)")
 ```
 reappraisal direction x group4 has significant influence. The depression is more likely to accept the gambles in both punish and empathy context.
 
 6. $total\, stake$ x $group4$ two way interaction
-```{r}
+```{r, include=FALSE}
 m9_2interaction4 <- glmer(allData$AcceptOffer ~ scale(totalStake) + ReappraisalDirection + Fairness_score + group4 + scale(totalStake) * group4 + (block|ID), data = allData, family = binomial, control = glmerControl(optimizer = "bobyqa"))
 
 stargazer(m9_2interaction4, type = "text")
@@ -585,6 +730,10 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 print(logit2OR(cf))
+
+# main effect and interaction effect
+eff.m <- allEffects(m9_2interaction4)
+plot(eff.m$`scale(totalStake):group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "totalStake * group4 in (block|ID)")
 
 ```
 total stake x group4 has significant influence. The depression and the attempter are more likely to accept tha gambles as the stake size increase.
@@ -599,11 +748,15 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+# main effect and interaction effect
+eff.m <- allEffects(m9_2interaction5)
+plot(eff.m$`scale(totalStake):Fairness_score`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "totalStake * fairness score in (block|ID)")
+
 ```
 total stake x fairness score has significant influence. As the stake size increase, more gambles are accepted even the unfairness increase.
 
 **which interaction model is the best model among all the interaction models:**
-```{r best interaction model, echo=FALSE}
+```{r best interaction model2, echo=FALSE}
 modellist2 <- model.sel(m9_3interaction, m9_2interaction1, m9_2interaction2, m9_2interaction3, m9_2interaction4, m9_2interaction5)
 print(modellist2)
 ```
@@ -626,12 +779,17 @@ colnames(cf) <- c("probability")
 print("probability coefficients")
 print(logit2prob(cf))
 
+
+# main effect and interaction effect
+eff.m <- allEffects(m_exit3)
+plot(eff.m$`ReappraisalDirection:scale(totalStake):group4`, axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE, main = "Reappraisal Direction * totalStake * group4 controlling EXIT in (block|ID)")
+
 ```
 Only $EXIT$ has significant influence. The higher $EXIT$, the less likely to accept the gambles. The depression group is more likely to accept regardless of context, as the stake size increase. The attempter only accept more gambles under empathy context, as the stake size increases.
 
 
 Compare (1|ID) and (block|ID) $EXIT$ models:
-```{r, echo=FALSE}
+```{r, echo=FALSE, include=FALSE}
 modellist3 <- model.sel(m_exit, m_exit1, m_exit2, m_exit3)
 print(modellist3)
 ```
