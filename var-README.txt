@@ -14,6 +14,8 @@
 		3-30/70 split
 		4-20/80 split
 		5-10/90 split ()
+		# fair = 5-5, 6-4;
+                # unfair = 7-3, 8-2, 9 -1
 
 
 		ReappraisalText: Sharon cannot afford to send her son to college. (same as text above)

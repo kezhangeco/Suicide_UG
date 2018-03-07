@@ -30,4 +30,19 @@ UG_data_analysis/.RDataTmp
 
 *.png
 *.xml
+<<<<<<< HEAD
 *.back
+=======
+
+*.back
+
+UG_data_analysis/UG_data_analysis_alex_knit_cache/latex/__packages
+
+*.log
+
+*.tex
+
+UG_data_analysis/UG_data_analysis_alex_knit_cache/docx/__packages
+
+UG_data_analysis/.Rhistory
+>>>>>>> 93b86380a4b5216a6a6f4e2a2dbf1f87d7e25f33

@@ -77,7 +77,7 @@ def questionnaires_description():
     question_bygroup4.to_excel(writer, 'group4_questionnaired')
     writer.save()
     writer.close()
-questionnaires_description()
+
 
 def demo_summ_clean():
     summ5 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/UG_summary.xlsx', sheetname='group5')
