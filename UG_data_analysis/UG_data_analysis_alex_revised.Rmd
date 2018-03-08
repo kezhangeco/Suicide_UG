@@ -33,26 +33,35 @@ library(compareGroups)
 #demo <- read_excel("/home/kzhang5/scratch/ug_demog.xlsx")
 #question <- read_excel("/home/kzhang5/scratch/ug_questionnaire.xlsx")
 #
-#task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
-#demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
-#question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
+task <- read.csv("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_all_task_data.csv")
+demo <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_demog.xlsx")
+question <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\UG_clean_updated\\ug_questionnaire.xlsx")
 
 
-task <- read.csv("~/code/Suicide_UG/ug_all_task_data.csv")
-demo <- read_excel("~/code/Suicide_UG/ug_demog.xlsx")
-question <- read_excel("~/code/Suicide_UG/ug_questionnaire.xlsx")
+#task <- read.csv("~/code/Suicide_UG/ug_all_task_data.csv")
+#demo <- read_excel("~/code/Suicide_UG/ug_demog.xlsx")
+#question <- read_excel("~/code/Suicide_UG/ug_questionnaire.xlsx")
 
 question <- rename(question, c("UPPSP NEG URGENCY" = "urgency"))
 demoQuestion <- merge(demo, question, on = "ID")
 
+# compare the group differences
 c1 <- demoQuestion[,c(2,3,15,49,93,129,78,79)]
+myVar <- c("EDUCATION", "GENDERTEXT", "PROTECT2AGE", "RACETEXT", "MMSE TOTAL", "WTARSS", "DRS", "EXIT", "BIS_NONPLAN", "urgency", "IIP15INTAMBV")
+c1_1 <- demoQuestion[myVar]
 c2 <- compareGroups(c1,demoQuestion$group4)
+c2_2 <- compareGroups(c1_1, demoQuestion$group4)
+c2_3 <- compareGroups(c1_1, demoQuestion$group5)
 t1 <- createTable(c2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+t1_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+t1_2 <- createTable(c2_3,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+
+
 
 allData <- merge(task, demoQuestion, on = "ID")
 allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
 allData <- rename(allData, c("HOUSEHOLD INCOME" = "HouseholdIncome", "HRSD NO SUI" = "HRSD_NO_SUI", "PER CAPITA INCOME" = "IncomePerCapita", "MMSE TOTAL" = "MMSE"))
-allData$Fairness_score <- as.factor(allData$Fairness_score)
+allData$Fairness_score <- as.numeric(allData$Fairness_score)
 allData$ID <- as.factor(allData$ID)
 allData$AcceptOffer <- as.factor(allData$AcceptOffer)
 
@@ -63,13 +72,13 @@ allData <- within(allData, group5 <- relevel(group5, ref = "AttempterHL"))
 # block number
 allData$block <- NA
 allData$block <- ifelse(allData$merged_trial < 27, "1", ifelse((allData$merged_trial > 26) & (allData$merged_trial < 53), "2", "3" ))
-print(allData$block)
 
+# fairness ratio
 allData$fairLR <- log(allData$PlayerProposedAmount/allData$OpponentProposedAmount)
 allData$fairR <- (allData$PlayerProposedAmount/allData$OpponentProposedAmount)
 
 df <- allData
-save(list = ls(all.names = TRUE), file = "UG1.RData")
+save(list = ls(all.names = TRUE), file = "UG_cleanDF.RData")
 
 ```
 
@@ -85,6 +94,11 @@ variables in the models:
  - block number
  - an impulsivity measure: BIS_NONPLAN (3 missing values)/UPPS negative urgency
  - an interpersonal function measure: IIP15INTAMBV (4 missing values)
+ 
+```{r rm missing values, include = False}
+missingVar <- c('ID', 'BIS_NONPLAN', 'IIP15INTAMBV', 'EXIT', 'urgency')
+
+```
 
 ```{r missing values, include=FALSE}
 # complete missing values
@@ -105,6 +119,8 @@ missingVar_complete <- rename(missingVar_complete, c("BIS_NONPLAN" = "BIS_NONPLA
 allData <- merge(allData, missingVar_complete, by = "ID")
 df <- allData
 ```
+
+
 # correlation matrix of the subject level variables
 ```{r corr, echo=FALSE}
 corrMatrix <- ggpairs(demoQuestion[, c("PER CAPITA INCOME", "HRSD NO SUI", "DRS", "EDUCATION", "EXIT", "BIS_NONPLAN", "IIP15INTAMBV", "urgency")])
@@ -122,13 +138,15 @@ The following variables are moderately/highly correlated:
 - urgency x BIS nonplan
 - **urgency x interpersonal**
 
+# models$1|ID|block$
+$$offer = reappraisal\,direction & stake & fairness$$
 ```{r}
 m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID/block), family = binomial, data = allData,  
   control = glmerControl(optimizer = "bobyqa"))
-
 summary(m0)
-# convergence problems with Fairness_score
+
 plot(df$Fairness_score, df$fairLR)
+
 m0r <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + fairLR + (1|ID/block), family = binomial, data = allData, 
   control = glmerControl(optimizer = "bobyqa"))
 summary(m0r)
@@ -136,8 +154,8 @@ car::Anova(m0r)
 anova(m0,m0r)
 lsm <- lsmeans(m0r, "ReappraisalDirection")
 plot(lsm, horiz = F)
-plot(Effect("totalStake",m0r))
-plot(Effect("fairLR",m0r))
+plot(Effect("totalStake",m0r), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
+plot(Effect("fairLR",m0r), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
 m1 <- glmer(allData$AcceptOffer ~ ReappraisalDirection*fairLR*scale(totalStake) + (1|ID/block), family = binomial, data = allData,   
 control = glmerControl(optimizer = "bobyqa"))
@@ -148,16 +166,23 @@ lsm <- lsmeans(m1, "ReappraisalDirection", by = "totalStake", at = list(totalSta
 plot(lsm, horiz = F)
 lsm <- lsmeans(m1, "fairLR", by = "totalStake", at = list(totalStake = c(8, 13,18), fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F)
+lsm <- lsmeans(m1, "ReappraisalDirection", by = "totalStake", at = list(totalStake = c(8, 13,18)))
+
+```
+The $ReappraisalDirection*fairLR*scale(totalStake)$ is the best fit model.
+
+$$offer = reappraisal\,direction & stake & fairness & groups$$
+```{r}
+# 4 way interaction: ReappraisalDirection * scale(fairLR) * scale(totalStake) * group. Too complex to converge. 
+#m1_4way <- glmer(allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) * group4 +  (1 | ID/block), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"), optCtrl = list(maxfun = 2e4))
 
 
-# Group
+# Group interaction
 m1g <-glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 |
-  ID/block),
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 | ID/block),
   family = binomial,
   data = allData,
-  
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1g)
 car::Anova(m1g)
@@ -188,39 +213,19 @@ m1g_cens <- glmer(
   summary(m1g_cens)
 car::Anova(m1g_cens)
 # results are not sensitive to that
-
 ## tried context*fair*Group -- too complex, would not bother including
-# control for MMSE
-m1gm <-
-  glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(MMSE) + (1 |
-  ID),
-  family = binomial,
-  data = allData,
-    
-  control = glmerControl(optimizer = "bobyqa"))
-  summary(m1gm)
-car::Anova(m1gm, type = 'III')
-pdf("UGcontext*MMSE.pdf", width=8, height=6)
-lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,28,30)))
-plot(lsm, horiz = F)
-dev.off()
+
 ```
 
-```{r}
-```
-# control for MMSE
+```{r control MMSE}
+# no missing values
+# control for MMSE with (1 | ID)
 m1gm <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(MMSE) + (1 |
-  ID),
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(MMSE) + (1 | ID),
   family = binomial,
   data = allData,
-    
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1gm)
 car::Anova(m1gm, type = 'III')
@@ -229,14 +234,33 @@ lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,
 plot(lsm, horiz = F)
 dev.off()
 
+# control for MMSE with (1 | ID/block)
+m1gm_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(MMSE) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+summary(m1gm)
+car::Anova(m1gm, type = 'III')
+pdf("UGcontext*MMSE.pdf", width=8, height=6)
+lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,28,30)))
+plot(lsm, horiz = F)
+dev.off()
+
+anova(m1gm, m1gm_1)
+```
+
+```{r control IRI}
 # IRI_EMPATHETIC_CONCERN
+## Interpersonal Reactivity Index - Empathetic Concern subscale
 
 m1gi <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(IRI_EMPATHETIC_CONCERN) + (1 |
-  ID/block),
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +
+    ReappraisalDirection*scale(IRI_EMPATHETIC_CONCERN) + (1 | ID/block),
   family = binomial,
   data = allData,
   nAGQ = 0,  
@@ -253,13 +277,15 @@ lsm <- lsmeans(m1gi, "ReappraisalDirection", by = "group4")
 plot(lsm, horiz = F)
 dev.off()
 
+```
+
+```{r control interpersonal}
 # Interpersonal aggression and sensitivity
 m1ga <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(IIP15AGRESS) + (1 |
-  ID/block),
+      ReappraisalDirection*scale(IIP15AGRESS) + (1 | ID/block),
   family = binomial,
   data = allData,
   nAGQ = 0,  
@@ -271,51 +297,33 @@ lsm <- lsmeans(m1ga, "ReappraisalDirection", by = "IIP15AGRESS", at = list(IIP15
 plot(lsm, horiz = F)
 dev.off()
 
-m1gs <-
-  glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(IIP15INTSEN) + (1 |
-  ID/block),
-  family = binomial,
-  data = allData,
-  nAGQ = 0,  
-  control = glmerControl(optimizer = "bobyqa"))
-  summary(m1ga)
-car::Anova(m1ga, type = 'III')
-pdf("UGcontext*IIPsens.pdf", width=12, height=6)
-lsm <- lsmeans(m1gs, "ReappraisalDirection", by = "IIP15INTSEN", at = list(IIP15INTSEN = c(0,4,11)))
-plot(lsm, horiz = F)
-dev.off()
 
 m1gex <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(IIP15INTSEN) + (1 |
-  ID/block),
+      ReappraisalDirection*scale(IIP15INTSEN) + (1 | ID/block),
   family = binomial,
   data = allData,
   nAGQ = 0,  
   control = glmerControl(optimizer = "bobyqa"))
-  summary(m1ga)
-car::Anova(m1ga, type = 'III')
-pdf("UGcontext*EXIT.pdf", width=12, height=6)
+  summary(m1gex)
+car::Anova(m1gex, type = 'III')
+pdf("UGcontext*IIPsens.pdf", width=12, height=6)
 lsm <- lsmeans(m1gs, "ReappraisalDirection", by = "IIP15INTSEN", at = list(IIP15INTSEN = c(3,5,10)))
 plot(lsm, horiz = F)
 dev.off()
 
+```
 
-
-# with lethality
+```{r control lethality}
+# with lethality by group5
 m1gl <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + (1 |
-  ID/block),
+  group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + (1 | ID/block),
   family = binomial,
   data = allData,
-   
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1gl)
 car::Anova(m1gl)
@@ -333,11 +341,11 @@ dev.off()
 m1gl1 <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + scale(fairLR) * scale(totalStake) * group5 + (1 |
-  ID/block),
+  group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + scale(fairLR) * scale(totalStake) * group5 +
+    (1 | ID/block),
   family = binomial,
   data = allData,
-   nAGQ = 0,
+  nAGQ = 0,
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1gl1)
 car::Anova(m1gl1)
@@ -347,7 +355,6 @@ pdf("UGfair*stake*groupLeth.pdf", width=14, height=6)
 lsm <- lsmeans::lsmeans(m1gl, "fairLR", by = c("totalStake", "group5"), at = list(fairLR = c(-2.66,0.22),totalStake = c(8,18)))
 plot(lsm, horiz = F)
 dev.off()
-
 
 ```
 
@@ -375,23 +382,6 @@ lsm <- lsmeans::lsmeans(rt1, "totalStake", by = "group4", at = list(totalStake =
 plot(lsm, horiz = F)
 dev.off()
 
-```
-```{r}
-m_education3 <- update(m9_3interaction, .~. + scale(EDUCATION))
-m_income3 <- update(m9_3interaction, .~. + scale(IncomePerCapita))
-m_exit3 <- update(m9_3interaction, .~. + scale(EXIT))
-m_mmse3 <- update(m9_3interaction, .~. + scale(MMSE))
-m_nonplan3 <- update(m9_3interaction, .~. + scale(BIS_NONPLAN))
-m_urgency3 <- update(m9_3interaction, .~. + scale(urgency))
-m_interpersonal3 <- update(m9_3interaction, .~. + scale(IIP15INTAMBV))
-
-summary(m_exit3)
+save.image("ouput.RData")
 ```
 
-Only $EXIT$ has significant influence. 
-
-Compare (1|ID) and (block|ID) models:
-```{r}
-modellist3 <- model.sel(m_exit, m_exit1, m_exit2, m_exit3)
-print(modellist3)
-```
