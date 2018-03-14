@@ -770,6 +770,7 @@ mReact5list2 <- lapply(varlist, function(x) {
 })
 lapply(mReact5list2, summary)
 
+
 # graphs
 pltFun <- function(x){
   lsm <- lsmeans(x, "Q_type", by = c("group5"))
@@ -793,9 +794,9 @@ print(plt_NonInter1)
 for (i in plt_NonInter1) {
   for (j in varlist) {
     #jpeg(paste('/Volumes/LAB/Suicide_UG/UG_data_analysis/plots/rating=Q_type*group5+', j, '.jpg'))
-    plt_NonInter1 <- i + ggtitle(paste("Rating=group5*Q_type+", j))
+    plt_NonInter <- i + ggtitle(paste("Rating=group5*Q_type+", j))
     dev.off()
-    print(plt_NonInter1)
+    print(plt_NonInter)
   }
 }
 
@@ -804,18 +805,23 @@ print(plt2)
 
 ## interaction model graphs
 plt_Inter1 <- lapply(mReact5list2, pltFun)
+print(plt_Inter1)
 
 for (i in plt_Inter1) {
   for (j in varlist) {
-    plt_Inter1 <- i + ggtitle(paste("Rating=group5*Q_type*", j))
+    plt_Inter <- i + ggtitle(paste("Rating=group5*Q_type*", j))
     dev.off()
-    print(plt_Inter1)
+    print(plt_Inter)
   }
 }
 
 plt1 <- lapply(mReact5list2, pltFun1)
 print(plt1)
 
+print(plt_Inter1)
+print(plt_NonInter1)
+lapply(mReact5list1, summary)
+lapply(mReact5list2, summary)
 ```
 
 In no interaction models: 
@@ -839,7 +845,7 @@ plot(lsm, horiz = F, xlab = "reappraisal type") +
 dev.off()
 mEff <- allEffects(mReact5Agress1)
 plot(mEff, axes = list(y = list(lab = "reactivity")))
-
+summary(mReact5Agress1)
 mReact5Agress2 <- lmer(
   scale(Rating) ~ Q_type*group5*scale(IIP15AGRESS) + (1|ID), data = emoRating)
 jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/plots/rating=group5*Qtype*IIP15AGRESS.jpg')
@@ -851,6 +857,7 @@ plot(lsm, horiz = F, xlab = "reappraisal type") +
 dev.off()
 mEff <- allEffects(mReact5Agress)
 plot(mEff, axes = list(y = list(lab = "reactivity")))
+summary(mReact5Agress2)
 
 mReact5Sensive <- lmer(
   scale(Rating) ~ Q_type*group5*scale(IIP15INTSEN) + (1|ID), data = emoRating)
