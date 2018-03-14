@@ -416,12 +416,16 @@ save.image("ouput.RData")
 # post-survey analysis 
 ```{r fairness perception}
 # whether fairness perception differ between groups
+jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/plots/reactivity_boxplot_group5.jpg')
 boxplot(allData$reactivity~allData$group5)
+dev.off()
 ano5 <-aov(allData$reactivity ~ allData$group5)
 summary(ano5)
 tk5 <- TukeyHSD(ano5)
 
+jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/plots/reactivity_boxplot_group4.jpg')
 boxplot(allData$reactivity~allData$group4)
+dev.off()
 ano4 <-aov(allData$reactivity ~ allData$group4)
 summary(ano4)
 tk4 <- TukeyHSD(ano4)
@@ -662,7 +666,6 @@ plot(lsm, horiz = F) +
 dev.off()
 mEff <- allEffects(m2React5)
 plot(mEff, axes = list(y = list(lab = "reactivity")))
-summary(m2React5)
 
 # interaction group x reappraisal type
 m3React4 <- lmer(
@@ -688,12 +691,16 @@ dev.off()
 mEff <- allEffects(m3React5)
 plot(mEff, axes = list(y = list(lab = "reactivity")))
 summary(m3React5)
+summary(m2React5)
 
 # compare models , m1React4, m2React4, m3React4, m4React4
 modellst <- model.sel(m1React5, m2React5, m3React5, m4React5)
 print(modellst)
 anova(m2React5, m3React5)
-
+summary(m1React5)
+summary(m2React5)
+summary(m3React5)
+summary(m4React5)
 
 m1React4_1 <- lmer(
   scale(Rating, scale = FALSE) ~ Q_type + group4 + (1|ID), data = reactivity)
