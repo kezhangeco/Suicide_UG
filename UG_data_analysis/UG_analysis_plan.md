@@ -123,7 +123,7 @@ what types of context and groups influence one's offer acceptance?
 |         |              | total stake size            |
 |         |              | Fairness ratio              |
 |         |              | Social framing context      |
-|         |              |                             |
+|         |              | Fairness perception         |
 |         |              | **Offer Acceptance (DV)**   |
 
 ### HLM2
@@ -221,9 +221,34 @@ use model averaging.
 - decomposes the data into within-subject and between-subjects components, allow models for each level.
 
 
+**Predictors:**
 
+- sex
 
+- age
 
+- fairness perception
+
+- income
+
+- executive control function: MMSE
+
+- Non planning impulsivity:  BIS_NONPLAN
+
+- dementia: DRS
+
+- interpersonal difficulties:
+
+  | IIP15INTSEN      | Inventory of Interpersonal  Problems - Interpersonal Sensitivity |
+  | ---------------- | ---------------------------------------- |
+  | **IIP15INTAMBV** | **Inventory of Interpersonal  Problems - Ambivalence** |
+  | **IIP15AGRESS**  | **Inventory of Interpersonal  Problems - Aggression** |
+
+   IIP15INTSEN
+
+  IIP15AGRESS
+
+  IRI_EMPATHETIC_CONCERN
 
   # Hypothesis
 
@@ -234,5 +259,7 @@ use model averaging.
 3. participants accept more unfair gambles under empathy conditions compared to others
 
 4. different groups have different acceptance rate of unfair gambles under empathy vs punish context. 
+
+   ​
 
    ​
