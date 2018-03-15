@@ -195,11 +195,11 @@ m1gm <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
-      ReappraisalDirection*scale(MMSE) + (1 |
+      ReappraisalDirection*scale(EXIT) + (1 |
   ID),
   family = binomial,
   data = allData,
-    
+  nAGQ = 0,  
   control = glmerControl(optimizer = "bobyqa"))
   summary(m1gm)
 car::Anova(m1gm, type = 'III')
@@ -207,6 +207,12 @@ pdf("UGcontext*MMSE.pdf", width=8, height=6)
 lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,28,30)))
 plot(lsm, horiz = F)
 dev.off()
+
+pdf("UGcontext*Group_w_EXIT.pdf", width=8, height=6)
+lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "group4")
+plot(lsm, horiz = F)
+dev.off()
+
 ```
 
 ```{r}
