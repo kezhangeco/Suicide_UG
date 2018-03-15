@@ -30,7 +30,6 @@ library(usdm)
 library(car)
 library(glmulti)
 library(rJava)
-
 ```
 
 ## R Markdown
