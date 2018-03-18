@@ -1,0 +1,80 @@
+
+AcceptOffer ~ PunishingType * fairLR * totalStake + PunishingType*group4 + fairLR * group4 + totalStake * group4 + PunishingType* PROTECT2AGE + (1 | ID/block)
+==================================================================================
+                                                           Dependent variable:    
+                                                       ---------------------------
+                                                               AcceptOffer        
+----------------------------------------------------------------------------------
+PunishingTyperesources                                          2.526***          
+                                                                 (0.203)          
+                                                                                  
+scale(fairLR)                                                   1.097***          
+                                                                 (0.122)          
+                                                                                  
+scale(totalStake)                                                 0.162           
+                                                                 (0.106)          
+                                                                                  
+group4control                                                     0.208           
+                                                                 (0.655)          
+                                                                                  
+group4depression                                                  0.748           
+                                                                 (0.659)          
+                                                                                  
+group4ideator                                                     0.031           
+                                                                 (0.688)          
+                                                                                  
+PROTECT2AGE                                                      -0.045           
+                                                                 (0.233)          
+                                                                                  
+PunishingTyperesources:scale(fairLR)                            0.438***          
+                                                                 (0.116)          
+                                                                                  
+PunishingTyperesources:scale(totalStake)                         0.197*           
+                                                                 (0.110)          
+                                                                                  
+scale(fairLR):scale(totalStake)                                  -0.044           
+                                                                 (0.075)          
+                                                                                  
+PunishingTyperesources:group4control                             0.707**          
+                                                                 (0.336)          
+                                                                                  
+PunishingTyperesources:group4depression                         1.848***          
+                                                                 (0.309)          
+                                                                                  
+PunishingTyperesources:group4ideator                            1.236***          
+                                                                 (0.383)          
+                                                                                  
+scale(fairLR):group4control                                       0.017           
+                                                                 (0.169)          
+                                                                                  
+scale(fairLR):group4depression                                  -0.579***         
+                                                                 (0.147)          
+                                                                                  
+scale(fairLR):group4ideator                                      -0.125           
+                                                                 (0.178)          
+                                                                                  
+scale(totalStake):group4control                                  -0.180           
+                                                                 (0.145)          
+                                                                                  
+scale(totalStake):group4depression                               -0.055           
+                                                                 (0.133)          
+                                                                                  
+scale(totalStake):group4ideator                                  -0.031           
+                                                                 (0.157)          
+                                                                                  
+PunishingTyperesources:PROTECT2AGE                               -0.135           
+                                                                 (0.115)          
+                                                                                  
+PunishingTyperesources:scale(fairLR):scale(totalStake)            0.009           
+                                                                 (0.108)          
+                                                                                  
+Constant                                                        -1.775***         
+                                                                 (0.418)          
+                                                                                  
+----------------------------------------------------------------------------------
+Observations                                                      3,770           
+Log Likelihood                                                 -1,409.902         
+Akaike Inf. Crit.                                               2,867.804         
+Bayesian Inf. Crit.                                             3,017.440         
+==================================================================================
+Note:                                                  *p<0.1; **p<0.05; ***p<0.01

@@ -1,0 +1,91 @@
+
+==================================================================================
+                                                           Dependent variable:    
+                                                       ---------------------------
+                                                               AcceptOffer        
+----------------------------------------------------------------------------------
+PunishingTyperesources                                          2.601***          
+                                                                 (0.298)          
+                                                                                  
+scale(fairLR)                                                   0.970***          
+                                                                 (0.162)          
+                                                                                  
+scale(totalStake)                                                 0.054           
+                                                                 (0.144)          
+                                                                                  
+group5AttempterLL                                                 0.261           
+                                                                 (0.839)          
+                                                                                  
+group5control                                                     0.268           
+                                                                 (0.818)          
+                                                                                  
+group5depression                                                  0.800           
+                                                                 (0.814)          
+                                                                                  
+group5ideator                                                     0.108           
+                                                                 (0.832)          
+                                                                                  
+scale(MMSE)                                                       0.046           
+                                                                 (0.234)          
+                                                                                  
+PunishingTyperesources:scale(fairLR)                            0.446***          
+                                                                 (0.116)          
+                                                                                  
+PunishingTyperesources:scale(totalStake)                         0.200*           
+                                                                 (0.110)          
+                                                                                  
+scale(fairLR):scale(totalStake)                                  -0.045           
+                                                                 (0.075)          
+                                                                                  
+PunishingTyperesources:group5AttempterLL                          0.034           
+                                                                 (0.404)          
+                                                                                  
+PunishingTyperesources:group5control                              0.603           
+                                                                 (0.405)          
+                                                                                  
+PunishingTyperesources:group5depression                         1.749***          
+                                                                 (0.382)          
+                                                                                  
+PunishingTyperesources:group5ideator                            1.221***          
+                                                                 (0.438)          
+                                                                                  
+scale(fairLR):group5AttempterLL                                   0.273           
+                                                                 (0.220)          
+                                                                                  
+scale(fairLR):group5control                                       0.142           
+                                                                 (0.200)          
+                                                                                  
+scale(fairLR):group5depression                                  -0.454**          
+                                                                 (0.182)          
+                                                                                  
+scale(fairLR):group5ideator                                      -0.005           
+                                                                 (0.208)          
+                                                                                  
+scale(totalStake):group5AttempterLL                               0.196           
+                                                                 (0.185)          
+                                                                                  
+scale(totalStake):group5control                                  -0.073           
+                                                                 (0.174)          
+                                                                                  
+scale(totalStake):group5depression                                0.053           
+                                                                 (0.164)          
+                                                                                  
+scale(totalStake):group5ideator                                   0.077           
+                                                                 (0.184)          
+                                                                                  
+PunishingTyperesources:scale(MMSE)                               0.226*           
+                                                                 (0.120)          
+                                                                                  
+PunishingTyperesources:scale(fairLR):scale(totalStake)            0.014           
+                                                                 (0.109)          
+                                                                                  
+Constant                                                        -1.883***         
+                                                                 (0.620)          
+                                                                                  
+----------------------------------------------------------------------------------
+Observations                                                      3,770           
+Log Likelihood                                                 -1,407.251         
+Akaike Inf. Crit.                                               2,870.502         
+Bayesian Inf. Crit.                                             3,045.077         
+==================================================================================
+Note:                                                  *p<0.1; **p<0.05; ***p<0.01

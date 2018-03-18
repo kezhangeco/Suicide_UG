@@ -1,0 +1,62 @@
+
+Rating ~ ReappraisalDirection*group4* HRSD+ (1|ID)
+===================================================================================
+                                                            Dependent variable:    
+                                                        ---------------------------
+                                                                  Rating           
+-----------------------------------------------------------------------------------
+ReappraisalDirectionpunish                                        -0.106           
+                                                                  (0.073)          
+                                                                                   
+group4control                                                     -0.244           
+                                                                  (0.324)          
+                                                                                   
+group4depression                                                   0.072           
+                                                                  (0.106)          
+                                                                                   
+group4ideator                                                      0.101           
+                                                                  (0.118)          
+                                                                                   
+HRSD_NO_SUI                                                        0.032           
+                                                                  (0.064)          
+                                                                                   
+ReappraisalDirectionpunish:group4control                           0.386           
+                                                                  (0.354)          
+                                                                                   
+ReappraisalDirectionpunish:group4depression                       -0.090           
+                                                                  (0.113)          
+                                                                                   
+ReappraisalDirectionpunish:group4ideator                          -0.090           
+                                                                  (0.126)          
+                                                                                   
+ReappraisalDirectionpunish:HRSD_NO_SUI                             0.097           
+                                                                  (0.069)          
+                                                                                   
+group4control:HRSD_NO_SUI                                         -0.330           
+                                                                  (0.263)          
+                                                                                   
+group4depression:HRSD_NO_SUI                                      -0.077           
+                                                                  (0.133)          
+                                                                                   
+group4ideator:HRSD_NO_SUI                                         -0.018           
+                                                                  (0.127)          
+                                                                                   
+ReappraisalDirectionpunish:group4control:HRSD_NO_SUI               0.427           
+                                                                  (0.286)          
+                                                                                   
+ReappraisalDirectionpunish:group4depression:HRSD_NO_SUI           -0.051           
+                                                                  (0.141)          
+                                                                                   
+ReappraisalDirectionpunish:group4ideator:HRSD_NO_SUI              -0.209           
+                                                                  (0.135)          
+                                                                                   
+Constant                                                           0.037           
+                                                                  (0.068)          
+                                                                                   
+-----------------------------------------------------------------------------------
+Observations                                                       2,481           
+Log Likelihood                                                  -3,492.723         
+Akaike Inf. Crit.                                                7,021.447         
+Bayesian Inf. Crit.                                              7,126.142         
+===================================================================================
+Note:                                                   *p<0.1; **p<0.05; ***p<0.01

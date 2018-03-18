@@ -1,0 +1,80 @@
+
+AcceptOffer ~ PunishingType * fairLR * totalStake + PunishingType*group4 + fairLR * group4 + totalStake * group4 + PunishingType* HRSD+ (1 | ID/block)
+==================================================================================
+                                                           Dependent variable:    
+                                                       ---------------------------
+                                                               AcceptOffer        
+----------------------------------------------------------------------------------
+PunishingTyperesources                                          2.519***          
+                                                                 (0.213)          
+                                                                                  
+scale(fairLR)                                                   1.100***          
+                                                                 (0.122)          
+                                                                                  
+scale(totalStake)                                                 0.160           
+                                                                 (0.106)          
+                                                                                  
+group4control                                                     0.249           
+                                                                 (0.836)          
+                                                                                  
+group4depression                                                  0.727           
+                                                                 (0.666)          
+                                                                                  
+group4ideator                                                     0.034           
+                                                                 (0.689)          
+                                                                                  
+HRSD_NO_SUI                                                       0.027           
+                                                                 (0.310)          
+                                                                                  
+PunishingTyperesources:scale(fairLR)                            0.436***          
+                                                                 (0.116)          
+                                                                                  
+PunishingTyperesources:scale(totalStake)                         0.198*           
+                                                                 (0.110)          
+                                                                                  
+scale(fairLR):scale(totalStake)                                  -0.046           
+                                                                 (0.075)          
+                                                                                  
+PunishingTyperesources:group4control                             0.707*           
+                                                                 (0.429)          
+                                                                                  
+PunishingTyperesources:group4depression                         1.886***          
+                                                                 (0.307)          
+                                                                                  
+PunishingTyperesources:group4ideator                            1.273***          
+                                                                 (0.381)          
+                                                                                  
+scale(fairLR):group4control                                       0.017           
+                                                                 (0.169)          
+                                                                                  
+scale(fairLR):group4depression                                  -0.580***         
+                                                                 (0.147)          
+                                                                                  
+scale(fairLR):group4ideator                                      -0.127           
+                                                                 (0.178)          
+                                                                                  
+scale(totalStake):group4control                                  -0.176           
+                                                                 (0.145)          
+                                                                                  
+scale(totalStake):group4depression                               -0.054           
+                                                                 (0.133)          
+                                                                                  
+scale(totalStake):group4ideator                                  -0.027           
+                                                                 (0.157)          
+                                                                                  
+PunishingTyperesources:HRSD_NO_SUI                               -0.025           
+                                                                 (0.149)          
+                                                                                  
+PunishingTyperesources:scale(fairLR):scale(totalStake)            0.010           
+                                                                 (0.108)          
+                                                                                  
+Constant                                                        -1.803***         
+                                                                 (0.433)          
+                                                                                  
+----------------------------------------------------------------------------------
+Observations                                                      3,770           
+Log Likelihood                                                 -1,410.665         
+Akaike Inf. Crit.                                               2,869.329         
+Bayesian Inf. Crit.                                             3,018.965         
+==================================================================================
+Note:                                                  *p<0.1; **p<0.05; ***p<0.01

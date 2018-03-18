@@ -1,0 +1,98 @@
+
+AcceptOffer ~ PunishingType * fairLR * totalStake + PunishingType*group4 + fairLR * group4 + totalStake * group4 + PunishingType*group4* GENDERTEXT + (1 | ID/block)
+==================================================================================
+                                                           Dependent variable:    
+                                                       ---------------------------
+                                                               AcceptOffer        
+----------------------------------------------------------------------------------
+PunishingTyperesources                                          1.771***          
+                                                                 (0.275)          
+                                                                                  
+scale(fairLR)                                                   1.098***          
+                                                                 (0.122)          
+                                                                                  
+scale(totalStake)                                                 0.164           
+                                                                 (0.106)          
+                                                                                  
+group4control                                                    -0.005           
+                                                                 (0.912)          
+                                                                                  
+group4depression                                                 -0.812           
+                                                                 (1.086)          
+                                                                                  
+group4ideator                                                    -1.325           
+                                                                 (1.096)          
+                                                                                  
+GENDERTEXTMALE                                                   -0.526           
+                                                                 (0.820)          
+                                                                                  
+PunishingTyperesources:scale(fairLR)                            0.448***          
+                                                                 (0.117)          
+                                                                                  
+PunishingTyperesources:scale(totalStake)                         0.195*           
+                                                                 (0.110)          
+                                                                                  
+scale(fairLR):scale(totalStake)                                  -0.040           
+                                                                 (0.075)          
+                                                                                  
+PunishingTyperesources:group4control                             0.859**          
+                                                                 (0.420)          
+                                                                                  
+PunishingTyperesources:group4depression                         1.949***          
+                                                                 (0.591)          
+                                                                                  
+PunishingTyperesources:group4ideator                            2.779***          
+                                                                 (0.600)          
+                                                                                  
+scale(fairLR):group4control                                       0.019           
+                                                                 (0.171)          
+                                                                                  
+scale(fairLR):group4depression                                  -0.577***         
+                                                                 (0.148)          
+                                                                                  
+scale(fairLR):group4ideator                                      -0.125           
+                                                                 (0.180)          
+                                                                                  
+scale(totalStake):group4control                                  -0.180           
+                                                                 (0.146)          
+                                                                                  
+scale(totalStake):group4depression                               -0.052           
+                                                                 (0.134)          
+                                                                                  
+scale(totalStake):group4ideator                                  -0.016           
+                                                                 (0.158)          
+                                                                                  
+PunishingTyperesources:GENDERTEXTMALE                           1.377***          
+                                                                 (0.378)          
+                                                                                  
+group4control:GENDERTEXTMALE                                      0.370           
+                                                                 (1.293)          
+                                                                                  
+group4depression:GENDERTEXTMALE                                  2.593*           
+                                                                 (1.355)          
+                                                                                  
+group4ideator:GENDERTEXTMALE                                      2.223           
+                                                                 (1.382)          
+                                                                                  
+PunishingTyperesources:scale(fairLR):scale(totalStake)            0.012           
+                                                                 (0.109)          
+                                                                                  
+PunishingTyperesources:group4control:GENDERTEXTMALE               0.218           
+                                                                 (0.649)          
+                                                                                  
+PunishingTyperesources:group4depression:GENDERTEXTMALE           -0.554           
+                                                                 (0.686)          
+                                                                                  
+PunishingTyperesources:group4ideator:GENDERTEXTMALE             -2.625***         
+                                                                 (0.730)          
+                                                                                  
+Constant                                                        -1.531**          
+                                                                 (0.628)          
+                                                                                  
+----------------------------------------------------------------------------------
+Observations                                                      3,770           
+Log Likelihood                                                 -1,392.808         
+Akaike Inf. Crit.                                               2,845.616         
+Bayesian Inf. Crit.                                             3,032.661         
+==================================================================================
+Note:                                                  *p<0.1; **p<0.05; ***p<0.01

@@ -1,0 +1,74 @@
+
+AcceptOffer ~ PunishingType * scale(fairLR) * scale(totalStake) + PunishingType * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + (1 | ID/block)
+==================================================================================
+                                                           Dependent variable:    
+                                                       ---------------------------
+                                                               AcceptOffer        
+----------------------------------------------------------------------------------
+PunishingTyperesources                                          2.508***          
+                                                                 (0.203)          
+                                                                                  
+scale(fairLR)                                                   1.099***          
+                                                                 (0.122)          
+                                                                                  
+scale(totalStake)                                                 0.161           
+                                                                 (0.106)          
+                                                                                  
+group4control                                                     0.203           
+                                                                 (0.661)          
+                                                                                  
+group4depression                                                  0.726           
+                                                                 (0.664)          
+                                                                                  
+group4ideator                                                     0.036           
+                                                                 (0.689)          
+                                                                                  
+PunishingTyperesources:scale(fairLR)                            0.435***          
+                                                                 (0.116)          
+                                                                                  
+PunishingTyperesources:scale(totalStake)                         0.198*           
+                                                                 (0.110)          
+                                                                                  
+scale(fairLR):scale(totalStake)                                  -0.046           
+                                                                 (0.075)          
+                                                                                  
+PunishingTyperesources:group4control                             0.752**          
+                                                                 (0.335)          
+                                                                                  
+PunishingTyperesources:group4depression                         1.887***          
+                                                                 (0.307)          
+                                                                                  
+PunishingTyperesources:group4ideator                            1.273***          
+                                                                 (0.381)          
+                                                                                  
+scale(fairLR):group4control                                       0.017           
+                                                                 (0.169)          
+                                                                                  
+scale(fairLR):group4depression                                  -0.580***         
+                                                                 (0.147)          
+                                                                                  
+scale(fairLR):group4ideator                                      -0.128           
+                                                                 (0.178)          
+                                                                                  
+scale(totalStake):group4control                                  -0.176           
+                                                                 (0.145)          
+                                                                                  
+scale(totalStake):group4depression                               -0.054           
+                                                                 (0.133)          
+                                                                                  
+scale(totalStake):group4ideator                                  -0.027           
+                                                                 (0.157)          
+                                                                                  
+PunishingTyperesources:scale(fairLR):scale(totalStake)            0.010           
+                                                                 (0.108)          
+                                                                                  
+Constant                                                        -1.793***         
+                                                                 (0.418)          
+                                                                                  
+----------------------------------------------------------------------------------
+Observations                                                      3,770           
+Log Likelihood                                                 -1,410.680         
+Akaike Inf. Crit.                                               2,865.360         
+Bayesian Inf. Crit.                                             3,002.527         
+==================================================================================
+Note:                                                  *p<0.1; **p<0.05; ***p<0.01

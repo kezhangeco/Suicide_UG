@@ -1,0 +1,98 @@
+
+AcceptOffer ~ PunishingType * fairLR * totalStake + PunishingType*group4 + fairLR * group4 + totalStake * group4 + PunishingType*group4* PROTECT2AGE + (1 | ID/block)
+==================================================================================
+                                                           Dependent variable:    
+                                                       ---------------------------
+                                                               AcceptOffer        
+----------------------------------------------------------------------------------
+PunishingTyperesources                                          2.510***          
+                                                                 (0.204)          
+                                                                                  
+scale(fairLR)                                                   1.082***          
+                                                                 (0.121)          
+                                                                                  
+scale(totalStake)                                                 0.160           
+                                                                 (0.106)          
+                                                                                  
+group4control                                                     0.108           
+                                                                 (0.650)          
+                                                                                  
+group4depression                                                  0.771           
+                                                                 (0.667)          
+                                                                                  
+group4ideator                                                    -0.028           
+                                                                 (0.677)          
+                                                                                  
+PROTECT2AGE                                                      -0.0001          
+                                                                 (0.351)          
+                                                                                  
+PunishingTyperesources:scale(fairLR)                            0.460***          
+                                                                 (0.117)          
+                                                                                  
+PunishingTyperesources:scale(totalStake)                         0.200*           
+                                                                 (0.110)          
+                                                                                  
+scale(fairLR):scale(totalStake)                                  -0.042           
+                                                                 (0.074)          
+                                                                                  
+PunishingTyperesources:group4control                             0.774**          
+                                                                 (0.339)          
+                                                                                  
+PunishingTyperesources:group4depression                         1.839***          
+                                                                 (0.308)          
+                                                                                  
+PunishingTyperesources:group4ideator                            1.300***          
+                                                                 (0.390)          
+                                                                                  
+scale(fairLR):group4control                                       0.018           
+                                                                 (0.168)          
+                                                                                  
+scale(fairLR):group4depression                                  -0.578***         
+                                                                 (0.147)          
+                                                                                  
+scale(fairLR):group4ideator                                      -0.077           
+                                                                 (0.181)          
+                                                                                  
+scale(totalStake):group4control                                  -0.171           
+                                                                 (0.145)          
+                                                                                  
+scale(totalStake):group4depression                               -0.052           
+                                                                 (0.133)          
+                                                                                  
+scale(totalStake):group4ideator                                  -0.041           
+                                                                 (0.159)          
+                                                                                  
+PunishingTyperesources:PROTECT2AGE                               -0.080           
+                                                                 (0.162)          
+                                                                                  
+group4control:PROTECT2AGE                                         0.393           
+                                                                 (0.588)          
+                                                                                  
+group4depression:PROTECT2AGE                                     -0.038           
+                                                                 (0.588)          
+                                                                                  
+group4ideator:PROTECT2AGE                                        -0.991           
+                                                                 (0.761)          
+                                                                                  
+PunishingTyperesources:scale(fairLR):scale(totalStake)            0.010           
+                                                                 (0.109)          
+                                                                                  
+PunishingTyperesources:group4control:PROTECT2AGE                  0.257           
+                                                                 (0.287)          
+                                                                                  
+PunishingTyperesources:group4depression:PROTECT2AGE              -0.180           
+                                                                 (0.325)          
+                                                                                  
+PunishingTyperesources:group4ideator:PROTECT2AGE                -0.908**          
+                                                                 (0.399)          
+                                                                                  
+Constant                                                        -1.781***         
+                                                                 (0.413)          
+                                                                                  
+----------------------------------------------------------------------------------
+Observations                                                      3,770           
+Log Likelihood                                                 -1,403.380         
+Akaike Inf. Crit.                                               2,866.760         
+Bayesian Inf. Crit.                                             3,053.805         
+==================================================================================
+Note:                                                  *p<0.1; **p<0.05; ***p<0.01
