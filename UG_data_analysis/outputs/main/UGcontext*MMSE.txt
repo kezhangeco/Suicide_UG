@@ -1,0 +1,104 @@
+
+AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(MMSE) + (1 | ID/block)
+=======================================================================================
+                                                                Dependent variable:    
+                                                            ---------------------------
+                                                                    AcceptOffer        
+---------------------------------------------------------------------------------------
+ReappraisalDirectionempathy                                            0.417           
+                                                                      (0.316)          
+                                                                                       
+ReappraisalDirectionpunish                                           -2.350***         
+                                                                      (0.310)          
+                                                                                       
+scale(fairLR)                                                        2.260***          
+                                                                      (0.110)          
+                                                                                       
+scale(totalStake)                                                      0.052           
+                                                                      (0.075)          
+                                                                                       
+group4control                                                         -0.638           
+                                                                      (0.634)          
+                                                                                       
+group4depression                                                      -1.142*          
+                                                                      (0.588)          
+                                                                                       
+group4ideator                                                         -0.145           
+                                                                      (0.638)          
+                                                                                       
+scale(MMSE)                                                          0.578***          
+                                                                      (0.212)          
+                                                                                       
+ReappraisalDirectionempathy:scale(fairLR)                            -1.356***         
+                                                                      (0.119)          
+                                                                                       
+ReappraisalDirectionpunish:scale(fairLR)                             -1.336***         
+                                                                      (0.107)          
+                                                                                       
+ReappraisalDirectionempathy:scale(totalStake)                          0.112           
+                                                                      (0.089)          
+                                                                                       
+ReappraisalDirectionpunish:scale(totalStake)                         0.275***          
+                                                                      (0.076)          
+                                                                                       
+scale(fairLR):scale(totalStake)                                       -0.126*          
+                                                                      (0.073)          
+                                                                                       
+ReappraisalDirectionempathy:group4control                            1.506***          
+                                                                      (0.525)          
+                                                                                       
+ReappraisalDirectionpunish:group4control                              0.986*           
+                                                                      (0.511)          
+                                                                                       
+ReappraisalDirectionempathy:group4depression                         3.733***          
+                                                                      (0.440)          
+                                                                                       
+ReappraisalDirectionpunish:group4depression                          2.642***          
+                                                                      (0.410)          
+                                                                                       
+ReappraisalDirectionempathy:group4ideator                            1.627***          
+                                                                      (0.528)          
+                                                                                       
+ReappraisalDirectionpunish:group4ideator                               0.621           
+                                                                      (0.506)          
+                                                                                       
+scale(fairLR):group4control                                            0.137           
+                                                                      (0.101)          
+                                                                                       
+scale(fairLR):group4depression                                       -0.365***         
+                                                                      (0.086)          
+                                                                                       
+scale(fairLR):group4ideator                                            0.134           
+                                                                      (0.110)          
+                                                                                       
+scale(totalStake):group4control                                      -0.199**          
+                                                                      (0.088)          
+                                                                                       
+scale(totalStake):group4depression                                    -0.136*          
+                                                                      (0.078)          
+                                                                                       
+scale(totalStake):group4ideator                                       -0.035           
+                                                                      (0.094)          
+                                                                                       
+ReappraisalDirectionempathy:scale(MMSE)                              -0.530***         
+                                                                      (0.172)          
+                                                                                       
+ReappraisalDirectionpunish:scale(MMSE)                               -0.452***         
+                                                                      (0.166)          
+                                                                                       
+ReappraisalDirectionempathy:scale(fairLR):scale(totalStake)           0.223**          
+                                                                      (0.098)          
+                                                                                       
+ReappraisalDirectionpunish:scale(fairLR):scale(totalStake)            -0.053           
+                                                                      (0.086)          
+                                                                                       
+Constant                                                             1.781***          
+                                                                      (0.393)          
+                                                                                       
+---------------------------------------------------------------------------------------
+Observations                                                          10,166           
+Log Likelihood                                                      -3,939.122         
+Akaike Inf. Crit.                                                    7,942.245         
+Bayesian Inf. Crit.                                                  8,173.503         
+=======================================================================================
+Note:                                                       *p<0.1; **p<0.05; ***p<0.01

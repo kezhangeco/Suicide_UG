@@ -1,4 +1,5 @@
 
+AcceptOffer ~ PunishingType * scale(fairLR) * scale(totalStake) + PunishingType
 ==================================================================================
                                                            Dependent variable:    
                                                        ---------------------------
