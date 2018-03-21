@@ -4,12 +4,15 @@
 
 $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * \\group4 + (1 | ID/block)$$
 
-**The reference is $baseline$, $attempter$, and $attempterHL$.*
+**The reference is $baseline$, $attempter$, and $attempterHL$.**
 
  ```*p<0.1; **p<0.05; ***p<0.01```
 
 1. Main effect:
 
+   - ReappraisalDirectionempathy                                           0.723**          
+   - ReappraisalDirectionpunish                                              -2.088***         
+   - scale(fairLR)                                                                          2.248***          
    - Empathy is more likely to accept the offer compared to the baseline.
    - Punishment is less likely to accept the baseline.
    - stake size has no effect.
@@ -177,7 +180,7 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + Reapp
    - MMSE                                                                                          0.578***  
    - ReappraisalDirectionpunish                                                        -2.350*** 
    - group4depression                                                                        -1.142*                          
-2. $Reppraisal\direction*MMSE$
+2. $Reppraisal\,direction*MMSE$
    - ReappraisalDirectionempathy:scale(MMSE)                                -0.530***         
    - ReappraisalDirectionpunish:scale(MMSE)                                   -0.452***     
 
@@ -209,7 +212,23 @@ $$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + Reapp
    - ReappraisalDirectionempathy:scale(IIP15AGRESS)                                       0.564*   
 3. $IIP15AGRESS *Reappraisal\,Direction*group4$
    - ReappraisalDirectionempathy:group4depression:scale(IIP15AGRESS)          2.259***    
-   - ReappraisalDirectionpunish:group4depression:scale(IIP15AGRESS)            0.810**                        
+
+   - ReappraisalDirectionpunish:group4depression:scale(IIP15AGRESS)            0.810**   
+
+     ​
+
+### Gender ($Reappraisal\,Direction*gender$)
+
+1. No main effect
+
+2. $gender * Reappraisal\,Direction$
+
+   - ReappraisalDirectionempathy:GENDERTEXTMALE                           1.626***          
+   - ReappraisalDirectionpunish:GENDERTEXTMALE                             1.395***          
+
+   ![Gcontext*gende](outputs/main/UGcontext*gender.jpg)
+
+​                     
 
 # Punishment Type
 
@@ -302,6 +321,26 @@ $$AcceptOffer ~ PunishingType * scale(fairLR) * scale(totalStake) + PunishingTyp
 6. $punishType * total\,stake$
 
    - PunishingTypeempathy:scale(totalStake)                                  0.299***        
+
+
+
+## Individual Characterstics
+
+### Education($ punishType*education$)
+
+PunishingTyperesources:EDUCATION                                       0.291**          
+
+### Gender ($ punishType*gender$)
+
+PunishingTyperesources:GENDERTEXTMALE                           0.886***          
+
+### MMSE($ punishType*MMSE$)
+
+PunishingTyperesources:MMSE                                                  0.237**          
+
+
+
+
 
 # Emotional reactivity
 
