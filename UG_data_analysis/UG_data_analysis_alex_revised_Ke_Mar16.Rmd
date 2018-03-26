@@ -796,6 +796,7 @@ dev.off()
 ```
 
 ```{r, control MMSE}
+# THE FOLLOWING CODES ARE CONTROLLING INDIVIDUAL VARS
 # no missing values
 # control for MMSE with (1 | ID)
 modelPun1_mg <-
@@ -1020,6 +1021,7 @@ pltFunPun2_3way <- lapply(varlist, function(individualFactor) {
 })
 ```
 
+# Ke's codes on emotional reactivity
 # post-survey analysis 
 ```{r emotion clean data}
 # emotion reactivity within the 3 categories of quesions
@@ -1049,7 +1051,6 @@ boxplot(emoRating$Rating ~ emoRating$ReappraisalDirection, main = "Emotion react
 
 ```
 
-
 ```{r post survey HLM?}
 ## HLM necessary?
 interceptOnly <- glm(Rating ~ 1, family = gaussian, data = reactivity)
@@ -1070,7 +1071,6 @@ cat("ICC is", ICC_model(randomInterceptOnly))
 ```
 HLM is needed.
 
-## KE's codes
 ```{r, reactivity model}
 # reactivity of each question: unfairness, sympathy, and anger under reppraisal direction
 mFair <- lmer(scale(Rating) ~ ReappraisalDirection*group4 + (1|ID), data = unfair)
@@ -1127,99 +1127,11 @@ plot(lsm, horiz = F) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) 
 stargazer(summary(m_2type)$coefficients, type = "text", title="scale(Rating) ~ Q_type*group4 + ReappraisalDirection*group4 + (1|ID)",out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/reactivity_2types.txt")
 
-mEmpathy1 <- lmer(scale(Rating) ~ Q_type * group4 + (1|ID), data = empathyDF)
-mResource1 <- lmer(scale(Rating) ~ Q_type * group4 + (1|ID), data = resourcesDF)
-mReputation1 <- lmer(scale(Rating) ~ Q_type * group4 + (1|ID), data = reputationDF)
 
-stargazer(summary(mResource1)$coefficients, type = "text", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/resources.txt")
-stargazer(summary(mReputation1)$coefficients, type = "text", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/reputation.txt")
-stargazer(summary(mEmpathy1)$coefficients, type = "text", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/empathy.txt")
-
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/empathy.jpg')
-lsm <- lsmeans(mEmpathy1, "Q_type", by = c("group4"))
-plot(lsm, horiz = F) +
-  facet_grid( ~ group4) +
-  theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  ggtitle("Empathy context")
-
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/resources.jpg')
-lsm <- lsmeans(mResource1, "Q_type", by = c("group4"))
-plot(lsm, horiz = F) +
-  facet_grid( ~ group4) +
-  theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  ggtitle("Resources context")
-dev.off()
-
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/reputation.jpg')
-lsm <- lsmeans(mReputation1, "Q_type", by = c("group4"))
-plot(lsm, horiz = F) +
-  facet_grid( ~ group4) +
-  theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  ggtitle("Reputation context")
-
-
-m2React5 <- lmer(
-  scale(Rating) ~ ReappraisalDirection + group5 + (1|ID), data = emoRating)
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/group5Reappraisal.jpg')
-lsm <- lsmeans(m2React5, "ReappraisalDirection", by = c("group5"))
-plot(lsm, horiz = F) +
-  facet_grid(. ~ group5)
-dev.off()
-mEff <- allEffects(m2React5)
-plot(mEff, axes = list(y = list(lab = "reactivity")))
-stargazer(summary(m2React5)$coefficients, type = "text", title = "Rating ~ ReappraisalDirection + group5 + (1|ID)",
-          out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/roup5Reappraisal.txt")
-
-
-# scale(Rating) ~ ReappraisalDirection*group4+(1|ID)
-m3React4 <- lmer(
-  scale(Rating) ~ ReappraisalDirection*group4 + (1|ID), data = emoRating)
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/group4*Reappraisal.jpg')
-lsm <- lsmeans(m3React4, "ReappraisalDirection", by = c("group4"))
-plot(lsm, horiz = F) +
-  facet_grid(. ~ group4)
-dev.off()
-mEff <- allEffects(m3React4)
-plot(mEff, axes = list(y = list(lab = "reactivity")))
-summary(m3React4)
-stargazer(summary(m3React4)$coefficients, type = "text", title = "Rating ~ ReappraisalDirection*group4 + (1|ID)",
-          out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/group4*Reappraisal.txt")
-
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/group4*Reappraisal.jpg')
-lsm <- lsmeans(m3React4, "ReappraisalDirection", by = c("group4"))
-plot(lsm, horiz = F) +
-  facet_grid(. ~ group4)
-dev.off()
-
-m3React5 <- lmer(
-  scale(Rating) ~ ReappraisalDirection*group5 + (1|ID), data = emoRating)
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/group5*Reappraisal.jpg')
-lsm <- lsmeans(m3React5, "ReappraisalDirection", by = c("group5"))
-plot(lsm, horiz = F) +
-  facet_grid(. ~ group5)
-dev.off()
-mEff <- allEffects(m3React5)
-plot(mEff, axes = list(y = list(lab = "reactivity")))
-stargazer(summary(m3React5)$coefficients, type = "text", title = "Rating ~ ReappraisalDirection*group5 + (1|ID)",
-          out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/group5*Reappraisal.txt")
-
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/group5*Reappraisal.jpg')
-lsm <- lsmeans(m3React5, "ReappraisalDirection", by = c("group4"))
-plot(lsm, horiz = F) +
-  facet_grid(. ~ group5)
-dev.off()
-
-# the interaction model is not better.
-anova(m2React4,m3React4)
-anova(m2React5,m3React5)
-plot(mEff,1)
 ```
-```
-- Depression have higher reactivity compared to attempterHL.
-- Depression under sympathy has higher reactivity compared to attempterHL under sympathy
-- Depresssion under unfair has higher reactivity compared to attempterHL under unfair
 
-# control other individual factors
+# control individual factors
+The followings are controlling demographics and other questionnaires-based variables.
 ```{r, MMSE}
 mReact4MMSE1 <- lmer(
   scale(Rating) ~ ReappraisalDirection*group4 + scale(MMSE) + (1|ID), data = emoRating)
@@ -1426,14 +1338,6 @@ lapply(mReact5list1, summary)
 lapply(mReact5list2, summary)
 ```
 
-In no interaction models: 
-- IIP15AGRESS Inventory of Interpersonal Problems - Aggression is significant
-- depression x ReappraisalDirection: depression under sympathy and unfair has higher reactivity than attempterHL 
-
-In interaction models:
-- IIP15INTSEN Inventory of Interpersonal Problems - Interpersonal Sensitivity is significant
-- attempterLL x sympathy/unfair; depression x sympathy/unfair have higher reactivity than attempterHL
-- 3 way interaction
 
 ```{r, IIP15AGRESS}
 # IIP15AGRESS is significant at Rating = ReappraisalDirection*group5+IIP15AGRESS
@@ -1469,7 +1373,5 @@ plot(lsm, horiz = F, xlab = "reappraisal type") +
 dev.off()
 mEff <- allEffects(mReact5Agress1)
 plot(mEff, axes = list(y = list(lab = "reactivity")))
-
-
 
 ```
