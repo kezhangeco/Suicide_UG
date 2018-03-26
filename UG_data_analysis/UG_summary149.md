@@ -52,6 +52,60 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\Rea
    - scale(fairLR):scale(totalStake)                                                -0.136**       
 
 
+
+   
+
+## Whether the interaction of $fairness*total\,stake*group5$ exists? A replication of the previous study.
+
+$$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group5 + \\scale(fairLR) * group5 + scale(totalStake) * group5 + scale(fairLR) * scale(totalStake) * group5 + \\(1 | ID/block)$$
+
+1. Main effect
+
+   - ​
+
+2. $ReappraisalDirection * group$
+
+   - ​                                          
+
+3. $fairness * group$
+
+4. $total\, stake * group$
+
+   - ​
+
+     ​                 
+
+     ​
+
+5. $fairness * total\, stake * group$
+
+   - ​
+
+#### Comparison with the previous study
+
+- The previous study shows $group * magnitude$ interaction. The control, depression, attempterLL accepted fewer high stake size offers. T
+- The previous study did not find $fairness*magnitude$ and $fairness*magnitude*group$ interaction. The current study does not find $fairness*magnitude$, but $fairness*magnitude*group$. 
+
+## Individual characteristics on the offer acceptance.
+
+### MMSE $(MMSE *Reappraisal\,Direction)$
+
+ 
+
+### IRI_EMPATHETIC_CONCERN $(IRI\,EMPATHETIC\,CONCERN*Reappraisal\,Direction*group)$
+
+1. ​
+
+### IIP15INTSEN $(IIP15INTSEN*Reappraisal\,Direction*group)$
+
+
+
+### IIP15AGRESS$(IIP15AGRESS *Reappraisal\,Direction*group4)$
+
+
+
+### Gender ($Reappraisal\,Direction*gender$)
+
 ​               
 
 # Punishment Type
@@ -107,6 +161,24 @@ $$AcceptOffer = AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairL
    - No interaction
 
    ​
+
+## Individual Characterstics
+
+### Education($ punishType*education$)
+
+
+
+### Gender ($ punishType*gender$)
+
+
+
+### MMSE($ punishType*MMSE$)
+
+
+
+
+
+
 
 # Emotional reactivity
 
