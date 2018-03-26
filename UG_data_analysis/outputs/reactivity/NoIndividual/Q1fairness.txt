@@ -1,0 +1,18 @@
+
+Unfairness: scale(Rating) ~ PunishingType*group4 + (1|ID)
+========================================================================================
+                                         Estimate Std. Error   df    t value Pr(> | t| )
+----------------------------------------------------------------------------------------
+(Intercept)                               0.018     0.100    202.652  0.181     0.856   
+PunishingTypereputation                   -0.057    0.106    971.051 -0.543     0.588   
+PunishingTyperesources                    -0.121    0.117    969.691 -1.036     0.300   
+group4control                             0.313     0.161    210.464  1.938     0.054   
+group4depression                          0.130     0.156    199.957  0.831     0.407   
+group4ideator                             0.262     0.159    214.116  1.648     0.101   
+PunishingTypereputation:group4control     -0.691    0.172    968.632 -4.028    0.0001   
+PunishingTyperesources:group4control      -0.440    0.188    973.915 -2.343     0.019   
+PunishingTypereputation:group4depression  -0.244    0.166    964.833 -1.468     0.142   
+PunishingTyperesources:group4depression   -0.109    0.183    965.073 -0.599     0.549   
+PunishingTypereputation:group4ideator     -0.535    0.166    969.256 -3.228     0.001   
+PunishingTyperesources:group4ideator      -0.141    0.182    962.037 -0.776     0.438   
+----------------------------------------------------------------------------------------

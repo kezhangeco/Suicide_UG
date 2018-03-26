@@ -1,0 +1,42 @@
+---
+title: "Demographics comparison of the 149 participants"
+author: "Ke"
+date: '2018-03-24'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE,echo=FALSE}
+library(plyr)
+library(readxl)
+library(compareGroups)
+```
+
+```{r, echo=FALSE}
+demographics <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog149.csv")
+```
+
+## number of participants in the groups
+```{r, echo=FALSE}
+table(demographics$group4)
+table(demographics$group5)
+```
+
+## demographics summary
+```{r, echo=FALSE}
+myVar <- demographics[, c("GENDERTEXT", "PROTECT2AGE", "RACETEXT", "MARITALTEXT", "EDUCATION")]
+summary(myVar)
+```
+
+```{r, echo=FALSE}
+c1 <- compareGroups(myVar,demographics$group4)
+c2 <- compareGroups(myVar, demographics$group5)
+t1 <- createTable(c1, hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+t2 <- createTable(c2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+
+t1
+t2
+```
+
+### Group4 have imbalance on $marriage$ and $education$; Group5 have imbalance on $gender$, $race$, and $education$

@@ -1,0 +1,98 @@
+
+AcceptOffer ~ AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep
+========================================================================================
+                                                                 Dependent variable:    
+                                                             ---------------------------
+                                                                     AcceptOffer        
+----------------------------------------------------------------------------------------
+AcceptOffer_lag1                                                       -0.041           
+                                                                       (0.068)          
+                                                                                        
+ReappraisalDirectionResourcesRepempathy                               0.928***          
+                                                                       (0.247)          
+                                                                                        
+ReappraisalDirectionResourcesRepreputation                            -2.931***         
+                                                                       (0.256)          
+                                                                                        
+ReappraisalDirectionResourcesRepresources                             -0.504**          
+                                                                       (0.256)          
+                                                                                        
+scale(fairLR)                                                         2.089***          
+                                                                       (0.091)          
+                                                                                        
+scale(totalStake)                                                      -0.003           
+                                                                       (0.050)          
+                                                                                        
+group4control                                                           0.016           
+                                                                       (0.532)          
+                                                                                        
+group4depression                                                        0.710           
+                                                                       (0.544)          
+                                                                                        
+group4ideator                                                           0.449           
+                                                                       (0.549)          
+                                                                                        
+ReappraisalDirectionResourcesRepempathy:scale(fairLR)                 -1.256***         
+                                                                       (0.099)          
+                                                                                        
+ReappraisalDirectionResourcesRepreputation:scale(fairLR)              -1.226***         
+                                                                       (0.104)          
+                                                                                        
+ReappraisalDirectionResourcesRepresources:scale(fairLR)               -0.825***         
+                                                                       (0.110)          
+                                                                                        
+ReappraisalDirectionResourcesRepempathy:scale(totalStake)               0.043           
+                                                                       (0.075)          
+                                                                                        
+ReappraisalDirectionResourcesRepreputation:scale(totalStake)            0.117           
+                                                                       (0.089)          
+                                                                                        
+ReappraisalDirectionResourcesRepresources:scale(totalStake)            0.166*           
+                                                                       (0.092)          
+                                                                                        
+ReappraisalDirectionResourcesRepempathy:group4control                 1.027***          
+                                                                       (0.393)          
+                                                                                        
+ReappraisalDirectionResourcesRepreputation:group4control               -0.135           
+                                                                       (0.401)          
+                                                                                        
+ReappraisalDirectionResourcesRepresources:group4control                 0.651           
+                                                                       (0.402)          
+                                                                                        
+ReappraisalDirectionResourcesRepempathy:group4depression               -0.048           
+                                                                       (0.397)          
+                                                                                        
+ReappraisalDirectionResourcesRepreputation:group4depression            -0.185           
+                                                                       (0.406)          
+                                                                                        
+ReappraisalDirectionResourcesRepresources:group4depression              0.445           
+                                                                       (0.414)          
+                                                                                        
+ReappraisalDirectionResourcesRepempathy:group4ideator                  0.917**          
+                                                                       (0.409)          
+                                                                                        
+ReappraisalDirectionResourcesRepreputation:group4ideator               -0.569           
+                                                                       (0.419)          
+                                                                                        
+ReappraisalDirectionResourcesRepresources:group4ideator                 0.498           
+                                                                       (0.417)          
+                                                                                        
+scale(fairLR):group4control                                             0.126           
+                                                                       (0.098)          
+                                                                                        
+scale(fairLR):group4depression                                         -0.107           
+                                                                       (0.094)          
+                                                                                        
+scale(fairLR):group4ideator                                            0.236**          
+                                                                       (0.105)          
+                                                                                        
+Constant                                                              1.557***          
+                                                                       (0.347)          
+                                                                                        
+----------------------------------------------------------------------------------------
+Observations                                                           11,615           
+Log Likelihood                                                       -4,099.085         
+Akaike Inf. Crit.                                                     8,258.170         
+Bayesian Inf. Crit.                                                   8,478.972         
+========================================================================================
+Note:                                                        *p<0.1; **p<0.05; ***p<0.01
