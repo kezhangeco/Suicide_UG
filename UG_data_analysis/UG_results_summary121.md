@@ -35,7 +35,7 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\Rea
 
    - As the offers getting fairer, the attempterLL, control, and ideation are more likely to accept offers than the attempterHL. But the depression is less likely to accept offers than the attempterHL.
 
-     ![Gfair*group](outputs/main/NoIndividual/UGfair*group4.jpg)
+     ![Gfair*group](https://ws3.sinaimg.cn/large/006tKfTcgy1fpreoodtk4j30dc0dcq3i.jpg)
 
      ![Gfair*group](outputs/main/NoIndividual/UGfair*group5.jpg)
 
@@ -53,7 +53,7 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\Rea
 
      ​
 
-     ![Gstake*group](outputs/main/NoIndividual/UGstake*group4.jpg)
+     ![Gstake*group](https://ws1.sinaimg.cn/large/006tKfTcgy1fpreos152pj30dc0dct9i.jpg)
 
      ![Gstake*group](outputs/main/NoIndividual/UGstake*group5.jpg)
 
@@ -81,7 +81,7 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\Rea
 
      ​
 
-     ![Gcontext*group](outputs/main/NoIndividual/UGcontext*group4.jpg)
+     ![Gcontext*group](https://ws2.sinaimg.cn/large/006tKfTcgy1fpreouo54wj30dc0dcmxv.jpg)
 
      ![Gcontext*group](outputs/main/NoIndividual/UGcontext*group5.jpg)
 

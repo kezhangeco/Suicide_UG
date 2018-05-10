@@ -22,7 +22,7 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\Rea
 
    - As the offers are getting fairer, the depression becomes less likely to accept offers compared to the attempter.   
 
-     ​                              ![Gfair*group](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGfair*group4.jpg)     
+     ​                              ![Gfair*group](https://ws1.sinaimg.cn/large/006tKfTcgy1fpreoxxm1wj30dc0dcq3i.jpg)     
 
 3. $ReappraisalDirection * group$
 
@@ -30,13 +30,13 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\Rea
 
    - Compared to the attempter, the control has a higher increasing tendency to accept offers under empathy relative to baseline.
 
-     ![Gcontext*group](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGcontext*group4.jpg)
+     ![Gcontext*group](https://ws1.sinaimg.cn/large/006tKfTcgy1fprep2cy68j30dc0dcmxv.jpg)
 
 4. $total \, stake * group$
 
    - No interaction
 
-     ![Gstake*group](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGstake*group4.jpg)
+     ![Gstake*group](https://ws3.sinaimg.cn/large/006tKfTcgy1fprep4jp4wj30dc0dcmxv.jpg)
 
 5. $ReappraisalDirection * fairness$
 
@@ -136,7 +136,7 @@ $$AcceptOffer = AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairL
 
    - Compared to the attempter, the increasing likelihood of accepting offers under empathy from baseline is higher in the control and ideator.
 
-     ![roup4*Pu](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4*Pun.jpg)       
+     ![roup4*Pu](https://ws1.sinaimg.cn/large/006tKfTcgy1fprep5blrlj30dc0dct9i.jpg)       
 
 3. $fairness * group$
 
@@ -144,7 +144,7 @@ $$AcceptOffer = AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairL
 
    - The ideator has higher increase in the tendency of acceptance as the offers are getting fairer, compared to the attempter.
 
-     ![roup4*fai](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4*fair.jpg)       
+     ![roup4*fai](https://ws3.sinaimg.cn/large/006tKfTcgy1fprepbjskaj30dc0dcjrx.jpg)       
 
 4. $total\, stake * group$
 
@@ -207,9 +207,9 @@ $Reappraisal Direction: empathy, punish (reputation, resources)$
 
      - ReappraisalDirectionpunish:group4control      -0.582***    
 
-     ![1fairnes](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Q1fairness.jpg)
+     ![1fairnes](https://ws4.sinaimg.cn/large/006tKfTcgy1fprepdx7q2j30dc0dcjrx.jpg)
 
-     ![fairnes](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qfairness.jpg)
+     ![fairnes](https://ws4.sinaimg.cn/large/006tKfTcgy1fprepg5oixj30dc0dcgmb.jpg)
 
 #### Sympathy survey 
 
@@ -224,9 +224,9 @@ $Reappraisal Direction: empathy, punish (reputation, resources)$
 
 2. No interaction
 
-   ![1sympath](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Q1sympathy.jpg)
+   ![1sympath](https://ws4.sinaimg.cn/large/006tKfTcgy1fpreph9oh2j30dc0dcwf4.jpg)
 
-   ![sympath](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qsympathy.jpg)
+   ![sympath](https://ws1.sinaimg.cn/large/006tKfTcgy1fprepkrftmj30dc0dcaap.jpg)
 
 #### Anger survey
 
@@ -241,9 +241,9 @@ $Reappraisal Direction: empathy, punish (reputation, resources)$
 
 2. No interaction effect
 
-   ![1ange](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Q1anger.jpg)
+   ![1ange](https://ws3.sinaimg.cn/large/006tKfTcgy1fprepm6hquj30dc0dcdgd.jpg)
 
-   ![ange](/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qanger.jpg)
+   ![ange](https://ws3.sinaimg.cn/large/006tKfTcgy1fprepmr8m3j30dc0dcdgh.jpg)
 
 
 

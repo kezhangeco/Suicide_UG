@@ -300,6 +300,7 @@ car::Anova(m1g_cens)
 # results are not sensitive to that
 ## tried context*fair*Group -- too complex, would not bother including
 
+plot(m1g)
 ```
 
 
