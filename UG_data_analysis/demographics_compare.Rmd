@@ -15,6 +15,10 @@ library(compareGroups)
 
 ```{r, echo=FALSE}
 demographics <- read.csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog149.csv")
+
+ug <- read_excel("C:\\Users\\ke\\ownCloud\\Suicide_UG\\raw_data_backup\\APRIL UG UPDATE.xlsx")
+
+nrow(ug)
 ```
 
 ## number of participants in the groups
