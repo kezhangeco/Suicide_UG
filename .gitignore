@@ -50,3 +50,5 @@ UG_data_analysis/.Rhistory
 UG_data_analysis/.RDataTmp2
 
 .DS_Store
+
+*.txt
