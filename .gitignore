@@ -51,4 +51,30 @@ UG_data_analysis/.RDataTmp2
 
 .DS_Store
 
+<<<<<<< HEAD
 *.txt
+=======
+ug_all_task_data.csv
+
+UG_data_analysis/__pycache__/demo_question_describe.cpython-36.pyc
+
+ug_all_task_data.csv
+
+UG_data_analysis/HLM_HSB_example.Rmd
+
+UG_data_analysis/oldDataCheck.Rmd
+
+UG_data_analysis/wrongOutputs/main/NoIndividual/UGcontext*group5.jpg alias
+
+UG_data_analysis/outputs/main/NoIndividual/UGcontext*group5.jpg alias
+
+UG_data_analysis/wrongOutputs/main/NoIndividual/UGfair*group5.jpg alias
+
+UG_data_analysis/UG_model_output.docx
+>>>>>>> origin/master
+
+*.txt
+
+*.txt
+
+*.jpg

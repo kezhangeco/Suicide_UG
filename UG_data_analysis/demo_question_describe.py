@@ -30,14 +30,17 @@ def demo_description():
     # add 'group' variable into demographic data: 5 levels group and 4 levels group. HH and LL attempters
     # describe demographic info, mean, median, sd...
 
-    df1 = pd.read_excel('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.xlsx')
+    df1 = pd.read_csv('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ug_demog.csv')
+    ID120 = pd.read_csv("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/wrongData/ug_all_task_data.csv",
+                        encoding="ISO-8859-1")
+
     book = load_workbook('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/summary.xlsx')
     writer = pd.ExcelWriter('/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/summary.xlsx', engine='openpyxl')
     writer.book = book
 
-    group5_demo = df1.groupby(['group5'])['PROTECT2AGE', 'MARITALTEXT', 'GENDERTEXT',
-                                          'EDUCATION', 'RACETEXT'].describe(percentiles=None, include = 'all')
-    group4_demo = df1.groupby(['group4'])['PROTECT2AGE', 'MARITALTEXT', 'GENDERTEXT',
+    group5_demo = df1.groupby(['group5'])['PROTECT2 AGE', 'MARITAL TEXT', 'GENDER TEXT',
+                                          'EDUCATION', 'RACE TEXT'].describe(percentiles=None, include = 'all')
+    group4_demo = df1.groupby(['group4'])['PROTECT2 AGE', 'MARITAL TEXT', 'GENDER TEXT',
                                           'EDUCATION'].describe(percentiles=None, include = 'all')
 
 
@@ -47,6 +50,28 @@ def demo_description():
     group4_demo.to_excel(writer, 'group4_demo')
     writer.save()
     writer.close()
+    idls = np.unique(df1['ID'])
+    # print(idls)
+    # print(len(idls))
+
+    HL = np.unique(df1[df1['group5'] == 'AttempterHL']['ID'])
+    LL = np.unique(df1[df1['group5'] == 'AttempterLL']['ID'])
+    c = np.unique(df1[df1['group5'] == 'control']['ID'])
+    d = np.unique(df1[df1['group5'] == 'depression']['ID'])
+    i = np.unique(df1[df1['group5'] == 'ideator']['ID'])
+    # print(bool(set(HL) & set(LL) & set(c) & set(d) & set(i)))
+    # print(HL, len(HL))
+    # print(LL, len(LL))
+    # print(c, len(c))
+    # print(d, len(d))
+    # print(i, len(i))
+
+    dID = df1[df1['group5'] == 'depression']['ID']
+    # print(list(dID), len(dID))
+    # print(len(np.unique(dID)))
+    # print(list(set(dID)- (set(d))))
+    print(dID[dID.duplicated()])
+
 
 
 def questionnaires_description():
@@ -173,8 +198,6 @@ def compareMean():
     for n in question_exclHC_ls:
         f, p = stats.f_oneway(attempter[n], ideator[n], depression[n])
         print('One attempter No control', n, 'f value: ', f, 'p value: ', p)
-
-
 
 
 
