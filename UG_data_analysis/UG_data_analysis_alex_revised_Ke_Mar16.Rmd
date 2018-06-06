@@ -9,7 +9,7 @@ outputs: text_document
 knitr::opts_chunk$set(echo = TRUE)
 library(lme4)
 library(ggplot2)
-# library(GGally)
+library(GGally)
 library(plyr)
 library(Matrix)
 library(readxl)
@@ -41,10 +41,8 @@ library(tidyverse)
 
 task <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data149.csv")
 demo <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_demog149.csv")
-question <- read_excel("~/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.xlsx")
+question <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.csv")
 emoRating <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_reactivity149.csv")
-task120 <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/wrongData/ug_all_task_data.csv")
-
 
 # check number of participants 
 print(length(unique(task$ID)))
@@ -55,19 +53,35 @@ question <- question[!duplicated(question),]
 print(length(question$ID))
 
 # merge demographics and questionniares. 
-question <- plyr::rename(question, c("UPPSP NEGURGENCY" = "urgency"))
-demoQuestion <- merge(demo, question, all = T)
+demoQuestion <- merge(demo, question[, c("ID", "HOUSEHOLD.INCOME", 
+                                         "PER.CAPITA.INCOME", "HRSD.NO.SUI",
+                                         "DEP.ONSET.AGE", "SIS.ML.TOTAL",
+                                         "SIS.ML.PLAN", "SSI.BL.CURRENT", "MMSE.TOTAL",
+                                         "EXIT", "DRS", "BIS_NONPLAN", "BIS_MOTOR",
+                                         "BIS_COGNIT", "BIS_TOTMEAN", "IIP15INTSEN",
+                                         "IIP15INTAMBV", "IIP15AGRESS", "UPPSP.NEG.URGENCY",
+                                         "UPPSP.POS.URGENCY", "UPPSP.LACK.OF.PREMED",
+                                         "UPPSP.LACK.OF.PERSEV", "IRI_PERSPECTIVE_TAKING",
+                                         "IRI_FANTASY_SCALE", "IRI_EMPATHETIC_CONCERN",
+                                         "IRI_PERSONAL_DISTRESS", "GOALS", "IMPULSE",
+                                         "AWARENESS", "WTARRAW", "WTARSS")], on = "ID")
+
+demoQuestion <- plyr::rename(demoQuestion, c("UPPSP.NEG.URGENCY" = "Nurgency", "UPPSP.POS.URGENCY" = "Purgency", "MMSE.TOTAL" = "MMSETOTAL"))
 
 # compare the group differences
-#c1 <- demoQuestion[,c(2,3,15,49,93,129,78,79)]
-myVar <- c("EDUCATION", "GENDERTEXT", "PROTECT2AGE", "RACETEXT", "MMSETOTAL", "WTARSS", "DRS", "EXIT", "BIS_NONPLAN", "urgency", "IIP15INTAMBV")
+myVar <- c("EDUCATION", "GENDERTEXT", "PROTECT2AGE", "RACETEXT", "MMSETOTAL", 
+           "WTARSS", "WTARRAW", "DRS", "EXIT", "BIS_NONPLAN", "Nurgency", "Purgency",
+           "IIP15INTAMBV", "SSI.BL.CURRENT", "IIP15INTSEN", "IIP15AGRESS")
 idx <- match(myVar, names(demoQuestion))
-idx <- sort(c(idx-1, idx))
-c1 <- demoQuestion[, idx]
+# idx <- sort(c(idx-1, idx))
+# c1 <- demoQuestion[, idx]
+c1 <- demoQuestion[, myVar]
 c2 <- compareGroups(c1,demoQuestion$group4)
 c2_2 <- compareGroups(c1, demoQuestion$group5)
-t2 <- createTable(c2, hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+t1 <- createTable(c2, hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
 t2_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+
+export2csv(t2_1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/demo1.csv")
 
 task$check <- 1:dim(task)[1]
 task_no_duplicates <- task %>% group_by(ID, merged_trial, Stimuli_RT) %>% filter(row_number(check) == 1)
@@ -77,22 +91,6 @@ plot(t)
 t_nodupes <- table(task_no_duplicates$ID, task_no_duplicates$ReappraisalDirection)
 plot(t_nodupes)
 
-# compare any difference in the new 149 and 120 data
-comparison <- compare(task,task120)
-print(comparison)
-comparison$tM
-
-
-# check N of trials in each context
-  for (i in unique(task$ID)) {
-  df <- subset(task, task$ID == i)
-  emp <- nrow(subset(df, df$ReappraisalDirection == "empathy"))
-  base <- nrow(subset(df, df$ReappraisalDirection == "baseline"))
-  pun <- nrow(subset(df, df$ReappraisalDirection == "punish"))
-  ifelse(emp != 26, print(i), "ok")
-  ifelse(base != 26,print(i), "ok")
-  ifelse(pun != 26, print(i), "ok")
-}
 
 # ID 221242 has missing trials in empathy and baseline
 ID221242 <- subset(task, task$ID == 221242)
@@ -101,32 +99,22 @@ print(nrow(subset(ID221242, ID221242$ReappraisalDirection == "empathy")))
 print(nrow(subset(ID221242, ID221242$ReappraisalDirection == "punish")))
 print(nrow(subset(ID221242, ID221242$ReappraisalDirection == "baseline")))
 
-
-# ID 221242 has missing trials in empathy and baseline
-ID221242 <- subset(task120, task$ID == 221242)
-print(nrow(ID221242))
-print(nrow(subset(ID221242, ID221242$ReappraisalDirection == "empathy")))
-print(nrow(subset(ID221242, ID221242$ReappraisalDirection == "punish")))
-print(nrow(subset(ID221242, ID221242$ReappraisalDirection == "baseline")))
-
-
 allData <- merge(task_no_duplicates, demoQuestion, on = "ID")
 
 allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
-allData <- plyr::rename(allData, c("HOUSEHOLD.INCOME" = "HouseholdIncome", "HRSD.NO.SUI" = "HRSD_NO_SUI", "PER.CAPITA.INCOME" = "IncomePerCapita", "MMSE.TOTAL" = "MMSE"))
+allData <- plyr::rename(allData, c("HOUSEHOLD.INCOME" = "HouseholdIncome", "HRSD.NO.SUI" = "HRSD_NO_SUI", "PER.CAPITA.INCOME" = "IncomePerCapita", "MMSETOTAL" = "MMSE"))
 
 allData$Fairness_score <- as.numeric(allData$Fairness_score)
 allData$ID <- as.factor(allData$ID)
 allData$AcceptOffer <- as.factor(allData$AcceptOffer)
 allData$Trial_Number <- as.factor(allData$Trial_Number)
-allData$group4 <- as.factor(allData$group4)
-allData$group5 <- as.factor(allData$group5)
 
 # reference group = attempter
 allData <- within(allData, group4 <- relevel(group4, ref = "attempter"))
 allData <- within(allData, group5 <- relevel(group5, ref = "AttempterHL"))
 emoRating <- within(emoRating, group4 <- relevel(group4, ref = "attempter"))
 emoRating <- within(emoRating, group5 <- relevel(group5, ref = "AttempterHL"))
+
 # block number
 allData$block <- NA
 allData$block <- ifelse(allData$merged_trial < 27, "1", ifelse((allData$merged_trial > 26) & (allData$merged_trial < 53), "2", "3" ))
@@ -147,16 +135,11 @@ attLL <- subset(allData, group5 == "AttempterLL")
 #Pvars <- allData[, c("ID", "MMSE", "PROTECT2AGE", "GENDERTEXT", "IncomePerCapita", "HRSD_NO_SUI", "EDUCATION", "RACETEXT", "WTARSS", "DRS", "EXIT", "BIS_NONPLAN", "urgency", "IIP15INTAMBV", "IIP15INTSEN", "IIP15AGRESS", "IRI_EMPATHETIC_CONCERN")]
 #Pvars <- subset(Pvars, !duplicated(ID))
 #emoRating <- merge(emoRating, Pvars, by = "ID")
-#emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 1] <- "punish"
-#emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 2] <- "empathy"
-#emoRating$ReappraisalDirection <- as.factor(emoRating$ReappraisalDirection)
+emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 1] <- "punish"
+emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 2] <- "empathy"
+emoRating$ReappraisalDirection <- as.factor(emoRating$ReappraisalDirection)
 
-# check the number of participants in the df
-print(length(unique(allData$ID)))
-print(length(unique(emoRating$ID)))
-print(length(unique(demoQuestion$ID)))
-print(length(unique(question$ID)))
-print(length(unique(demo$ID)))
+save.image("/Volumes/LAB/Suicide_UG/UG_data_analysis/ugDATA.RData")
 ```
 
 variables in the models:
@@ -173,34 +156,35 @@ variables in the models:
  - an interpersonal function measure: IIP15INTAMBV (4 missing values)
  
 ```{r rm missing values, include = False}
-missingVar <- c('ID', 'BIS_NONPLAN', 'IIP15INTAMBV', 'EXIT', 'urgency')
-
+# the columns with missing values
+criticalMissingVar <- c('ID', 'BIS_NONPLAN', 'IIP15INTAMBV', "IIP15INTSEN", "IIP15AGRESS", 'EXIT', 'Purgency', "Nurgency", "DRS")
+names(which(colSums(is.na(allData))>0))
 ```
 
 ```{r impute missing values, include=FALSE}
-# complete missing values
 # check how many percentage of data is missing in the question dataframe
-pMiss <- function(x){sum(is.na(x))/length(x)*100}
-missingVar <- c('ID', 'BIS_NONPLAN', 'IIP15INTAMBV', 'EXIT', 'urgency')
-missingDF <- question[, missingVar]
-apply(question[missingVar], 2, pMiss)
-print(md.pattern(question[missingVar]))
+# pMiss <- function(x){sum(is.na(x))/length(x)*100}
+# missingVar <- c('ID', 'BIS_NONPLAN', 'IIP15INTAMBV', 'EXIT', 'urgency')
+# missingDF <- question[, missingVar]
+# apply(question[missingVar], 2, pMiss)
+# print(md.pattern(question[missingVar]))
 
 # impute data
-missingDF_impute <- mice(missingDF, m = 5, meth = "pmm", maxit = 50)
-print(summary(missingDF_impute))
-missingVar_complete <- complete(missingDF_impute,1)
+# missingDF_impute <- mice(missingDF, m = 5, meth = "pmm", maxit = 50)
+# print(summary(missingDF_impute))
+# missingVar_complete <- complete(missingDF_impute,1)
 
 # merge the generated values to the df
-missingVar_complete <- rename(missingVar_complete, c("BIS_NONPLAN" = "BIS_NONPLAN_full", "IIP15INTAMBV" = "IIP15INTAMBV_full", "EXIT" = "EXIT_full", "urgency" = "urgency_full"))
-allData <- merge(allData, missingVar_complete, by = "ID")
-df <- allData
+# missingVar_complete <- rename(missingVar_complete, c("BIS_NONPLAN" = "BIS_NONPLAN_full", "IIP15INTAMBV" = "IIP15INTAMBV_full", "EXIT" = "EXIT_full", "urgency" = "urgency_full"))
+# allData <- merge(allData, missingVar_complete, by = "ID")
+# df <- allData
 ```
 
 
 # correlation matrix of the subject level variables
 ```{r corr, echo=FALSE}
-corrMatrix <- ggpairs(demoQuestion[, c("PER CAPITA INCOME", "HRSD NO SUI", "DRS", "EDUCATION", "EXIT", "BIS_NONPLAN", "IIP15INTAMBV", "urgency")])
+ggpairs(allData[, c("IncomePerCapita", "HRSD_NO_SUI", "DRS", "EDUCATION", "EXIT", 
+            "BIS_NONPLAN", "IIP15INTAMBV", "Purgency", "Nurgency")])
 ```
 The following variables are moderately/highly correlated:
 - DRS x income
@@ -219,8 +203,6 @@ The following variables are moderately/highly correlated:
 # Level 1 models (no group interaction)
 $$offer = reappraisal direction & stake & fairness$$
 ```{r}
-plot(allData$Fairness_score, allData$fairLR)
-
 # fairness scores
 m0 <- glmer(allData$AcceptOffer ~ ReappraisalDirection + scale(totalStake) + Fairness_score + (1|ID/block), family = binomial, data = allData,  
   control = glmerControl(optimizer = "bobyqa"))
@@ -259,7 +241,7 @@ $$offer = reappraisal\,direction & stake & fairness & groups$$
 #m1_4way <- glmer(allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) * group4 +  (1 | ID/block), family = binomial, data = allData, control = glmerControl(optimizer = "bobyqa"), optCtrl = list(maxfun = 2e4))
 
 
-# Group interaction
+# Group three way interaction
 m1g <-glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 | ID/block),
@@ -267,7 +249,7 @@ m1g <-glmer(
   data = allData,
   control = glmerControl(optimizer = "bobyqa"))
 
-stargazer(summary(m1g)$coefficients, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction_p.txt")
+stargazer(summary(m1g)$coefficients, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction.txt")
 
 car::Anova(m1g)
 anova(m1,m1g)
@@ -305,7 +287,7 @@ plot(m1g)
 
 
 
-```{r control MMSE}
+```{r control MMSE EXIT}
 # no missing values
 # control for MMSE with (1 | ID)
 m1gm <-
@@ -321,8 +303,27 @@ lsm <- lsmeans(m1gm, "ReappraisalDirection", by = "MMSE", at = list(MMSE = c(26,
 plot(lsm, horiz = F)
 dev.off()
 
+m1gE <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection
+  *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EXIT) + (1|ID),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa"))
+
+m1gENI <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection
+  *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection + scale(EXIT) + (1|ID),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa"))
+
+#____________________________________________________________________________________________________________________
+
 # control for MMSE with (1 | ID/block)
 ## ReappraisalDirection*scale(MMSE)
+### This model is the best
 m1gm_1 <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
@@ -330,15 +331,34 @@ m1gm_1 <-
   family = binomial,
   data = allData,
   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
-stargazer(m1gm_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(MMSE) + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*MMSE.txt")
+stargazer(summary(m1gm_1)$coefficients, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(MMSE) + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*MMSE.txt")
 car::Anova(m1gm_1, type = 'III')
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*MMSE.jpg")
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*MMSE.tiff', 
+     units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gm_1, "ReappraisalDirection", by = c("MMSE", "group4"), at = list(MMSE = c(26,28,30)))
 print(lsm)
 plot(lsm, horiz = F) +
     theme(axis.text.x=element_text(angle=90, hjust=1)) +
-    facet_grid(.~ MMSE + group4) 
+    facet_grid(.~ MMSE + group4)  + ggtitle("UGcontext*MMSE")
 dev.off()
+
+m1gE_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EXIT) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+stargazer(m1gE_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EXIT) + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*EXIT12.txt")
+car::Anova(m1gm_1, type = 'III')
+lsm <- lsmeans(m1gE_1, "ReappraisalDirection", by = c("EXIT", "group4"), at = list(EXIT = c(5, 10, 15)))
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*EXIT.tiff', 
+     units="in", height = 8, width = 10, res=300)
+plot(lsm, horiz = F) +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    facet_grid(.~ EXIT + group4)  + ggtitle("UGcontext*EXIT")
+dev.off()
+#___________________________________Above best model ____________________________________________________
 
 ## ReappraisalDirection*scale(MMSE)*group4
 m1gm_2 <-
@@ -349,9 +369,25 @@ m1gm_2 <-
   data = allData,
   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
 lsm <- lsmeans(m1gm_2, "ReappraisalDirection", by = c("MMSE", "group4"), at = list(MMSE = c(26,28,30)))
-plot(lsm, horiz = F) +
+ggplot(lsm, horiz = F) +
     theme(axis.text.x=element_text(angle=90, hjust=1)) +
-    facet_grid(.~ MMSE + group4) 
+    facet_grid(.~ MMSE + group4)
+
+m1gE_2 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EXIT)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+
+m1gE_3 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(EXIT)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
 
 anova(m1gm_2, m1gm_1)
 summary(m1gm_2)
@@ -360,12 +396,11 @@ summary(m1gm_2)
 ```{r control IRI}
 # IRI_EMPATHETIC_CONCERN
 ## Interpersonal Reactivity Index - Empathetic Concern subscale
-
-m1gi <-
+m1gi_3 <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +
-    ReappraisalDirection*scale(IRI_EMPATHETIC_CONCERN) + (1 | ID/block),
+    group4*scale(IRI_EMPATHETIC_CONCERN) + (1 | ID/block),
   family = binomial,
   data = allData,
   nAGQ = 0,  
@@ -406,7 +441,6 @@ plot(lsm, horiz = F) +
 anova(m1gi_1, m1gi)
 
 ```
-
 ```{r control interpersonal}
 # Interpersonal aggression and sensitivity
 m1ga <-
@@ -493,6 +527,185 @@ anova(m1gex_1, m1gex)
 
 ```
 
+```{r education}
+
+m1gEd_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EDUCATION) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+
+
+
+m1gEd_2 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + group4*scale(EDUCATION) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa",optCtrl = list(maxfun = 2e4)))
+
+
+## ReappraisalDirection*scale(Ed)*group4
+
+### best model 
+m1gEd_3 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EDUCATION)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+lsm <- lsmeans(m1gm_2, "ReappraisalDirection", by = c("MMSE", "group4"), at = list(MMSE = c(26,28,30)))
+ggplot(lsm, horiz = F) +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    facet_grid(.~ MMSE + group4)
+
+stargazer(m1gEd_3, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EDUCATION)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*Edu*group4.text")
+lsm <- lsmeans(m1gEd_3, "ReappraisalDirection", by = c("EDUCATION", "group4"), at = list(EDUCATION = c(12, 16, 20)))
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*Edu*group4.tiff', 
+     units="in", height = 8, width = 10, res=300)
+plot(lsm, horiz = F) +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    facet_grid(.~ EDUCATION + group4)  + ggtitle("UGcontext*Edu*group4")
+dev.off()
+```
+
+```{r SSI.BL.CURRENT}
+# best model
+m1gSSI_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(`SSI.BL.CURRENT`) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa",optCtrl = list(maxfun = 2e4)))
+stargazer(m1gSSI_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(`SSI.BL.CURRENT`) + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/SSIBLCURRENT.text")
+
+
+## ReappraisalDirection*scale(SSI)*group4
+
+m1gEd_2 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(`SSI.BL.CURRENT`) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+lsm <- lsmeans(m1gm_2, "ReappraisalDirection", by = c("MMSE", "group4"), at = list(MMSE = c(26,28,30)))
+ggplot(lsm, horiz = F) +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    facet_grid(.~ MMSE + group4)
+```
+```{r BIS_NONPLAN}
+
+m1gBIS_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+stargazer(m1gBIS_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontent*BIS_NONPLAN*group4.text")
+
+m1gBIS_2 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(BIS_NONPLAN)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+stargazer(m1gBIS_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontent*BIS_NONPLAN*group4.text")
+
+
+```
+```{r IIP15INTSEN}
+m1gIIPSEN_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(IIP15INTSEN)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+stargazer(m1gIIPSEN_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(IIP15INTSEN)*group4 + (1 | ID/block) + ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/IIP15INTSEN*group4.text")
+
+
+m1gIIPSEN_3 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(IIP15INTSEN) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+
+m1gIIPSEN_2 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(IIP15INTSEN) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+stargazer(m1gIIPSEN_2, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(IIP15INTSEN) + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*IIP15INTSEN*group4.text")
+
+```
+
+```{r IIP15AGRESS}
+m1gIIPAGR_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(IIP15AGRESS)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+stargazer(m1gIIPAGR_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(IIP15INTSEN)*group4 + (1 | ID/block) + ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/IIP15INTSEN*group4.text")
+
+m1gIIPAGR_2 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(IIP15AGRESS)*group4*ReappraisalDirection + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+
+
+```
+
+```{r gender}
+m1gGen_3 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*Gender + Gender * group4+ (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+
+stargazer(m1gGen_2, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*Gender + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/ReappraisalDirection*Gender.text")
+
+```
+
+```{r Nurgency}
+m1gPurgent_1 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(Purgency)*group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+# stargazer(m1gNurgent_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(IIP15INTSEN)*group4 + (1 | ID/block) + ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/IIP15INTSEN*group4.text")
+
+
+m1gPurgent_2 <-
+  glmer(
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(Purgency) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
+stargazer(m1gPurgent_2, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(Purgency) + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*Purgency.text")
+```
+
 ```{r control lethality}
 # with lethality by group5
 m1gl <-
@@ -528,6 +741,9 @@ dev.off()
 
 
 ```
+
+
+
 
 ```{r replica}
 # try to replicate previous UG paper (group x magnitude x fairness)
@@ -796,17 +1012,21 @@ dev.off()
 
 ```
 
-```{r, control MMSE}
+```{r control MMSE EXIT}
 # THE FOLLOWING CODES ARE CONTROLLING INDIVIDUAL VARS
 # no missing values
 # control for MMSE with (1 | ID)
-modelPun1_mg <-
-  glmer(
-  AcceptOffer ~ PunishingType * scale(fairLR) * scale(totalStake) + PunishingType
-  *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + PunishingType*scale(MMSE) + (1|ID),
+
+m1gPun_m1 <-glmer(
+  AcceptOffer ~ AcceptOffer_lag + 
+    ReappraisalDirectionResourcesRep * scale(fairLR) + 
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +
+    scale(fairLR) * group4 + 
+    ReappraisalDirectionResourcesRep*scale(MMSE)+ (1 | ID/block),
   family = binomial,
-  data = punishMaster,
-  control = glmerControl(optimizer = "bobyqa"))
+  data = allDataL,
+  control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa"))
 
 stargazer(modelPun1_mg, type = "text")
 summary(modelPun1_mg)
@@ -816,45 +1036,81 @@ lsm <- lsmeans(modelPun1_mg, "PunishingType", by = "MMSE", at = list(MMSE = c(26
 plot(lsm, horiz = F)
 dev.off()
 
-# control for MMSE with (1 | ID/block)
-## better than (1|ID)
-## PunishingType*scale(MMSE)
-modelPun2_mg <-
-  glmer(
-  punishMaster$AcceptOffer ~ PunishingType * scale(fairLR) * scale(totalStake) + PunishingType *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + PunishingType*scale(MMSE) + (1 | ID/block),
-  family = binomial,
-  data = punishMaster,
-  control = glmerControl(optimizer = "bobyqa"))
-
-summary(modelPun2_mg)
-stargazer(modelPun2_mg, type = "text", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*MMSE_ind.txt")
-car::Anova(modelPun2_mg, type = 'III')
-anova(modelPun2_mg, modelPun1_mg)
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*MMSE_ind.jpg")
-lsm <- lsmeans(modelPun2_mg, "PunishingType", by = "MMSE", at = list(MMSE = c(26,28,30)))
-plot(lsm, horiz = F)
-dev.off()
-
 # PunishingType*scale(MMSE)*group4
-modelPun3_mg <-
-  glmer(
-  punishMaster$AcceptOffer ~ PunishingType * scale(fairLR) * scale(totalStake) + PunishingType *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + PunishingType*scale(MMSE)*group4 + (1 | ID/block),
+m1gPun_E1 <-glmer(
+  AcceptOffer ~ AcceptOffer_lag + 
+    ReappraisalDirectionResourcesRep * scale(fairLR) + 
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +
+    scale(fairLR) * group4 + 
+    ReappraisalDirectionResourcesRep*scale(EXIT)*group4+ (1 | ID/block),
   family = binomial,
-  data = punishMaster,
-  control = glmerControl(optimizer = "bobyqa"))
+  data = allDataL,
+  control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa")) 
 
-stargazer(modelPun3_mg, type = "text", title = "AcceptOffer ~ PunishingType * scale(fairLR) * scale(totalStake) + PunishingType *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + PunishingType*scale(MMSE)*group4 + (1 | ID/block)",out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*group4*MMSE_ind.txt")
+stargazer(m1gPun_E1, type = "text", title = "AcceptOffer ~ AcceptOffer ~ AcceptOffer_lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + ReappraisalDirectionResourcesRep*scale(EXIT)*group4+ (1 | ID/block))",out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*group4*EXIT.txt")
 
-lsm <- lsmeans(modelPun3_mg, "PunishingType", by = c("MMSE", "group4"), at = list(MMSE = c(26,28,30)))
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*group4*MMSE_ind.jpg")
-plot(lsm, horiz = F) +
-  theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  facet_grid(~ MMSE+group4)
-dev.off()
+lsm <- lsmeans(m1gPun_E1, "ReappraisalDirectionResourcesRep", by = c("EXIT", "group4"), at = list(EXIT = c(5, 10, 15)))
 anova(modelPun3_mg, modelPun2_mg)
+```
+```{r gender}
+m1gPun_Gen2 <-glmer(
+  AcceptOffer ~ AcceptOffer_lag + 
+    ReappraisalDirectionResourcesRep * scale(fairLR) + 
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +
+    scale(fairLR) * group4 + 
+    ReappraisalDirectionResourcesRep*Gender*group4+ (1 | ID/block),
+  family = binomial,
+  data = allDataL,
+  control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa")) 
+
+stargazer(m1gPun_Gen1, type = "text", title = "AcceptOffer ~ AcceptOffer ~ AcceptOffer_lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + ReappraisalDirectionResourcesRep*Gender+ (1 | ID/block))",out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*Gender.txt")
+
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*Gender.tiff', 
+     units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(m1gPun_Gen1, "ReappraisalDirectionResourcesRep", 
+               by = c("Gender"))
+print(lsm)
+plot(lsm, horiz = F) +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    facet_grid(.~ Gender)  + ggtitle("Gender")
+dev.off()
+```
+
+```{r education}
+m1gPun_Edu <-glmer(
+  AcceptOffer ~ AcceptOffer_lag + 
+    ReappraisalDirectionResourcesRep * scale(fairLR) + 
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +
+    scale(fairLR) * group4 + 
+    ReappraisalDirectionResourcesRep*scale(EDUCATION)*group4+ (1 | ID/block),
+  family = binomial,
+  data = allDataL,
+  control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa")) 
+
+stargazer(m1gPun_Edu, type = "text", title = "AcceptOffer ~ AcceptOffer ~ AcceptOffer_lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + ReappraisalDirectionResourcesRep*scale(EDUCATION)*group4+ (1 | ID/block))",out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*Edu*group4.txt")
+
+
+
+```
+
+```{r IIP15INTSEN}
+m1gPun_IIPSEN <-glmer(
+  AcceptOffer ~ AcceptOffer_lag + 
+    ReappraisalDirectionResourcesRep * scale(fairLR) + 
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +
+    scale(fairLR) * group4 + 
+    ReappraisalDirectionResourcesRep*scale(IIP15INTSEN)*group4+ (1 | ID/block),
+  family = binomial,
+  data = allDataL,
+  control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa")) 
+
+stargazer(m1gPun_IIPSEN, type = "text", title = "AcceptOffer ~ AcceptOffer ~ AcceptOffer_lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + ReappraisalDirectionResourcesRep*scale(IIP15INTSEN)*group4+ (1 | ID/block))",out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/punishType*IIP15INTSEN*group4.txt")
+
+
 ```
 
 ```{r, control lethality group5}

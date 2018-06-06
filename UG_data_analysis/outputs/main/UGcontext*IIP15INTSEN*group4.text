@@ -1,0 +1,131 @@
+
+AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(IIP15INTSEN) + (1 | ID/block)
+===========================================================================================
+                                                                    Dependent variable:    
+                                                                ---------------------------
+                                                                        AcceptOffer        
+-------------------------------------------------------------------------------------------
+ReappraisalDirectionempathy                                              0.918***          
+                                                                          (0.250)          
+                                                                                           
+ReappraisalDirectionpunish                                               -1.818***         
+                                                                          (0.241)          
+                                                                                           
+scale(fairLR)                                                            2.047***          
+                                                                          (0.090)          
+                                                                                           
+scale(totalStake)                                                          0.050           
+                                                                          (0.065)          
+                                                                                           
+group4control                                                             -0.559           
+                                                                          (0.638)          
+                                                                                           
+group4depression                                                           0.631           
+                                                                          (0.500)          
+                                                                                           
+group4ideator                                                              0.232           
+                                                                          (0.530)          
+                                                                                           
+scale(IIP15INTSEN)                                                        -0.024           
+                                                                          (0.328)          
+                                                                                           
+ReappraisalDirectionempathy:scale(fairLR)                                -1.266***         
+                                                                          (0.099)          
+                                                                                           
+ReappraisalDirectionpunish:scale(fairLR)                                 -1.198***         
+                                                                          (0.091)          
+                                                                                           
+ReappraisalDirectionempathy:scale(totalStake)                              0.060           
+                                                                          (0.078)          
+                                                                                           
+ReappraisalDirectionpunish:scale(totalStake)                              0.149**          
+                                                                          (0.071)          
+                                                                                           
+scale(fairLR):scale(totalStake)                                          -0.123**          
+                                                                          (0.062)          
+                                                                                           
+ReappraisalDirectionempathy:group4control                                 1.175**          
+                                                                          (0.523)          
+                                                                                           
+ReappraisalDirectionpunish:group4control                                  1.057**          
+                                                                          (0.482)          
+                                                                                           
+ReappraisalDirectionempathy:group4depression                               0.005           
+                                                                          (0.397)          
+                                                                                           
+ReappraisalDirectionpunish:group4depression                                0.034           
+                                                                          (0.374)          
+                                                                                           
+ReappraisalDirectionempathy:group4ideator                                 0.845**          
+                                                                          (0.419)          
+                                                                                           
+ReappraisalDirectionpunish:group4ideator                                   0.218           
+                                                                          (0.397)          
+                                                                                           
+scale(fairLR):group4control                                               0.172*           
+                                                                          (0.091)          
+                                                                                           
+scale(fairLR):group4depression                                            -0.125           
+                                                                          (0.087)          
+                                                                                           
+scale(fairLR):group4ideator                                               0.228**          
+                                                                          (0.098)          
+                                                                                           
+scale(totalStake):group4control                                           -0.153*          
+                                                                          (0.079)          
+                                                                                           
+scale(totalStake):group4depression                                        -0.083           
+                                                                          (0.078)          
+                                                                                           
+scale(totalStake):group4ideator                                           -0.099           
+                                                                          (0.083)          
+                                                                                           
+ReappraisalDirectionempathy:scale(IIP15INTSEN)                            -0.114           
+                                                                          (0.254)          
+                                                                                           
+ReappraisalDirectionpunish:scale(IIP15INTSEN)                              0.031           
+                                                                          (0.243)          
+                                                                                           
+group4control:scale(IIP15INTSEN)                                          -0.417           
+                                                                          (0.663)          
+                                                                                           
+group4depression:scale(IIP15INTSEN)                                        0.108           
+                                                                          (0.544)          
+                                                                                           
+group4ideator:scale(IIP15INTSEN)                                          -0.276           
+                                                                          (0.480)          
+                                                                                           
+ReappraisalDirectionempathy:scale(fairLR):scale(totalStake)               0.149*           
+                                                                          (0.087)          
+                                                                                           
+ReappraisalDirectionpunish:scale(fairLR):scale(totalStake)                 0.068           
+                                                                          (0.078)          
+                                                                                           
+ReappraisalDirectionempathy:group4control:scale(IIP15INTSEN)               0.464           
+                                                                          (0.559)          
+                                                                                           
+ReappraisalDirectionpunish:group4control:scale(IIP15INTSEN)               0.959*           
+                                                                          (0.505)          
+                                                                                           
+ReappraisalDirectionempathy:group4depression:scale(IIP15INTSEN)           1.115**          
+                                                                          (0.445)          
+                                                                                           
+ReappraisalDirectionpunish:group4depression:scale(IIP15INTSEN)             0.022           
+                                                                          (0.406)          
+                                                                                           
+ReappraisalDirectionempathy:group4ideator:scale(IIP15INTSEN)               0.141           
+                                                                          (0.372)          
+                                                                                           
+ReappraisalDirectionpunish:group4ideator:scale(IIP15INTSEN)               -0.313           
+                                                                          (0.355)          
+                                                                                           
+Constant                                                                 1.498***          
+                                                                          (0.324)          
+                                                                                           
+-------------------------------------------------------------------------------------------
+Observations                                                              11,070           
+Log Likelihood                                                          -4,359.008         
+Akaike Inf. Crit.                                                        8,800.016         
+Bayesian Inf. Crit.                                                      9,099.808         
+===========================================================================================
+Note:                                                           *p<0.1; **p<0.05; ***p<0.01
