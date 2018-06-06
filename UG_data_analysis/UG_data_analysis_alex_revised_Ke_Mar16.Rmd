@@ -66,22 +66,26 @@ demoQuestion <- merge(demo, question[, c("ID", "HOUSEHOLD.INCOME",
                                          "IRI_PERSONAL_DISTRESS", "GOALS", "IMPULSE",
                                          "AWARENESS", "WTARRAW", "WTARSS")], on = "ID")
 
-demoQuestion <- plyr::rename(demoQuestion, c("UPPSP.NEG.URGENCY" = "Nurgency", "UPPSP.POS.URGENCY" = "Purgency", "MMSE.TOTAL" = "MMSETOTAL"))
+demoQuestion <- plyr::rename(demoQuestion, c("UPPSP.NEG.URGENCY" = "Nurgency", "UPPSP.POS.URGENCY" = "Purgency", "MMSE.TOTAL" = "MMSE"))
 
 # compare the group differences
-myVar <- c("EDUCATION", "GENDERTEXT", "PROTECT2AGE", "RACETEXT", "MMSETOTAL", 
-           "WTARSS", "WTARRAW", "DRS", "EXIT", "BIS_NONPLAN", "Nurgency", "Purgency",
-           "IIP15INTAMBV", "SSI.BL.CURRENT", "IIP15INTSEN", "IIP15AGRESS")
+myVar <- c("EDUCATION", "GENDERTEXT", "PER.CAPITA.INCOME", "PROTECT2AGE", 
+           "RACETEXT", "MMSE", "HRSD.NO.SUI","WTARSS", "DRS", "EXIT", 
+           "BIS_NONPLAN", "Nurgency", "Purgency", "IIP15INTAMBV", "IIP15INTSEN", 
+           "IIP15AGRESS", "SSI.BL.CURRENT")
+
 idx <- match(myVar, names(demoQuestion))
 # idx <- sort(c(idx-1, idx))
 # c1 <- demoQuestion[, idx]
 c1 <- demoQuestion[, myVar]
+c1 <- plyr::rename(c1, c("PROTECT2AGE" = "Age", "EDUCATION" = "Education", "RACETEXT" = "Race", "HRSD.NO.SUI" = "Hamilton Rating Scale for Depression(no 16Q)", "GENDERTEXT" = "Gender", "WTARSS" = "Wechsler Test of Adult Reading Standardized Score", "DRS" = "Dementia Rating Scale", "EXIT" = "EXIT - Neuropsych Exam", "Nurgency" = "UPPSP Impulsive Behavior Scale - negative urgency", "Purgency" = "UPPSP Impulsive Behavior Scale - positive urgency", "SSI.BL.CURRENT" = "Suicide Ideation Scale", "PER.CAPITA.INCOME" = "Income Per Capita"))
+
 c2 <- compareGroups(c1,demoQuestion$group4)
 c2_2 <- compareGroups(c1, demoQuestion$group5)
 t1 <- createTable(c2, hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
 t2_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
 
-export2csv(t2_1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/demo1.csv")
+export2csv(t2_1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/demo5.csv")
 
 task$check <- 1:dim(task)[1]
 task_no_duplicates <- task %>% group_by(ID, merged_trial, Stimuli_RT) %>% filter(row_number(check) == 1)
@@ -124,6 +128,8 @@ allData$block <- as.factor(allData$block)
 allData$fairLR <- log(allData$PlayerProposedAmount/allData$OpponentProposedAmount)
 allData$fairR <- (allData$PlayerProposedAmount/allData$OpponentProposedAmount)
 
+
+allData[, c("PlayerProposedAmount", "OpponentProposedAmount")]
 # separate groups
 depression <- subset(allData, group4 == "depression")
 control <- subset(allData, group4 == "control")
@@ -243,26 +249,37 @@ $$offer = reappraisal\,direction & stake & fairness & groups$$
 
 # Group three way interaction
 m1g <-glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 | ID/block),
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 | ID/block),
   family = binomial,
   data = allData,
   control = glmerControl(optimizer = "bobyqa"))
 
 stargazer(summary(m1g)$coefficients, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +  (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction.txt")
 
-car::Anova(m1g)
-anova(m1,m1g)
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGcontext*group4.jpg")
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGcontext*fair*stake.tiff', 
+     units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(m1g, "ReappraisalDirection", by = c("totalStake", "fairLR"), 
+               at = list(totalStake = c(8, 13,18), fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm, horiz = F, fill = ReappraisalDirection) + 
+  theme(axis.text.x=element_text(angle=90, hjust=1)) +
+  ggtitle("UGcontext*fair*total stake")
+  
+dev.off()
+
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGcontext*group4.tiff', 
+     units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1g, "ReappraisalDirection", by = "group4")
 plot(lsm, horiz = F)
-
 dev.off()
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGfair*group4.jpg")
+
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGfair*group4.tiff', 
+     units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1g, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F)
 dev.off() 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGstake*group4.jpg")
+
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGstake*group4.tiff', 
+     units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1g, "totalStake", by = "group4", at = list(totalStake = c(8, 13,18)))
 plot(lsm, horiz = F)
 dev.off()
@@ -621,6 +638,7 @@ stargazer(m1gBIS_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection *
 
 
 ```
+
 ```{r IIP15INTSEN}
 m1gIIPSEN_1 <-
   glmer(
@@ -756,10 +774,12 @@ m1gl1 <-
   data = allData,
   nAGQ = 0,
   control = glmerControl(optimizer = "bobyqa"))
- 
-car::Anova(m1gl1)
+stargazer(m1gl1, type = "text", title = "AcceptOffer ~ eappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+  group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + scale(fairLR) * scale(totalStake) * group5 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group5Interaction.txt")
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/replicate1_fairLR*totalStake*group5.jpg")
+car::Anova(m1gl1)
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group5Interaction.tiff', 
+     units="in", height = 6, width = 8, res=300)
 lsm <- lsmeans(m1gl1, "fairLR", by = c("totalStake", "group5"), at = list(fairLR = c(-2.66,0.22),totalStake = c(8,18)))
 plot(lsm, horiz = F) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
@@ -781,6 +801,7 @@ lsm <- lsmeans(m1gl1, "ReappraisalDirection", by = ("group5"))
 plot(lsm, horiz = F) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
   facet_grid(.~ group5)
+head(tmp)
 ```
 
 ## RT analyses
