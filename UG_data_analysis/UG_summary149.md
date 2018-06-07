@@ -2,65 +2,71 @@
 
 ###  4 groups
 
-|                                                     | attempter         | control           | depression        | ideator           | p.overall | N    |
-| --------------------------------------------------- | ----------------- | ----------------- | ----------------- | ----------------- | --------- | ---- |
-|                                                     | N=49              | N=35              | N=33              | N=32              |           |      |
-| Education                                           | 14.1 (2.9)        | 15.7 (2.7)        | 15.1 (2.6)        | 15.3 (2.2)        | 0.038     | 149  |
-| Gender:                                             |                   |                   |                   |                   | 0.584     | 149  |
-| FEMALE                                              | 24 (49.0%)        | 21 (60.0%)        | 16 (48.5%)        | 14 (43.8%)        |           |      |
-| MALE                                                | 25 (51.0%)        | 14 (40.0%)        | 17 (51.5%)        | 18 (56.2%)        |           |      |
-| Income Per Capita                                   | 18217.7 (11455.6) | 36495.3 (21215.7) | 20947.0 (16602.4) | 23332.0 (20680.6) | <0.001    | 149  |
-| Age                                                 | 62.3 (8.5)        | 63.5 (8.7)        | 63.0 (7.8)        | 60.4 (6.0)        | 0.432     | 149  |
-| Race:                                               |                   |                   |                   |                   | 0.331     | 149  |
-| AFRICAN AMERICAN                                    | 7 (14.3%)         | 4 (11.4%)         | 8 (24.2%)         | 2 (6.2%)          |           |      |
-| ASIAN                                               | 1 (2.0%)          | 0 (0.0%)          | 1 (3.0%)          | 1 (3.1%)          |           |      |
-| MORE THAN ONE RACE                                  | 0 (0.0%)          | 0 (0.0%)          | 0 (0.0%)          | 1 (3.1%)          |           |      |
-| WHITE                                               | 41 (83.7%)        | 31 (88.6%)        | 24 (72.7%)        | 28 (87.5%)        |           |      |
-| MMSE                                                | 28.4 (1.8)        | 28.9 (1.1)        | 29.0 (1.0)        | 29.0 (1.4)        | 0.169     | 149  |
-| Hamilton Rating Scale for Depression(no   16Q)      | 17.9 (8.5)        | 2.3 (2.5)         | 15.9 (6.0)        | 17.8 (7.0)        | <0.001    | 149  |
-| Wechsler Test of Adult Reading   Standardized Score | 102.5 (16.0)      | 107.6 (11.5)      | 107.2 (14.1)      | 110.8 (12.7)      | 0.069     | 144  |
-| Dementia Rating Scale                               | 135.2 (4.7)       | 138.2 (3.4)       | 135.8 (5.1)       | 137.2 (3.9)       | 0.012     | 143  |
-| EXIT - Neuropsych Exam                              | 7.0 (3.2)         | 4.9 (2.7)         | 5.1 (3.1)         | 5.7 (2.8)         | 0.007     | 144  |
-| BIS_NONPLAN                                         | 21.5 (7.9)        | 11.5 (5.2)        | 19.3 (7.0)        | 19.1 (7.5)        | <0.001    | 142  |
-| UPPSP Impulsive Behavior Scale - negative   urgency | 28.8 (7.6)        | 18.0 (4.3)        | 24.9 (6.9)        | 27.0 (7.7)        | <0.001    | 140  |
-| UPPSP Impulsive Behavior Scale - positive   urgency | 25.3 (10.2)       | 16.5 (4.0)        | 21.2 (6.7)        | 22.8 (7.6)        | <0.001    | 140  |
-| IIP15INTAMBV                                        | 6.0 (5.3)         | 2.9 (3.7)         | 4.4 (3.5)         | 6.6 (4.8)         | 0.004     | 142  |
-| IIP15INTSEN                                         | 8.0 (4.5)         | 3.2 (3.1)         | 6.5 (4.3)         | 8.4 (5.4)         | <0.001    | 142  |
-| IIP15AGRESS                                         | 3.9 (3.7)         | 1.6 (2.5)         | 4.5 (3.3)         | 5.2 (4.2)         | 0.001     | 142  |
-| Suicide Ideation Scale                              | 21.2 (7.6)        | 0.0 (0.0)         | 0.5 (1.5)         | 15.4 (5.7)        | <0.001    | 149  |
-
-### group5
-
-|                                                     | AttempterHL       | AttempterLL      | control           | depression        | ideator           | p.overall | N    |
-| --------------------------------------------------- | ----------------- | ---------------- | ----------------- | ----------------- | ----------------- | --------- | ---- |
-|                                                     | N=23              | N=26             | N=35              | N=33              | N=32              |           |      |
-| Education                                           | 14.0 (3.1)        | 14.2 (2.8)       | 15.7 (2.7)        | 15.1 (2.6)        | 15.3 (2.2)        | 0.076     | 149  |
-| Gender:                                             |                   |                  |                   |                   |                   | 0.026     | 149  |
-| FEMALE                                              | 6 (26.1%)         | 18 (69.2%)       | 21 (60.0%)        | 16 (48.5%)        | 14 (43.8%)        |           |      |
-| MALE                                                | 17 (73.9%)        | 8 (30.8%)        | 14 (40.0%)        | 17 (51.5%)        | 18 (56.2%)        |           |      |
-| Income Per Capita                                   | 18518.1 (13339.5) | 17951.9 (9758.0) | 36495.3 (21215.7) | 20947.0 (16602.4) | 23332.0 (20680.6) | <0.001    | 149  |
-| Age                                                 | 64.0 (9.1)        | 60.8 (7.7)       | 63.5 (8.7)        | 63.0 (7.8)        | 60.4 (6.0)        | 0.31      | 149  |
-| Race:                                               |                   |                  |                   |                   |                   | 0.026     | 149  |
-| AFRICAN AMERICAN                                    | 0 (0.0%)          | 7 (26.9%)        | 4 (11.4%)         | 8 (24.2%)         | 2 (6.2%)          |           |      |
-| ASIAN                                               | 1 (4.3%)          | 0 (0.0%)         | 0 (0.0%)          | 1 (3.0%)          | 1 (3.1%)          |           |      |
-| MORE THAN ONE RACE                                  | 0 (0.0%)          | 0 (0.0%)         | 0 (0.0%)          | 0 (0.0%)          | 1 (3.1%)          |           |      |
-| WHITE                                               | 22 (95.7%)        | 19 (73.1%)       | 31 (88.6%)        | 24 (72.7%)        | 28 (87.5%)        |           |      |
-| MMSE                                                | 28.5 (1.8)        | 28.3 (1.7)       | 28.9 (1.1)        | 29.0 (1.0)        | 29.0 (1.4)        | 0.257     | 149  |
-| Hamilton Rating Scale for Depression(no   16Q)      | 16.8 (8.5)        | 18.8 (8.6)       | 2.3 (2.5)         | 15.9 (6.0)        | 17.8 (7.0)        | <0.001    | 149  |
-| Wechsler Test of Adult Reading   Standardized Score | 102.5 (16.2)      | 102.5 (16.2)     | 107.6 (11.5)      | 107.2 (14.1)      | 110.8 (12.7)      | 0.133     | 144  |
-| Dementia Rating Scale                               | 135.3 (4.8)       | 135.1 (4.8)      | 138.2 (3.4)       | 135.8 (5.1)       | 137.2 (3.9)       | 0.027     | 143  |
-| EXIT - Neuropsych Exam                              | 7.4 (3.5)         | 6.7 (2.8)        | 4.9 (2.7)         | 5.1 (3.1)         | 5.7 (2.8)         | 0.012     | 144  |
-| BIS_NONPLAN                                         | 20.2 (8.5)        | 22.7 (7.3)       | 11.5 (5.2)        | 19.3 (7.0)        | 19.1 (7.5)        | <0.001    | 142  |
-| UPPSP Impulsive Behavior Scale - negative   urgency | 28.0 (7.7)        | 29.5 (7.7)       | 18.0 (4.3)        | 24.9 (6.9)        | 27.0 (7.7)        | <0.001    | 140  |
-| UPPSP Impulsive Behavior Scale - positive   urgency | 25.9 (11.7)       | 24.8 (8.8)       | 16.5 (4.0)        | 21.2 (6.7)        | 22.8 (7.6)        | <0.001    | 140  |
-| IIP15INTAMBV                                        | 6.1 (5.6)         | 5.9 (5.1)        | 2.9 (3.7)         | 4.4 (3.5)         | 6.6 (4.8)         | 0.01      | 142  |
-| IIP15INTSEN                                         | 8.4 (4.6)         | 7.7 (4.5)        | 3.2 (3.1)         | 6.5 (4.3)         | 8.4 (5.4)         | <0.001    | 142  |
-| IIP15AGRESS                                         | 5.0 (4.4)         | 2.9 (2.6)        | 1.6 (2.5)         | 4.5 (3.3)         | 5.2 (4.2)         | <0.001    | 142  |
-| Suicide Ideation Scale                              | 23.4 (7.3)        | 19.3 (7.4)       | 0.0 (0.0)         | 0.5 (1.5)         | 15.4 (5.7)        | <0.001    | 149  |
+|                                                     | attempter         | control           | depression        | ideator           | p.overall | N    | Pairwise                                    |
+| --------------------------------------------------- | ----------------- | ----------------- | ----------------- | ----------------- | --------- | ---- | ------------------------------------------- |
+|                                                     | N=49              | N=35              | N=33              | N=32              |           |      |                                             |
+| Education                                           | 14.1 (2.9)        | 15.7 (2.7)        | 15.1 (2.6)        | 15.3 (2.2)        | 0.038     | 149  | control > attempter                         |
+| Gender:                                             |                   |                   |                   |                   | 0.584     | 149  |                                             |
+| FEMALE                                              | 24 (49.0%)        | 21 (60.0%)        | 16 (48.5%)        | 14 (43.8%)        |           |      |                                             |
+| MALE                                                | 25 (51.0%)        | 14 (40.0%)        | 17 (51.5%)        | 18 (56.2%)        |           |      |                                             |
+| Income Per Capita                                   | 18217.7 (11455.6) | 36495.3 (21215.7) | 20947.0 (16602.4) | 23332.0 (20680.6) | <0.001    | 149  | control > attempter, depression, ideator    |
+| Age                                                 | 62.3 (8.5)        | 63.5 (8.7)        | 63.0 (7.8)        | 60.4 (6.0)        | 0.432     | 149  |                                             |
+| Race:                                               |                   |                   |                   |                   | 0.331     | 149  |                                             |
+| AFRICAN AMERICAN                                    | 7 (14.3%)         | 4 (11.4%)         | 8 (24.2%)         | 2 (6.2%)          |           |      |                                             |
+| ASIAN                                               | 1 (2.0%)          | 0 (0.0%)          | 1 (3.0%)          | 1 (3.1%)          |           |      |                                             |
+| MORE THAN ONE RACE                                  | 0 (0.0%)          | 0 (0.0%)          | 0 (0.0%)          | 1 (3.1%)          |           |      |                                             |
+| WHITE                                               | 41 (83.7%)        | 31 (88.6%)        | 24 (72.7%)        | 28 (87.5%)        |           |      |                                             |
+| MMSE                                                | 28.4 (1.8)        | 28.9 (1.1)        | 29.0 (1.0)        | 29.0 (1.4)        | 0.169     | 149  |                                             |
+| Hamilton Rating Scale for Depression(no   16Q)      | 17.9 (8.5)        | 2.3 (2.5)         | 15.9 (6.0)        | 17.8 (7.0)        | <0.001    | 149  | control < attempter, depression, ideator    |
+| Wechsler Test of Adult Reading   Standardized Score | 102.5 (16.0)      | 107.6 (11.5)      | 107.2 (14.1)      | 110.8 (12.7)      | 0.069     | 144  |                                             |
+| Dementia Rating Scale                               | 135.2 (4.7)       | 138.2 (3.4)       | 135.8 (5.1)       | 137.2 (3.9)       | 0.012     | 143  | control > attempter                         |
+| EXIT - Neuropsych Exam                              | 7.0 (3.2)         | 4.9 (2.7)         | 5.1 (3.1)         | 5.7 (2.8)         | 0.007     | 144  | control < attempter; attempter > depression |
+| BIS_NONPLAN                                         | 21.5 (7.9)        | 11.5 (5.2)        | 19.3 (7.0)        | 19.1 (7.5)        | <0.001    | 142  | control < attempter, depression, ideator    |
+| UPPSP Impulsive Behavior Scale - negative   urgency | 28.8 (7.6)        | 18.0 (4.3)        | 24.9 (6.9)        | 27.0 (7.7)        | <0.001    | 140  | control < attempter, depression, ideator    |
+| UPPSP Impulsive Behavior Scale - positive   urgency | 25.3 (10.2)       | 16.5 (4.0)        | 21.2 (6.7)        | 22.8 (7.6)        | <0.001    | 140  | control < attempter, ideator                |
+| IIP15INTAMBV                                        | 6.0 (5.3)         | 2.9 (3.7)         | 4.4 (3.5)         | 6.6 (4.8)         | 0.004     | 142  | control < attempter, ideator                |
+| IIP15INTSEN                                         | 8.0 (4.5)         | 3.2 (3.1)         | 6.5 (4.3)         | 8.4 (5.4)         | <0.001    | 142  | control < attempter, depression, ideator    |
+| IIP15AGRESS                                         | 3.9 (3.7)         | 1.6 (2.5)         | 4.5 (3.3)         | 5.2 (4.2)         | 0.001     | 142  | control < attempter, depression, ideator    |
+| Suicide Ideation Scale                              | 21.2 (7.6)        | 0.0 (0.0)         | 0.5 (1.5)         | 15.4 (5.7)        | <0.001    | 149  | control < depression < ideator < attempter  |
 
 
 
-# Main results
+
+
+
+
+### 5 groups
+
+|                                                     | AttempterHL       | AttempterLL      | control           | depression        | ideator           | p.overall | N    | pairwise                                 |
+| --------------------------------------------------- | ----------------- | ---------------- | ----------------- | ----------------- | ----------------- | --------- | ---- | ---------------------------------------- |
+|                                                     | N=23              | N=26             | N=35              | N=33              | N=32              |           |      |                                          |
+| Education                                           | 14.0 (3.1)        | 14.2 (2.8)       | 15.7 (2.7)        | 15.1 (2.6)        | 15.3 (2.2)        | 0.076     | 149  |                                          |
+| Gender:                                             |                   |                  |                   |                   |                   | 0.026     | 149  |                                          |
+| FEMALE                                              | 6 (26.1%)         | 18 (69.2%)       | 21 (60.0%)        | 16 (48.5%)        | 14 (43.8%)        |           |      |                                          |
+| MALE                                                | 17 (73.9%)        | 8 (30.8%)        | 14 (40.0%)        | 17 (51.5%)        | 18 (56.2%)        |           |      |                                          |
+| Income Per Capita                                   | 18518.1 (13339.5) | 17951.9 (9758.0) | 36495.3 (21215.7) | 20947.0 (16602.4) | 23332.0 (20680.6) | <0.001    | 149  | control > HL, LL, depression, ideator    |
+| Age                                                 | 64.0 (9.1)        | 60.8 (7.7)       | 63.5 (8.7)        | 63.0 (7.8)        | 60.4 (6.0)        | 0.31      | 149  |                                          |
+| Race:                                               |                   |                  |                   |                   |                   | 0.026     | 149  |                                          |
+| AFRICAN AMERICAN                                    | 0 (0.0%)          | 7 (26.9%)        | 4 (11.4%)         | 8 (24.2%)         | 2 (6.2%)          |           |      |                                          |
+| ASIAN                                               | 1 (4.3%)          | 0 (0.0%)         | 0 (0.0%)          | 1 (3.0%)          | 1 (3.1%)          |           |      |                                          |
+| MORE THAN ONE RACE                                  | 0 (0.0%)          | 0 (0.0%)         | 0 (0.0%)          | 0 (0.0%)          | 1 (3.1%)          |           |      |                                          |
+| WHITE                                               | 22 (95.7%)        | 19 (73.1%)       | 31 (88.6%)        | 24 (72.7%)        | 28 (87.5%)        |           |      |                                          |
+| MMSE                                                | 28.5 (1.8)        | 28.3 (1.7)       | 28.9 (1.1)        | 29.0 (1.0)        | 29.0 (1.4)        | 0.257     | 149  |                                          |
+| Hamilton Rating Scale for Depression(no   16Q)      | 16.8 (8.5)        | 18.8 (8.6)       | 2.3 (2.5)         | 15.9 (6.0)        | 17.8 (7.0)        | <0.001    | 149  | control < HL, LL, depression, ideator    |
+| Wechsler Test of Adult Reading   Standardized Score | 102.5 (16.2)      | 102.5 (16.2)     | 107.6 (11.5)      | 107.2 (14.1)      | 110.8 (12.7)      | 0.133     | 144  |                                          |
+| Dementia Rating Scale                               | 135.3 (4.8)       | 135.1 (4.8)      | 138.2 (3.4)       | 135.8 (5.1)       | 137.2 (3.9)       | 0.027     | 143  |                                          |
+| EXIT - Neuropsych Exam                              | 7.4 (3.5)         | 6.7 (2.8)        | 4.9 (2.7)         | 5.1 (3.1)         | 5.7 (2.8)         | 0.012     | 144  | HL > control, depression,                |
+| BIS_NONPLAN                                         | 20.2 (8.5)        | 22.7 (7.3)       | 11.5 (5.2)        | 19.3 (7.0)        | 19.1 (7.5)        | <0.001    | 142  | control <  HL, LL, depression,   ideator |
+| UPPSP Impulsive Behavior Scale - negative   urgency | 28.0 (7.7)        | 29.5 (7.7)       | 18.0 (4.3)        | 24.9 (6.9)        | 27.0 (7.7)        | <0.001    | 140  | control <  HL, LL, depression,   ideator |
+| UPPSP Impulsive Behavior Scale - positive   urgency | 25.9 (11.7)       | 24.8 (8.8)       | 16.5 (4.0)        | 21.2 (6.7)        | 22.8 (7.6)        | <0.001    | 140  | control < HL, LL, ideator                |
+| IIP15INTAMBV                                        | 6.1 (5.6)         | 5.9 (5.1)        | 2.9 (3.7)         | 4.4 (3.5)         | 6.6 (4.8)         | 0.01      | 142  | control < ideator                        |
+| IIP15INTSEN                                         | 8.4 (4.6)         | 7.7 (4.5)        | 3.2 (3.1)         | 6.5 (4.3)         | 8.4 (5.4)         | <0.001    | 142  | control <  HL, LL, depression,   ideator |
+| IIP15AGRESS                                         | 5.0 (4.4)         | 2.9 (2.6)        | 1.6 (2.5)         | 4.5 (3.3)         | 5.2 (4.2)         | <0.001    | 142  | control < HL, depression, ideator        |
+| Suicide Ideation Scale                              | 23.4 (7.3)        | 19.3 (7.4)       | 0.0 (0.0)         | 0.5 (1.5)         | 15.4 (5.7)        | <0.001    | 149  | control < depression < ideator < LL < HL |
+
+#  
+
+#Main results
 
 ## How does $group$ interact with $fairness$, $total\, stake$, and $reappraisal\, direction$?
 
@@ -84,21 +90,21 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + \\Rea
 
    - As the offers are getting fairer, the depression becomes less likely to accept offers compared to the attempter.   
 
-     ​                              ![Gfair*group](https://ws1.sinaimg.cn/large/006tKfTcgy1fpreoxxm1wj30dc0dcq3i.jpg)     
+     ​                                   ![UGfair*group4](UG_summary149.assets/UGfair*group4.tiff)
 
-3. $ReappraisalDirection * group$
+3. $Reappraisa\,lDirection * group$
 
    - ReappraisalDirectionempathy:group4control                 0.850**   
 
    - Compared to the attempter, the control has a higher increasing tendency to accept offers under empathy relative to baseline.
 
-     ![Gcontext*group](https://ws1.sinaimg.cn/large/006tKfTcgy1fprep2cy68j30dc0dcmxv.jpg)
+     ![UGcontext*group4](UG_summary149.assets/UGcontext*group4.tiff)
 
 4. $total \, stake * group$
 
    - No interaction
 
-     ![Gstake*group](https://ws3.sinaimg.cn/large/006tKfTcgy1fprep4jp4wj30dc0dcmxv.jpg)
+     ![UGstake*group4](UG_summary149.assets/UGstake*group4.tiff)
 
 5. $ReappraisalDirection * fairness$
 
@@ -122,7 +128,10 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + Reapp
 1. $stake * group$
 
    - $totalStake*control$                                      -0.241***        
-   - $totalStake*depression$                               -0.163*                             
+
+   - $totalStake*depression$                               -0.163*  
+
+     ​                           ![group5*totalStake](UG_summary149.assets/group5*totalStake.tiff)
 
 2. $fairness * group$
 
@@ -130,11 +139,7 @@ $$AcceptOffer = ReappraisalDirection * scale(fairLR) * scale(totalStake) + Reapp
 
 3. $fairLR*totalStake*control$                                          -0.160*  
 
-4. $empathy*fairLR*totalStake$                                        0.142*       
-
-   ​            ![group5Interaction](UG_summary149.assets/group5Interaction.tiff)
-
-   ​         
+4. $empathy*fairLR*totalStake$                                        0.142*          ![group5Interaction-8330077](UG_summary149.assets/group5Interaction-8330077.tiff)
 
 #### Comparison with the previous study
 
@@ -220,30 +225,30 @@ $$AcceptOffer = AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairL
 
 1. Main effect:
 
-   - ReappraisalDirectionResourcesRepempathy                               0.928***          
-   - ReappraisalDirectionResourcesRepreputation                            -2.931***         
-   - ReappraisalDirectionResourcesRepresources                             -0.504**      
-   - scale(fairLR)                                                                                        2.089***  
+   - empathy                                                              0.928***          
+   - reputation                                                          -2.931***         
+   - resources                                                             -0.504**      
+   - fairLR                                                                    2.089***  
    - Participants accept more offers under empathy, and fewer offers under resources and reputation relative to baseline.
    - The fairer offers, the more acceptance.             
 
 2. $punishType * group$
 
-   - ReappraisalDirectionResourcesRepempathy:group4control                 1.027***          
+   - $empathy*control$                 1.027***          
 
-   - ReappraisalDirectionResourcesRepempathy:group4ideator                  0.917**   
+   - $empathy*ideator$                  0.917**   
 
    - Compared to the attempter, the increasing likelihood of accepting offers under empathy from baseline is higher in the control and ideator.
 
-     ![roup4*Pu](https://ws1.sinaimg.cn/large/006tKfTcgy1fprep5blrlj30dc0dct9i.jpg)       
+     ​       ![UGcontext*group4-8331119](UG_summary149.assets/UGcontext*group4-8331119.tiff)
 
 3. $fairness * group$
 
-   - scale(fairLR):group4ideator                                                                           0.236**   
+   - $fair*ideator$                                                                           0.236**   
 
    - The ideator has higher increase in the tendency of acceptance as the offers are getting fairer, compared to the attempter.
 
-     ![roup4*fai](https://ws3.sinaimg.cn/large/006tKfTcgy1fprepbjskaj30dc0dcjrx.jpg)       
+     ​       ![UGfair*group4-8331191](UG_summary149.assets/UGfair*group4-8331191.tiff)
 
 4. $total\, stake * group$
 

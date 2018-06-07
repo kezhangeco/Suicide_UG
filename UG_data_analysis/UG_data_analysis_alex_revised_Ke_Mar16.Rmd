@@ -80,12 +80,13 @@ idx <- match(myVar, names(demoQuestion))
 c1 <- demoQuestion[, myVar]
 c1 <- plyr::rename(c1, c("PROTECT2AGE" = "Age", "EDUCATION" = "Education", "RACETEXT" = "Race", "HRSD.NO.SUI" = "Hamilton Rating Scale for Depression(no 16Q)", "GENDERTEXT" = "Gender", "WTARSS" = "Wechsler Test of Adult Reading Standardized Score", "DRS" = "Dementia Rating Scale", "EXIT" = "EXIT - Neuropsych Exam", "Nurgency" = "UPPSP Impulsive Behavior Scale - negative urgency", "Purgency" = "UPPSP Impulsive Behavior Scale - positive urgency", "SSI.BL.CURRENT" = "Suicide Ideation Scale", "PER.CAPITA.INCOME" = "Income Per Capita"))
 
-c2 <- compareGroups(c1,demoQuestion$group4)
-c2_2 <- compareGroups(c1, demoQuestion$group5)
-t1 <- createTable(c2, hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
-t2_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE)
+c2 <- compareGroups(c1,demoQuestion$group4
+                    )
+c2_2 <- compareGroups(c1, demoQuestion$group5, show.p.trend = T)
+t1 <- createTable(c2, hide = NA, hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
+t2_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
 
-export2csv(t2_1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/demo5.csv")
+export2csv(t1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/demoP.csv")
 
 task$check <- 1:dim(task)[1]
 task_no_duplicates <- task %>% group_by(ID, merged_trial, Stimuli_RT) %>% filter(row_number(check) == 1)
@@ -774,34 +775,35 @@ m1gl1 <-
   data = allData,
   nAGQ = 0,
   control = glmerControl(optimizer = "bobyqa"))
-stargazer(m1gl1, type = "text", title = "AcceptOffer ~ eappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
+stargazer(summary(m1gl1)$coefficients, type = "text", title = "AcceptOffer ~ eappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
   group5 + scale(fairLR) * group5 + scale(totalStake) * group5  + scale(fairLR) * scale(totalStake) * group5 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group5Interaction.txt")
 
-car::Anova(m1gl1)
+
 tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group5Interaction.tiff', 
-     units="in", height = 6, width = 8, res=300)
+     units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gl1, "fairLR", by = c("totalStake", "group5"), at = list(fairLR = c(-2.66,0.22),totalStake = c(8,18)))
 plot(lsm, horiz = F) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  facet_grid(.~ group5 + totalStake)
+  facet_grid(.~ group5 + totalStake) +
+  ggtitle("total stake * fair * group5")
+dev.off()
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/replicate2_fairLR*group5.jpg")
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group5*UGfair.tiff",
+      units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gl1, "fairLR", by = c("group5"), at = list(fairLR = c(-2.66,0.22)))
 plot(lsm, horiz = F) +
   facet_grid(.~ group5)
+dev.off()
  
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/replicate3_totalStake*group5.jpg")
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group5*totalStake.tiff",
+     units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gl1, "totalStake", by = ("group5"), at = list(totalStake = c(8, 13,18)))
 plot(lsm, horiz = F) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
   facet_grid(.~ group5)
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/replicate3_UGcontext*group5.jpg")
-lsm <- lsmeans(m1gl1, "ReappraisalDirection", by = ("group5"))
-plot(lsm, horiz = F) +
-  theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  facet_grid(.~ group5)
-head(tmp)
+ 
+
 ```
 
 ## RT analyses
@@ -894,23 +896,25 @@ m1gPun <-glmer(
 stargazer(m1gPun, type = "text", title = "AcceptOffer ~ AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep *
   group4 + scale(fairLR) * group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun_p.txt")
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4*Pun.jpg")
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*group4.tiff",
+     units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gPun, "ReappraisalDirectionResourcesRep", by = "group4")
 plot(lsm, horiz = F) +
     theme(axis.text.x=element_text(angle=90, hjust=1)) +
     facet_grid(~ group4)
 dev.off()
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4*fair.jpg")
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGfair*group4.tiff",
+      units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gPun, "fairLR", by = "group4", at = list(fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F) +
   facet_grid(~group4)
 dev.off() 
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/Pun*fair.jpg")
-lsm <- lsmeans(m1gPun, "fairLR", by = "ReappraisalDirectionResourcesRep", at = list(fairLR = c(-2.66,-1.22,0.22)))
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/Pun*fair.tiff")
+lsm <- lsmeans(m1gPun, "fairLR", by = "group", at = list(fairLR = c(-2.66,-1.22,0.22)))
 plot(lsm, horiz = F) +
-  facet_grid(~ ReappraisalDirectionResourcesRep)
+  facet_grid(~ group4)
 dev.off()
 
 jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/Pun*totalStake.jpg")
