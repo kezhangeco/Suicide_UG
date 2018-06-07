@@ -28,6 +28,7 @@
 | IIP15INTSEN                                         | 8.0 (4.5)         | 3.2 (3.1)         | 6.5 (4.3)         | 8.4 (5.4)         | <0.001    | 142  | control < attempter, depression, ideator    |
 | IIP15AGRESS                                         | 3.9 (3.7)         | 1.6 (2.5)         | 4.5 (3.3)         | 5.2 (4.2)         | 0.001     | 142  | control < attempter, depression, ideator    |
 | Suicide Ideation Scale                              | 21.2 (7.6)        | 0.0 (0.0)         | 0.5 (1.5)         | 15.4 (5.7)        | <0.001    | 149  | control < depression < ideator < attempter  |
+| BIS Total                                           | 1.6 (0.6)         | 1.0 (0.3)         | 1.5 (0.5)         | 1.5 (0.4)         | <0.001    | 142  | control < attempter, depression, ideator    |
 
 
 
@@ -63,6 +64,7 @@
 | IIP15INTSEN                                         | 8.4 (4.6)         | 7.7 (4.5)        | 3.2 (3.1)         | 6.5 (4.3)         | 8.4 (5.4)         | <0.001    | 142  | control <  HL, LL, depression,   ideator |
 | IIP15AGRESS                                         | 5.0 (4.4)         | 2.9 (2.6)        | 1.6 (2.5)         | 4.5 (3.3)         | 5.2 (4.2)         | <0.001    | 142  | control < HL, depression, ideator        |
 | Suicide Ideation Scale                              | 23.4 (7.3)        | 19.3 (7.4)       | 0.0 (0.0)         | 0.5 (1.5)         | 15.4 (5.7)        | <0.001    | 149  | control < depression < ideator < LL < HL |
+| BIS Total                                           | 1.6 (0.6)         | 1.7 (0.5)        | 1.0 (0.3)         | 1.5 (0.5)         | 1.5 (0.4)         | <0.001    | 142  | control < HL, LL, depression, ideator    |
 
 #  
 
