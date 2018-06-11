@@ -88,7 +88,7 @@ c2_2 <- compareGroups(c1, demoQuestion$group5, show.p.trend = T)
 t1 <- createTable(c2, hide = NA, hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
 t2_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
 
-export2csv(t2_1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/demo5.csv")
+export2csv(t2_1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/group5IRI.csv")
 
 
 noControldemo <- subset(demoQuestion, demoQuestion$group4 != "control") 
