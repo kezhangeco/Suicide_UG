@@ -1,0 +1,131 @@
+
+AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EDUCATION)*group4 + (1 | ID/block)
+=========================================================================================
+                                                                  Dependent variable:    
+                                                              ---------------------------
+                                                                      AcceptOffer        
+-----------------------------------------------------------------------------------------
+ReappraisalDirectionempathy                                            1.096***          
+                                                                        (0.261)          
+                                                                                         
+ReappraisalDirectionpunish                                             -1.926***         
+                                                                        (0.245)          
+                                                                                         
+scale(fairLR)                                                          2.114***          
+                                                                        (0.090)          
+                                                                                         
+scale(totalStake)                                                        0.027           
+                                                                        (0.065)          
+                                                                                         
+group4control                                                           -0.365           
+                                                                        (0.476)          
+                                                                                         
+group4depression                                                         0.563           
+                                                                        (0.480)          
+                                                                                         
+group4ideator                                                            0.302           
+                                                                        (0.486)          
+                                                                                         
+scale(EDUCATION)                                                        0.587**          
+                                                                        (0.280)          
+                                                                                         
+ReappraisalDirectionempathy:scale(fairLR)                              -1.273***         
+                                                                        (0.099)          
+                                                                                         
+ReappraisalDirectionpunish:scale(fairLR)                               -1.267***         
+                                                                        (0.090)          
+                                                                                         
+ReappraisalDirectionempathy:scale(totalStake)                            0.078           
+                                                                        (0.078)          
+                                                                                         
+ReappraisalDirectionpunish:scale(totalStake)                           0.190***          
+                                                                        (0.069)          
+                                                                                         
+scale(fairLR):scale(totalStake)                                        -0.136**          
+                                                                        (0.061)          
+                                                                                         
+ReappraisalDirectionempathy:group4control                               0.657*           
+                                                                        (0.395)          
+                                                                                         
+ReappraisalDirectionpunish:group4control                                 0.355           
+                                                                        (0.372)          
+                                                                                         
+ReappraisalDirectionempathy:group4depression                            -0.156           
+                                                                        (0.407)          
+                                                                                         
+ReappraisalDirectionpunish:group4depression                              0.026           
+                                                                        (0.378)          
+                                                                                         
+ReappraisalDirectionempathy:group4ideator                                0.513           
+                                                                        (0.415)          
+                                                                                         
+ReappraisalDirectionpunish:group4ideator                                -0.028           
+                                                                        (0.382)          
+                                                                                         
+scale(fairLR):group4control                                              0.078           
+                                                                        (0.089)          
+                                                                                         
+scale(fairLR):group4depression                                          -0.161*          
+                                                                        (0.086)          
+                                                                                         
+scale(fairLR):group4ideator                                              0.120           
+                                                                        (0.093)          
+                                                                                         
+scale(totalStake):group4control                                         -0.147*          
+                                                                        (0.077)          
+                                                                                         
+scale(totalStake):group4depression                                      -0.086           
+                                                                        (0.077)          
+                                                                                         
+scale(totalStake):group4ideator                                         -0.060           
+                                                                        (0.080)          
+                                                                                         
+ReappraisalDirectionempathy:scale(EDUCATION)                             0.296           
+                                                                        (0.233)          
+                                                                                         
+ReappraisalDirectionpunish:scale(EDUCATION)                             -0.323           
+                                                                        (0.220)          
+                                                                                         
+group4control:scale(EDUCATION)                                           0.073           
+                                                                        (0.463)          
+                                                                                         
+group4depression:scale(EDUCATION)                                      -1.647***         
+                                                                        (0.481)          
+                                                                                         
+group4ideator:scale(EDUCATION)                                         -1.578***         
+                                                                        (0.533)          
+                                                                                         
+ReappraisalDirectionempathy:scale(fairLR):scale(totalStake)             0.155*           
+                                                                        (0.086)          
+                                                                                         
+ReappraisalDirectionpunish:scale(fairLR):scale(totalStake)               0.071           
+                                                                        (0.076)          
+                                                                                         
+ReappraisalDirectionempathy:group4control:scale(EDUCATION)              -0.382           
+                                                                        (0.404)          
+                                                                                         
+ReappraisalDirectionpunish:group4control:scale(EDUCATION)                0.146           
+                                                                        (0.371)          
+                                                                                         
+ReappraisalDirectionempathy:group4depression:scale(EDUCATION)           -0.517           
+                                                                        (0.411)          
+                                                                                         
+ReappraisalDirectionpunish:group4depression:scale(EDUCATION)           1.050***          
+                                                                        (0.380)          
+                                                                                         
+ReappraisalDirectionempathy:group4ideator:scale(EDUCATION)              -0.078           
+                                                                        (0.450)          
+                                                                                         
+ReappraisalDirectionpunish:group4ideator:scale(EDUCATION)               0.831**          
+                                                                        (0.418)          
+                                                                                         
+Constant                                                               1.651***          
+                                                                        (0.311)          
+                                                                                         
+-----------------------------------------------------------------------------------------
+Observations                                                            11,616           
+Log Likelihood                                                        -4,547.889         
+Akaike Inf. Crit.                                                      9,177.777         
+Bayesian Inf. Crit.                                                    9,479.543         
+=========================================================================================
+Note:                                                         *p<0.1; **p<0.05; ***p<0.01
