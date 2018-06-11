@@ -1,0 +1,151 @@
+---
+title: "UG description"
+author: "Ke"
+date: '2018-06-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(lme4)
+library(ggplot2)
+library(GGally)
+library(plyr)
+library(Matrix)
+library(readxl)
+library(reshape2)
+library(numDeriv)
+library(MuMIn)
+# library(glmulti)
+# library(rJava)
+library(mice)
+library(stargazer)
+library(lsmeans)
+library(effects)
+library(psych)
+library(compareGroups)
+library(afex)
+library(stargazer)
+library(magrittr)
+library(dplyr)
+library(tidyverse)
+
+```
+
+
+```{r cars}
+task <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_all_task_data149.csv")
+demo <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_demog149.csv")
+question <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_questionnaire.csv")
+emoRating <- read.csv("~/ownCloud/Suicide_UG/UG_clean_updated/ug_reactivity149.csv")
+
+# check number of participants 
+print(length(unique(task$ID)))
+print(length(demo$ID))
+print(length(question$ID))
+print(length(unique(emoRating$ID)))
+question <- question[!duplicated(question),]
+print(length(question$ID))
+
+# merge demographics and questionniares. 
+demoQuestion <- merge(demo, question[, c("ID", "HOUSEHOLD.INCOME", 
+                                         "PER.CAPITA.INCOME", "HRSD.NO.SUI",
+                                         "DEP.ONSET.AGE", "SIS.ML.TOTAL",
+                                         "SIS.ML.PLAN", "SSI.BL.CURRENT", "MMSE.TOTAL",
+                                         "EXIT", "DRS", "BIS_NONPLAN", "BIS_MOTOR",
+                                         "BIS_COGNIT", "BIS_TOTMEAN", "IIP15INTSEN",
+                                         "IIP15INTAMBV", "IIP15AGRESS", "UPPSP.NEG.URGENCY",
+                                         "UPPSP.POS.URGENCY", "UPPSP.LACK.OF.PREMED",
+                                         "UPPSP.LACK.OF.PERSEV", "IRI_PERSPECTIVE_TAKING",
+                                         "IRI_FANTASY_SCALE", "IRI_EMPATHETIC_CONCERN",
+                                         "IRI_PERSONAL_DISTRESS", "GOALS", "IMPULSE",
+                                         "AWARENESS", "WTARRAW", "WTARSS")], on = "ID")
+
+demoQuestion <- plyr::rename(demoQuestion, c("UPPSP.NEG.URGENCY" = "Nurgency", "UPPSP.POS.URGENCY" = "Purgency", "MMSE.TOTAL" = "MMSE"))
+
+# compare the group differences
+myVar <- c("EDUCATION", "GENDERTEXT", "PER.CAPITA.INCOME", "PROTECT2AGE", 
+           "RACETEXT", "MMSE", "HRSD.NO.SUI","WTARSS", "DRS", "EXIT", 
+           "BIS_NONPLAN", "BIS_TOTMEAN", "Nurgency", "Purgency", "IIP15INTAMBV", "IIP15INTSEN", 
+           "IIP15AGRESS", "SSI.BL.CURRENT")
+
+idx <- match(myVar, names(demoQuestion))
+# idx <- sort(c(idx-1, idx))
+# c1 <- demoQuestion[, idx]
+c1 <- demoQuestion[, myVar]
+c1 <- plyr::rename(c1, c("PROTECT2AGE" = "Age", "EDUCATION" = "Education", "RACETEXT" = "Race", "HRSD.NO.SUI" = "Hamilton Rating Scale for Depression(no 16Q)", "GENDERTEXT" = "Gender", "WTARSS" = "Wechsler Test of Adult Reading Standardized Score", "DRS" = "Dementia Rating Scale", "EXIT" = "EXIT - Neuropsych Exam", "Nurgency" = "UPPSP Impulsive Behavior Scale - negative urgency", "Purgency" = "UPPSP Impulsive Behavior Scale - positive urgency", "SSI.BL.CURRENT" = "Suicide Ideation Scale", "PER.CAPITA.INCOME" = "Income Per Capita", "BIS_TOTMEAN" = "BIS Total"))
+
+c2 <- compareGroups(c1,demoQuestion$group4)
+                    
+c2_2 <- compareGroups(c1, demoQuestion$group5, show.p.trend = T)
+t1 <- createTable(c2, hide = NA, hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
+t2_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
+
+
+task$check <- 1:dim(task)[1]
+task_no_duplicates <- task %>% group_by(ID, merged_trial, Stimuli_RT) %>% filter(row_number(check) == 1)
+t <- table(task$ID, task$ReappraisalDirection)
+plot(t)
+
+t_nodupes <- table(task_no_duplicates$ID, task_no_duplicates$ReappraisalDirection)
+plot(t_nodupes)
+
+
+
+allData <- merge(task_no_duplicates, demoQuestion, on = "ID")
+
+allData$totalStake <- allData$PlayerProposedAmount + allData$OpponentProposedAmount
+allData <- plyr::rename(allData, c("HOUSEHOLD.INCOME" = "HouseholdIncome", "HRSD.NO.SUI" = "HRSD_NO_SUI", "PER.CAPITA.INCOME" = "IncomePerCapita", "MMSETOTAL" = "MMSE"))
+
+allData$Fairness_score <- as.numeric(allData$Fairness_score)
+allData$ID <- as.factor(allData$ID)
+allData$AcceptOffer <- as.factor(allData$AcceptOffer)
+allData$Trial_Number <- as.factor(allData$Trial_Number)
+
+# reference group = attempter
+allData <- within(allData, group4 <- relevel(group4, ref = "attempter"))
+allData <- within(allData, group5 <- relevel(group5, ref = "AttempterHL"))
+emoRating <- within(emoRating, group4 <- relevel(group4, ref = "attempter"))
+emoRating <- within(emoRating, group5 <- relevel(group5, ref = "AttempterHL"))
+
+# block number
+allData$block <- NA
+allData$block <- ifelse(allData$merged_trial < 27, "1", ifelse((allData$merged_trial > 26) & (allData$merged_trial < 53), "2", "3" ))
+allData$block <- as.factor(allData$block)
+
+# fairness ratio
+allData$fairLR <- log(allData$PlayerProposedAmount/allData$OpponentProposedAmount)
+allData$fairR <- (allData$PlayerProposedAmount/allData$OpponentProposedAmount)
+
+
+allData[, c("PlayerProposedAmount", "OpponentProposedAmount")]
+# separate groups
+depression <- subset(allData, group4 == "depression")
+control <- subset(allData, group4 == "control")
+ideator <- subset(allData, group4 == "ideator")
+attempter <- subset(allData, group4 == "attempter")
+attHL <- subset(allData, group5 == "AttempterHL")
+attLL <- subset(allData, group5 == "AttempterLL")
+
+#Pvars <- allData[, c("ID", "MMSE", "PROTECT2AGE", "GENDERTEXT", "IncomePerCapita", "HRSD_NO_SUI", "EDUCATION", "RACETEXT", "WTARSS", "DRS", "EXIT", "BIS_NONPLAN", "urgency", "IIP15INTAMBV", "IIP15INTSEN", "IIP15AGRESS", "IRI_EMPATHETIC_CONCERN")]
+#Pvars <- subset(Pvars, !duplicated(ID))
+#emoRating <- merge(emoRating, Pvars, by = "ID")
+emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 1] <- "punish"
+emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 2] <- "empathy"
+emoRating$ReappraisalDirection <- as.factor(emoRating$ReappraisalDirection)
+```
+
+## Age
+
+
+```{r pressure, echo=FALSE}
+age <- matrix(
+  round(c(mean(question$PROTECT2.AGE), sd(question$PROTECT2.AGE), 
+          max(question$PROTECT2.AGE), min(question$PROTECT2.AGE)), 2),
+  nrow = 1, ncol = 4)
+colnames(age) <- c("Mean", "SD", "Max", "Min")
+rownames(age) <- "Age"
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -1,4 +1,4 @@
-
+ 
 AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(Nurgency) + (1 | ID/block)
 =======================================================================================
                                                                 Dependent variable:    
