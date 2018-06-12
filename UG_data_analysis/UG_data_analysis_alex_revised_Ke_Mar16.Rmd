@@ -1066,26 +1066,6 @@ save.image("ouput.RData")
 ```
 
 ## KE's code
-# Punishing type 
-```{r}
-# main models with the 2 separate punish types
-# Level 1 models (no group interaction)
-m0Pun <- glmer(allData$AcceptOffer ~ ReappraisalDirectionResourcesRep + scale(totalStake) + fairLR + (1|ID/block), family = binomial, data = allData,  
-  control = glmerControl(optimizer = "bobyqa"))
-car::Anova(m0Pun)
-stargazer(summary(m0Pun)$coefficients, type = "text")
-lsm <- lsmeans(m0Pun, "ReappraisalDirectionResourcesRep")
-plot(lsm, horiz = F)
-
-m1Pun <- glmer(allData$AcceptOffer ~ ReappraisalDirectionResourcesRep*scale(totalStake)*fairLR + (1|ID/block), family = binomial, data = allData,  
-  control = glmerControl(optimizer = "bobyqa"))
-stargazer(summary(m1Pun)$coefficients, type = "text")
-lsm <- lsmeans(m1Pun, "ReappraisalDirectionResourcesRep")
-plot(lsm, horiz = F)
-anova(m0Pun, m1Pun)
-```
-
-## Ke modified
 # level1 + level2 with groups (baseline, empathy, resources, reputation)
 ```{r}
 #################
@@ -1127,14 +1107,11 @@ m1gPun <-glmer(
   data = allDataL,
   control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa"))
 
-stargazer(m1gPun, type = "text", title = "AcceptOffer ~ AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep *
-  group4 + scale(fairLR) * group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun_p.txt")
+stargazer(m1gPun, type = "text", title = "AcceptOffer ~ AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun.txt")
 
-tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*group4.tiff",
-     units="in", height = 8, width = 10, res=300)
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*group4.tiff", units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gPun, "ReappraisalDirectionResourcesRep", by = "group4")
 plot(lsm, horiz = F) +
-    theme(axis.text.x=element_text(angle=90, hjust=1)) +
     facet_grid(~ group4)
 dev.off()
 
@@ -1145,20 +1122,30 @@ plot(lsm, horiz = F) +
   facet_grid(~group4)
 dev.off() 
 
-tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/Pun*fair.tiff")
-lsm <- lsmeans(m1gPun, "fairLR", by = "group", at = list(fairLR = c(-2.66,-1.22,0.22)))
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGstake*group4.tiff",
+      units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(m1gPun, "totalStake", by = "group4", at = list(totalStake = c(8, 13,18)))
 plot(lsm, horiz = F) +
-  facet_grid(~ group4)
-dev.off()
+  facet_grid(~group4)
+dev.off() 
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/Pun*totalStake.jpg")
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*totalStake.tiff", units="in", height = 8, width = 10, res=300)
 lsm <- lsmeans(m1gPun, "totalStake", by = "ReappraisalDirectionResourcesRep", at = list(totalStake = c(8, 13,18)))
 plot(lsm, horiz = F) +
   facet_grid(~ ReappraisalDirectionResourcesRep)
 dev.off()
 
-lsm <- lsmeans(m1gPun, "AcceptOffer_lag")
-plot(lsm, horiz = F)
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGfair*totalStake.tiff", units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(m1gPun, "totalStake", by = "fairLR", at = list(totalStake = c(8, 13,18),
+                                                              fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm, horiz = F) +
+  facet_grid(~ fairLR)
+dev.off()
+
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*UGfair.tiff", units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(m1gPun, "fairLR", by = "ReappraisalDirectionResourcesRep", at = list(fairLR = c(-2.66,-1.22,0.22)))
+plot(lsm, horiz = F) +
+  facet_grid(~ ReappraisalDirectionResourcesRep)
 dev.off()
 
 
