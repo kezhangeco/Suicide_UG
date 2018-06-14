@@ -73,9 +73,6 @@ UG_data_analysis/wrongOutputs/main/NoIndividual/UGfair*group5.jpg alias
 UG_data_analysis/UG_model_output.docx
 >>>>>>> origin/master
 
-*.txt
-
-*.txt
 
 *.jpg
 
@@ -84,3 +81,5 @@ UG_data_analysis/outputs/demo.csv
 UG_data_analysis/outputs/demo.csv
 
 UG_data_analysis/outputs/demo1.csv
+
+*.zip
