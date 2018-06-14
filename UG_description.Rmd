@@ -145,6 +145,7 @@ age <- matrix(
 colnames(age) <- c("Mean", "SD", "Max", "Min")
 rownames(age) <- "Age"
 
+describe(demoQuestion$GENDERTEXT)
 
 ```
 

@@ -1188,7 +1188,17 @@ m1gPun <-glmer(
   data = allDataL,
   control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa"))
 
-stargazer(m1gPun, type = "text", title = "AcceptOffer ~ AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun.txt")
+stargazer(m1gPun, digits = 2, type = "text", title = "AcceptOffer ~ AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun.txt")
+          
+m1gPunNolag <-glmer(
+  AcceptOffer ~ 
+    ReappraisalDirectionResourcesRep * scale(fairLR) + 
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +
+    scale(fairLR) * group4 + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa"))
 
 tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*group4.tiff", units="in", height = 5, width = 12, res=300)
 lsm <- lsmeans(m1gPun, "ReappraisalDirectionResourcesRep", by = "group4")
@@ -1244,8 +1254,6 @@ lsm <- lsmeans(m1gPun, "fairLR", by = "ReappraisalDirectionResourcesRep", at = l
 plot(lsm, horiz = F) +
   facet_grid(~ ReappraisalDirectionResourcesRep)
 dev.off()
-
-
 m1gPun1 <-glmer(
   AcceptOffer ~ AcceptOffer_lag + 
     ReappraisalDirectionResourcesRep * scale(fairLR) + 
@@ -1295,6 +1303,14 @@ dev.off()
 
 # end of Alex's code
 ##################
+stargazer(m1gPun, type = "text", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction.tex")
+
+stargazer(m1gPun, 
+          dep.var.caption = "Accept Offer",
+          out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun.tex")
+
+stargazer(m1gPunNolag, type = "text", digits = 2)
+
 ```
 
 ```{r punishType covariate}
@@ -1425,6 +1441,7 @@ lsm <- lsmeans(mpun1, "Gender", by = "ReappraisalDirectionResourcesRep")
 plot(lsm, horiz = F) +
   facet_grid(~ ReappraisalDirectionResourcesRep)
 dev.off()
+?lag
 
 ```
 
@@ -1740,6 +1757,7 @@ pltFunPun2_3way <- lapply(varlist, function(individualFactor) {
     dev.off()
     return(plt)
 })
+
 ```
 
 # Ke's codes on emotional reactivity
@@ -1824,24 +1842,50 @@ stargazer(summary(mFair)$coefficients, type = "text",
           out = '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qfairness.txt')
 
 msympathy <- lmer(scale(Rating) ~ PunishingType*group4 + (1|ID), data = sympathy)
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qsympathy.jpg')
-lsm <- lsmeans(msympathy, "ReappraisalDirection", by="group4")
-plot(lsm, horiz = F) +
-  facet_grid( ~ group4) +
-  theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  ggtitle("Sympathy Question")
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/QsympathyN.jpg',
+      units="in", height = 5, width = 12, res=300)
+lsm <- lsmeans(msympathy, "PunishingType", by="group4")
+lsmDf <- lsm[1:12]
+lsmDf <- as.data.frame(lsmDf)
+lsmDf$PunishingType <- factor(lsmDf$PunishingType)
+ggplot(lsmDf, aes(PunishingType, lsmean)) +
+  geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
+                position=position_dodge(.1)) +
+  geom_point() +
+  xlab("Reappraisal Context") +
+  ylab("Least Squares Mean") +
+  theme_bw(base_size = 14) +
+  theme(panel.spacing = unit(2, "lines"),
+        strip.text.x = element_text(size = 16)) +
+  facet_grid(~ group4) +
+  scale_x_discrete(labels = c("Empathy", "Reputation", "Resources"), expand=c(0.05,0.40)) +
+  theme(axis.title.x = element_text(margin = margin(t = 15)),
+        axis.title.y = element_text(margin = margin(r = 15)))
 dev.off()
+
 stargazer(summary(msympathy)$coefficients, type = "text", title = "Sympathy: scale(Rating) = PunishingType*group4 + (1|ID)",out = '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qsympathy.txt')
 
 manger <- lmer(scale(Rating) ~ PunishingType*group4 + (1|ID), data = anger)
-jpeg('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qanger.jpg')
-lsm <- lsmeans(manger, "ReappraisalDirection", by="group4")
-plot(lsm, horiz = F) +
-  facet_grid( ~ group4) +
-  theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  ggtitle("Anger Question")
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/QangerN.jpg',
+      units="in", height = 5, width = 12, res=300)
+lsm <- lsmeans(manger, "PunishingType", by="group4")
+lsmDf <- lsm[1:12]
+lsmDf <- as.data.frame(lsmDf)
+lsmDf$PunishingType <- factor(lsmDf$PunishingType)
+ggplot(lsmDf, aes(PunishingType, lsmean)) +
+  geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
+                position=position_dodge(.1)) +
+  geom_point() +
+  xlab("Reappraisal Context") +
+  ylab("Least Squares Mean") +
+  theme_bw(base_size = 14) +
+  theme(panel.spacing = unit(2, "lines"),
+        strip.text.x = element_text(size = 16)) +
+  facet_grid(~ group4) +
+  scale_x_discrete(labels = c("Empathy", "Reputation", "Resources"), expand=c(0.05,0.40)) +
+  theme(axis.title.x = element_text(margin = margin(t = 15)),
+        axis.title.y = element_text(margin = margin(r = 15)))
 dev.off()
-stargazer(summary(manger)$coefficients, type = "text", title = "Anger: scale(Rating) = PunishingType*group4 + (1|ID)",out = '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qanger.txt')
 
 
 # Reappraisal = empathy, reputation, resources
@@ -1874,14 +1918,16 @@ class(manger) <- "lmerMod"
 
 stargazer(mFair, msympathy, manger, align = T,
           column.labels = c("Fairness", "Sympathy", "Anger"),
-          dep.var.labels = "Ratings",
+          dep.var.labels = "Ratings" ,
+          digits = 2,
           covariate.labels = c("Reputation", "Resources", "Control", "Depression",
                                "Ideator", "Reputation  x Control", "Resources x Control",
                                "Reputation x Depression", "Resources x Depression",
                                "Reputation x Ideator", "Resources x Ideator", "Constant"),
-          out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/emoRating",
           type = "text")
-
+          # out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/emoRating.html")
+levels(unfair$PunishingType)
+stargazer(manger, type = "text", report = c("vcs*p"), out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/emoRating.html")
 ```
 
 # control individual factors
