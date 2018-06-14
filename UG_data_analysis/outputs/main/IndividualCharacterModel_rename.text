@@ -1,0 +1,257 @@
+ 
+AcceptOffer ~ ReappraisalDirection * fairLR * totalStake + ReappraisalDirection * group4 + fairLR * group4 + totalStake * group4 + ReappraisalDirection * EXIT + EDUCATION * group4 * ReappraisalDirection + IIP15INTSEN * group4 * ReappraisalDirection + Gender * ReappraisalDirection + ReappraisalDirection * DRS * group4 + HRSD*ReappraisalDirection*group4 + (1 | ID/block)
+====================================================================================
+                                                             Dependent variable:    
+                                                         ---------------------------
+                                                                 AcceptOffer        
+------------------------------------------------------------------------------------
+ReappraisalDirectionempathy                                        0.838**          
+                                                                   (0.329)          
+                                                                                    
+ReappraisalDirectionpunish                                        -1.909***         
+                                                                   (0.305)          
+                                                                                    
+fairLR                                                            2.097***          
+                                                                   (0.094)          
+                                                                                    
+totalStake                                                          0.066           
+                                                                   (0.067)          
+                                                                                    
+group4control                                                      -2.630           
+                                                                   (1.931)          
+                                                                                    
+group4depression                                                   -0.213           
+                                                                   (0.560)          
+                                                                                    
+group4ideator                                                      -0.417           
+                                                                   (0.588)          
+                                                                                    
+EXIT                                                              -0.426**          
+                                                                   (0.205)          
+                                                                                    
+EDUCATION                                                           0.431           
+                                                                   (0.348)          
+                                                                                    
+IIP15INTSEN                                                        -0.236           
+                                                                   (0.327)          
+                                                                                    
+Genderm                                                            -0.087           
+                                                                   (0.110)          
+                                                                                    
+DRS                                                                 0.254           
+                                                                   (0.341)          
+                                                                                    
+HRSD_NO_SUI                                                        -0.415           
+                                                                   (0.325)          
+                                                                                    
+ReappraisalDirectionempathy:fairLR                                -1.288***         
+                                                                   (0.105)          
+                                                                                    
+ReappraisalDirectionpunish:fairLR                                 -1.246***         
+                                                                   (0.095)          
+                                                                                    
+ReappraisalDirectionempathy:totalStake                              0.057           
+                                                                   (0.088)          
+                                                                                    
+ReappraisalDirectionpunish:totalStake                               0.109           
+                                                                   (0.074)          
+                                                                                    
+fairLR:totalStake                                                  -0.109*          
+                                                                   (0.065)          
+                                                                                    
+ReappraisalDirectionempathy:group4control                         4.936***          
+                                                                   (1.603)          
+                                                                                    
+ReappraisalDirectionpunish:group4control                           3.183**          
+                                                                   (1.532)          
+                                                                                    
+ReappraisalDirectionempathy:group4depression                        0.774           
+                                                                   (0.485)          
+                                                                                    
+ReappraisalDirectionpunish:group4depression                         0.515           
+                                                                   (0.437)          
+                                                                                    
+ReappraisalDirectionempathy:group4ideator                         1.935***          
+                                                                   (0.539)          
+                                                                                    
+ReappraisalDirectionpunish:group4ideator                            0.721           
+                                                                   (0.455)          
+                                                                                    
+fairLR:group4control                                               0.228**          
+                                                                   (0.095)          
+                                                                                    
+fairLR:group4depression                                            -0.176*          
+                                                                   (0.091)          
+                                                                                    
+fairLR:group4ideator                                               0.248**          
+                                                                   (0.101)          
+                                                                                    
+totalStake:group4control                                          -0.170**          
+                                                                   (0.081)          
+                                                                                    
+totalStake:group4depression                                        -0.090           
+                                                                   (0.082)          
+                                                                                    
+totalStake:group4ideator                                           -0.071           
+                                                                   (0.086)          
+                                                                                    
+ReappraisalDirectionempathy:EXIT                                   0.311*           
+                                                                   (0.168)          
+                                                                                    
+ReappraisalDirectionpunish:EXIT                                   0.529***          
+                                                                   (0.158)          
+                                                                                    
+group4control:EDUCATION                                             0.471           
+                                                                   (0.580)          
+                                                                                    
+group4depression:EDUCATION                                        -1.791***         
+                                                                   (0.559)          
+                                                                                    
+group4ideator:EDUCATION                                           -1.285**          
+                                                                   (0.645)          
+                                                                                    
+ReappraisalDirectionempathy:EDUCATION                               0.097           
+                                                                   (0.288)          
+                                                                                    
+ReappraisalDirectionpunish:EDUCATION                               -0.192           
+                                                                   (0.268)          
+                                                                                    
+group4control:IIP15INTSEN                                          -1.170           
+                                                                   (0.927)          
+                                                                                    
+group4depression:IIP15INTSEN                                        0.139           
+                                                                   (0.558)          
+                                                                                    
+group4ideator:IIP15INTSEN                                           0.101           
+                                                                   (0.540)          
+                                                                                    
+ReappraisalDirectionempathy:IIP15INTSEN                            -0.146           
+                                                                   (0.264)          
+                                                                                    
+ReappraisalDirectionpunish:IIP15INTSEN                              0.145           
+                                                                   (0.250)          
+                                                                                    
+ReappraisalDirectionempathy:Genderm                                 0.072           
+                                                                   (0.176)          
+                                                                                    
+ReappraisalDirectionpunish:Genderm                                -0.676***         
+                                                                   (0.142)          
+                                                                                    
+group4control:DRS                                                  -0.558           
+                                                                   (0.815)          
+                                                                                    
+group4depression:DRS                                               -0.495           
+                                                                   (0.491)          
+                                                                                    
+group4ideator:DRS                                                  -0.629           
+                                                                   (0.562)          
+                                                                                    
+group4control:HRSD_NO_SUI                                           0.120           
+                                                                   (1.419)          
+                                                                                    
+group4depression:HRSD_NO_SUI                                      1.829***          
+                                                                   (0.704)          
+                                                                                    
+group4ideator:HRSD_NO_SUI                                          1.087*           
+                                                                   (0.629)          
+                                                                                    
+ReappraisalDirectionempathy:HRSD_NO_SUI                            0.467*           
+                                                                   (0.258)          
+                                                                                    
+ReappraisalDirectionpunish:HRSD_NO_SUI                              0.165           
+                                                                   (0.247)          
+                                                                                    
+ReappraisalDirectionempathy:DRS                                     0.310           
+                                                                   (0.273)          
+                                                                                    
+ReappraisalDirectionpunish:DRS                                     -0.097           
+                                                                   (0.259)          
+                                                                                    
+ReappraisalDirectionempathy:fairLR:totalStake                       0.134           
+                                                                   (0.092)          
+                                                                                    
+ReappraisalDirectionpunish:fairLR:totalStake                        0.088           
+                                                                   (0.082)          
+                                                                                    
+ReappraisalDirectionempathy:group4control:EDUCATION                -0.522           
+                                                                   (0.489)          
+                                                                                    
+ReappraisalDirectionpunish:group4control:EDUCATION                 -0.141           
+                                                                   (0.461)          
+                                                                                    
+ReappraisalDirectionempathy:group4depression:EDUCATION             -0.200           
+                                                                   (0.482)          
+                                                                                    
+ReappraisalDirectionpunish:group4depression:EDUCATION              1.116**          
+                                                                   (0.435)          
+                                                                                    
+ReappraisalDirectionempathy:group4ideator:EDUCATION                -0.301           
+                                                                   (0.540)          
+                                                                                    
+ReappraisalDirectionpunish:group4ideator:EDUCATION                 0.849*           
+                                                                   (0.496)          
+                                                                                    
+ReappraisalDirectionempathy:group4control:IIP15INTSEN              1.933**          
+                                                                   (0.844)          
+                                                                                    
+ReappraisalDirectionpunish:group4control:IIP15INTSEN               1.550**          
+                                                                   (0.734)          
+                                                                                    
+ReappraisalDirectionempathy:group4depression:IIP15INTSEN           0.783*           
+                                                                   (0.474)          
+                                                                                    
+ReappraisalDirectionpunish:group4depression:IIP15INTSEN             0.134           
+                                                                   (0.430)          
+                                                                                    
+ReappraisalDirectionempathy:group4ideator:IIP15INTSEN               0.631           
+                                                                   (0.439)          
+                                                                                    
+ReappraisalDirectionpunish:group4ideator:IIP15INTSEN               -0.419           
+                                                                   (0.412)          
+                                                                                    
+ReappraisalDirectionempathy:group4control:HRSD_NO_SUI               1.844           
+                                                                   (1.176)          
+                                                                                    
+ReappraisalDirectionpunish:group4control:HRSD_NO_SUI                0.949           
+                                                                   (1.115)          
+                                                                                    
+ReappraisalDirectionempathy:group4depression:HRSD_NO_SUI          -1.518**          
+                                                                   (0.591)          
+                                                                                    
+ReappraisalDirectionpunish:group4depression:HRSD_NO_SUI            -0.480           
+                                                                   (0.550)          
+                                                                                    
+ReappraisalDirectionempathy:group4ideator:HRSD_NO_SUI             -1.736***         
+                                                                   (0.524)          
+                                                                                    
+ReappraisalDirectionpunish:group4ideator:HRSD_NO_SUI              -1.032**          
+                                                                   (0.479)          
+                                                                                    
+ReappraisalDirectionempathy:group4control:DRS                      1.147*           
+                                                                   (0.681)          
+                                                                                    
+ReappraisalDirectionpunish:group4control:DRS                       1.117*           
+                                                                   (0.633)          
+                                                                                    
+ReappraisalDirectionempathy:group4depression:DRS                   0.881**          
+                                                                   (0.395)          
+                                                                                    
+ReappraisalDirectionpunish:group4depression:DRS                     0.361           
+                                                                   (0.374)          
+                                                                                    
+ReappraisalDirectionempathy:group4ideator:DRS                     -1.495***         
+                                                                   (0.508)          
+                                                                                    
+ReappraisalDirectionpunish:group4ideator:DRS                        0.529           
+                                                                   (0.431)          
+                                                                                    
+Constant                                                          2.189***          
+                                                                   (0.386)          
+                                                                                    
+------------------------------------------------------------------------------------
+Observations                                                       10,602           
+Log Likelihood                                                   -4,031.356         
+Akaike Inf. Crit.                                                 8,228.712         
+Bayesian Inf. Crit.                                               8,832.022         
+====================================================================================
+Note:                                                    *p<0.1; **p<0.05; ***p<0.01
