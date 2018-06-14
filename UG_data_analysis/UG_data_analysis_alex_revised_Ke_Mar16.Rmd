@@ -64,6 +64,8 @@ demoQuestion <- merge(demo, question[, c("ID", "HOUSEHOLD.INCOME",
                                          "IRI_PERSONAL_DISTRESS", "GOALS", "IMPULSE",
                                          "AWARENESS", "WTARRAW", "WTARSS", "MAX.LETHALITY",
                                          "SIS.ML.PLAN", "SIS.ML.TOTAL")], on = "ID")
+demoQuestion$IRI_cogEmpathy <- demoQuestion$IRI_FANTASY_SCALE + demoQuestion$IRI_PERSPECTIVE_TAKING
+demoQuestion$IRI_affEmpathy <- demoQuestion$IRI_EMPATHETIC_CONCERN + demoQuestion$IRI_PERSONAL_DISTRESS
 
 demoQuestion <- plyr::rename(demoQuestion, c("UPPSP.NEG.URGENCY" = "Nurgency", "UPPSP.POS.URGENCY" = "Purgency", "MMSE.TOTAL" = "MMSE"))
 
@@ -73,7 +75,7 @@ myVar <- c("EDUCATION", "GENDERTEXT", "PER.CAPITA.INCOME", "PROTECT2AGE",
            "BIS_NONPLAN", "BIS_TOTAL", "Nurgency", "Purgency", "IIP15INTAMBV", "IIP15INTSEN", 
            "IIP15AGRESS", "MAX.LETHALITY", "SIS.ML.PLAN", "SIS.ML.TOTAL", 
            "IRI_PERSPECTIVE_TAKING", "IRI_FANTASY_SCALE", "IRI_EMPATHETIC_CONCERN",
-            "IRI_PERSONAL_DISTRESS")
+            "IRI_PERSONAL_DISTRESS", "IRI_cogEmpathy", "IRI_affEmpathy")
 
 # "SSI.BL.CURRENT" "SSI.BL.CURRENT" = "Suicide Ideation Scale", 
 
@@ -85,10 +87,10 @@ c1 <- plyr::rename(c1, c("PROTECT2AGE" = "Age", "EDUCATION" = "Education", "RACE
 
 c2 <- compareGroups(c1,demoQuestion$group4)
 c2_2 <- compareGroups(c1, demoQuestion$group5, show.p.trend = T)
-t1 <- createTable(c2, hide = c(Gender = "FEMALE", Race = "AFRICAN AMERICAN", Race = "ASIAN"), hide.no = 0, digits = 1, show.n = TRUE)
+t1 <- createTable(c2, hide = c(Gender = "FEMALE", Race = "AFRICAN AMERICAN", Race = "ASIAN"), hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
 t2_1 <- createTable(c2_2,hide = NA, hide.no = 0, digits = 1, show.n = TRUE, show.p.mul = T)
 
-# export2csv(t2_1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/group5IRI.csv")
+export2csv(t1, file = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/group4IRI.csv")
 
 
 noControldemo <- subset(demoQuestion, demoQuestion$group4 != "control") 
@@ -411,7 +413,6 @@ plot(lsm, horiz = F) +
   
 dev.off()
 
-
 ```
 
 ```{r}
@@ -457,7 +458,7 @@ tiff("/Users/kezhang/Desktop/ctgr.tiff", units="in", height = 15, width = 15, re
 ggpairs(na.omit(allData[,c("fairLR", "totalStake",
                        "EXIT", "EDUCATION", "IIP15INTSEN", "IncomePerCapita", 
                        "BIS_NONPLAN", "IIP15INTAMBV", "HRSD_NO_SUI", "DRS",
-                       "IIP15AGRESS")]))
+                       "IIP15AGRESS", "MMSE")]))
 dev.off()
 tiff("/Users/kezhang/Desktop/ctgr.tiff", units="in", height = 15, width = 15, res=300)
 ct <- ggpairs(newdataNA.omit[, c("AcceptOffer", "ReappraisalDirection", "fairLR", "totalStake",
@@ -1071,7 +1072,10 @@ plot(lsm, horiz = F)+
     facet_grid(~ group5)
 dev.off()
 
+plot(Effect("ReappraisalDirection*group4", mc7))
+plot(Effect("totalStake",m0r), axes = list(y=list(lab = "P(accept)", type = "response", lim = c(0,1))), multiline = TRUE, rug = FALSE)
 
+summary("ReappraisalDirection:group4:EDUCATION", mc7)
 ```
 
 
