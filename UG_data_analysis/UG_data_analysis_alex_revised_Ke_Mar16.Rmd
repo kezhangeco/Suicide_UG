@@ -756,9 +756,6 @@ plot(lsm, horiz = F) +
   facet_grid(.~ group4) +
   ggtitle("Controlling Education, Income, HRSD, DRS")
 dev.off()
-
-
-
 ```
 
 ```{r control IRI}
@@ -989,7 +986,8 @@ summary(m1gSSI_1)
 m1gBIS_1 <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block),
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+    ReappraisalDirection*scale(BIS_NONPLAN)*group4 + (1 | ID/block),
   family = binomial,
   data = allData,
   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
@@ -998,7 +996,8 @@ stargazer(m1gBIS_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection *
 m1gBIS_2 <-
   glmer(
   allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + scale(BIS_NONPLAN)*group4 + (1 | ID/block),
+  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + 
+    scale(BIS_NONPLAN)*group4 + (1 | ID/block),
   family = binomial,
   data = allData,
   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
