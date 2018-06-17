@@ -175,7 +175,7 @@ emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 2] <- "empathy"
 emoRating$ReappraisalDirection <- as.factor(emoRating$ReappraisalDirection)
 
 # save.image("/Volumes/LAB/Suicide_UG/UG_data_analysis/ugDATA.RData")
-load("/Volumes/LAB/Suicide_UG/UG_data_analysis/ugDATA.RData")
+load("/Users/kezhang/Dropbox/ugDATA1.RData")
 ```
 
 ```{r fisher}
@@ -413,6 +413,13 @@ plot(lsm, horiz = F) +
   
 dev.off()
 
+tb <- stargazer(summary(m1g)$coefficients,
+          covariate.labels = c("Independent variables", "Estimate", 
+                               "Standard error", "z", "p"), type = "text",
+          digits = 2)
+          # out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction1.tex")
+
+write.csv(round(summary(m1g)$coefficients, 2), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction.csv")
 ```
 
 ```{r}
@@ -720,18 +727,53 @@ anova(m1gm_2, m1gm_1)
 summary(m1gm_2)
 ```
 
-```{r control IRI}
-# IRI_EMPATHETIC_CONCERN
-## Interpersonal Reactivity Index - Empathetic Concern subscale
-m1gi_3 <-
+```{r demo}
+mDemo1 <-
   glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +
-    group4*scale(IRI_EMPATHETIC_CONCERN) + (1 | ID/block),
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 +
+    scale(EDUCATION) * group4 * ReappraisalDirection + 
+    scale(IncomePerCapita) * group4 * ReappraisalDirection +
+    scale(HRSD_NO_SUI) * group4 * ReappraisalDirection +
+    scale(DRS) * group4 * ReappraisalDirection +
+    (1 | ID/block),
   family = binomial,
   data = allData,
   nAGQ = 0,  
-  na.action=na.exclude,
+  control = glmerControl(optimizer = "bobyqa"))
+
+stargazer(round(summary(mDemo1)$coefficients, 2), out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/demoContrl.txt",
+          title = "Controlling demographics")
+write.csv(round(summary(mDemo1)$coefficients, 2),
+          "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/demoContrl.csv")
+
+lsm <- lsmeans(mDemo1, "ReappraisalDirection", by = "group4")
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/demoContrl.tiff', 
+     units="in", height = 8, width = 10, res=300)
+plot(lsm, horiz = F) +
+  facet_grid(.~ group4) +
+  ggtitle("Controlling Education, Income, HRSD, DRS")
+dev.off()
+
+
+
+```
+
+```{r control IRI}
+# IRI affective empathy
+## Interpersonal Reactivity Index - Empathetic Concern subscale
+mIRI1 <-
+  glmer(
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 +
+    group4*scale(IRI_affEmpathy) + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
   control = glmerControl(optimizer = "bobyqa"))
 summary(m1gi)
 car::Anova(m1gi, type = 'III')
@@ -746,28 +788,39 @@ plot(lsm, horiz = F)
 dev.off()
 
 # better
-m1gi_1 <-
+mIRI2 <-
   glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 +
-    ReappraisalDirection*scale(IRI_EMPATHETIC_CONCERN)*group4 + (1 | ID/block),
-  na.action=na.exclude,
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 +
+    group4*scale(IRI_affEmpathy)*ReappraisalDirection + (1 | ID/block),
   family = binomial,
   data = allData,
   nAGQ = 0,  
   control = glmerControl(optimizer = "bobyqa"))
-stargazer(m1gi_1, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(IRI_EMPATHETIC_CONCERN)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*IRI_EMPATHETIC_CONCERN*group4.txt")
 
-jpeg("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/UGcontext*IRI_EMPATHETIC_CONCERN*group4.jpg")
-lsm <- lsmeans(m1gi_1, "ReappraisalDirection", by = c("IRI_EMPATHETIC_CONCERN", "group4"), at = list(IRI_EMPATHETIC_CONCERN = c(12, 20, 26)))
+stargazer(mIRI2, type = "text", title = "AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection * group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(IRI_affEmpathy)*group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/UGcontext*IRI*group4.txt")
+
+write.csv(round(summary(mIRI2)$coefficients, 2), 
+          "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/UGcontext*IRI*group4.csv")
+
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/IRI*group4.tiff', 
+     units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(mIRI2, "IRI_affEmpathy", by ="group4", at = list(IRI_affEmpathy = c(23, 30, 40)))
 plot(lsm, horiz = F) +
-    theme(axis.text.x=element_text(angle=90, hjust=1)) +
-    facet_grid(.~ IRI_EMPATHETIC_CONCERN + group4) 
+  facet_grid(.~ group4) +
+  xlab("IRI Affective Empathy")
+dev.off()
 
-
-anova(m1gi_1, m1gi)
-
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/contrlIRI_UGcontext*group4.tiff', 
+     units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(mIRI2, "ReappraisalDirection", by ="group4")
+plot(lsm, horiz = F) +
+  facet_grid(.~ group4)
+dev.off()
 ```
+
 ```{r control interpersonal}
 # Interpersonal aggression and sensitivity
 m1ga <-
@@ -1193,7 +1246,10 @@ m1gPun <-glmer(
   control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa"))
 
 stargazer(m1gPun, digits = 2, type = "text", title = "AcceptOffer ~ AcceptOffer lag + ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep * group4 + scale(fairLR) * group4 + (1 | ID/block)", out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun.txt")
-          
+ 
+write.csv(round(summary(m1gPun)$coefficients, 2), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun.csv")
+
+         
 m1gPunNolag <-glmer(
   AcceptOffer ~ 
     ReappraisalDirectionResourcesRep * scale(fairLR) + 
@@ -1284,8 +1340,15 @@ m3gPun <-glmer(
   data = allDataL,
   control = glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=1e6)))
 stargazer(summary(m3gPun)$coefficient, type = "text")
+write.csv(round(summary(m3gPun)$coefficients, 2), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun3.csv")
+
 anova(m1gPun, m3gPun)
 opt <- all_fit(m3gPun)
+
+AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+  ReappraisalDirection * group4 + 
+  scale(fairLR) * group4 + 
+  scale(totalStake) * group4 +  (1 | ID/block)
 
 # reaction time
 rt1Pun <- lmer(Stimuli_RT ~  ReappraisalDirectionResourcesRep * scale(fairLR) + ReappraisalDirectionResourcesRep * scale(totalStake) + ReappraisalDirectionResourcesRep *
@@ -1932,6 +1995,8 @@ stargazer(mFair, msympathy, manger, align = T,
           # out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/emoRating.html")
 levels(unfair$PunishingType)
 stargazer(manger, type = "text", report = c("vcs*p"), out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/emoRating.html")
+summary(manger)$coefficients
+
 ```
 
 # control individual factors
