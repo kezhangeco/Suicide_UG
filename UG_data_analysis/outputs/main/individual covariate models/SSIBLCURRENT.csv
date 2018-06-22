@@ -1,0 +1,24 @@
+,Estimate,Std. Error,z value,Pr(>|z|),
+(Intercept),1.367,0.305,4.487,0,***
+ReappraisalDirectionempathy,1.18,0.242,4.879,0,***
+ReappraisalDirectionpunish,-1.648,0.228,-7.234,0,***
+scale(fairLR),2.031,0.107,18.999,0,***
+scale(totalStake),-0.026,0.075,-0.341,0.733,
+group4Ideator,0.218,0.521,0.418,0.676,
+scale(SSI.BL.CURRENT),0.157,0.283,0.554,0.58,
+ReappraisalDirectionempathy:scale(fairLR),-1.185,0.129,-9.197,0,***
+ReappraisalDirectionpunish:scale(fairLR),-1.182,0.117,-10.081,0,***
+ReappraisalDirectionempathy:scale(totalStake),0.196,0.103,1.902,0.057,*
+ReappraisalDirectionpunish:scale(totalStake),0.255,0.092,2.756,0.006,***
+scale(fairLR):scale(totalStake),-0.116,0.081,-1.435,0.151,
+ReappraisalDirectionempathy:group4Ideator,0.578,0.413,1.399,0.162,
+ReappraisalDirectionpunish:group4Ideator,-0.11,0.392,-0.281,0.778,
+scale(fairLR):group4Ideator,0.118,0.093,1.271,0.204,
+scale(totalStake):group4Ideator,-0.054,0.08,-0.675,0.5,
+group4Ideator:scale(SSI.BL.CURRENT),-0.532,0.548,-0.971,0.332,
+ReappraisalDirectionempathy:scale(SSI.BL.CURRENT),-0.681,0.222,-3.063,0.002,***
+ReappraisalDirectionpunish:scale(SSI.BL.CURRENT),-0.41,0.209,-1.958,0.05,*
+ReappraisalDirectionempathy:scale(fairLR):scale(totalStake),0.212,0.114,1.862,0.063,*
+ReappraisalDirectionpunish:scale(fairLR):scale(totalStake),0.079,0.102,0.773,0.439,
+ReappraisalDirectionempathy:group4Ideator:scale(SSI.BL.CURRENT),0.94,0.428,2.197,0.028,**
+ReappraisalDirectionpunish:group4Ideator:scale(SSI.BL.CURRENT),0.592,0.407,1.457,0.145,
