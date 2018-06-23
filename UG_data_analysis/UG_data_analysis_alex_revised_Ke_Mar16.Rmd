@@ -258,6 +258,9 @@ mean(fairAcceptPercDf$fairAcceptPerc)
 
 print("accept reject % most unfair offer")
 mean(fairAcceptPercDf$unfairRejectPerc)
+nrow(subset(task, task$Fairness_score == 1 | task$Fairness_score == 2))
+nrow(subset(task, task$Fairness_score == 3 | task$Fairness_score == 4 | task$Fairness_score == 5))
+nrow(subset(task, task$AcceptOffer == 0))
 ```
 
 ```{r rm missing values, include = False}
@@ -391,8 +394,8 @@ ggplot(lsmDf, aes(ReappraisalDirection, lsmean)) +
   geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
                 position=position_dodge(.1)) +
   geom_point() +
-  xlab("Reappraisal Context") +
-  ylab("Least Squares Mean") +
+  xlab("Context") +
+  ylab("Logit Probability of Offer Acceptance") +
   theme_bw(base_size = 14) +
   facet_grid(~ group4) +
   scale_x_discrete(labels = c("Baseline", "Empathy", "Punish"), expand=c(0.05,0.40)) +
@@ -402,6 +405,8 @@ ggplot(lsmDf, aes(ReappraisalDirection, lsmean)) +
         strip.text.x = element_text(size = 16))
         
 dev.off()
+
+
 
 tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGfair*group4.tiff', 
      units="in", height = 8, width = 10, res=300)
@@ -423,14 +428,37 @@ plot(lsm, horiz = F)
 dev.off()
 
 tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGcontext*UGfair.tiff', 
-     units="in", height = 8, width = 10, res=300)
-lsm <- lsmeans(m1g, "ReappraisalDirection", by = c("fairLR"), 
-               at = list(fairLR = c(-2.66,-1.22,0.22)))
-plot(lsm, horiz = F) +
-  ggtitle("UGcontext*fair")
-  
+     units="in", height = 5, width = 9, res=300)
+lsm <- lsmeans(m1g, "ReappraisalDirection", by = "fairLR",
+               at = list(fairLR = c(-2.66,-1.22,0.22))) 
+lsmDf <- lsm[1:9]
+lsmDf <- as.data.frame(lsmDf)
+lsmDf$fairLRrecode <- lsmDf$fairLR
+lsmDf$fairLRrecode[lsmDf$fairLRrecode == -2.66] <- "Low (-2SD) Fairness"
+lsmDf$fairLRrecode[lsmDf$fairLRrecode == -1.22] <- "Intermediate  Fairness"
+lsmDf$fairLRrecode[lsmDf$fairLRrecode == 0.22] <- "High (+2SD) Fairness"
+levels(lsmDf$fairLRrecode) <- c("High (+2SD) Fairness", "Intermediate  Fairness", "Low (-2SD) Fairness")
+
+ggplot(lsmDf, aes(ReappraisalDirection, lsmean)) +
+  geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
+                position=position_dodge(.1)) +
+  geom_point() +
+  xlab("Context") +
+  ylab("Logit Probability of Offer Acceptance") +
+  theme_bw(base_size = 14) +
+  theme(panel.spacing = unit(2, "lines")) +
+  facet_grid(~ fairLRrecode) +
+  scale_x_discrete(labels = c("Baseline", "Empathy", "Punish"), expand=c(0,0.3)) +
+  theme(axis.title.x = element_text(margin = margin(t = 15)),
+        axis.title.y = element_text(margin = margin(r = 15)))
+
 dev.off()
 
+mean(allData$fairLR) + 2*sd(allData$fairLR)
+
+lsm <- lsmeans(m1gPun, "AcceptOffer_lag")
+plot(lsm, horiz = F)
+dev.off()
 
 tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/UGcontext*UGstake.tiff', 
      units="in", height = 8, width = 10, res=300)
@@ -788,29 +816,6 @@ dev.off()
 
 ```{r control IRI}
 # IRI affective empathy
-## Interpersonal Reactivity Index - Empathetic Concern subscale
-mIRI1 <-
-  glmer(
-  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
-    ReappraisalDirection * group4 + 
-    scale(fairLR) * group4 + 
-    scale(totalStake) * group4 +
-    group4*scale(IRI_affEmpathy) + (1 | ID/block),
-  family = binomial,
-  data = allData,
-  nAGQ = 0,  
-  control = glmerControl(optimizer = "bobyqa"))
-summary(m1gi)
-car::Anova(m1gi, type = 'III')
-pdf("UGcontext*IRIemp.pdf", width=12, height=6)
-lsm <- lsmeans(m1gi, "ReappraisalDirection", by = "IRI_EMPATHETIC_CONCERN", at = list(IRI_EMPATHETIC_CONCERN = c(8,20,25)))
-plot(lsm, horiz = F)
-dev.off()
-
-pdf("UGcontext*group_adjusted_IRIemp.pdf", width=8, height=6)
-lsm <- lsmeans(m1gi, "ReappraisalDirection", by = "group4")
-plot(lsm, horiz = F)
-dev.off()
 
 # better
 mIRI2 <-
@@ -844,6 +849,41 @@ lsm <- lsmeans(mIRI2, "ReappraisalDirection", by ="group4")
 plot(lsm, horiz = F) +
   facet_grid(.~ group4)
 dev.off()
+
+mIRI_BIS <-
+  glmer(
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 +
+    group4*scale(IRI_affEmpathy)*ReappraisalDirection +
+    group4*scale(BIS_TOTAL)*ReappraisalDirection +
+    (1 | ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+
+write.csv(round(summary(mIRI_BIS)$coefficients, 3), 
+          "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/IRIandBISTotal.csv")
+
+mIRI_BISPLAN <-
+  glmer(
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 +
+    group4*scale(IRI_affEmpathy)*ReappraisalDirection +
+    group4*scale(BIS_NONPLAN)*ReappraisalDirection +
+    (1 | ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+
+write.csv(round(summary(mIRI_BISPLAN)$coefficients, 3), 
+          "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/IRIandBISNonplan.csv")
+summary(mIRI_BISPLAN)
 ```
 
 ```{r control interpersonal}
@@ -1071,6 +1111,9 @@ dev.off()
 noControlDep <- allData %>% filter(!group4 %in% c("Control", "Depression"))
 noControlDep$group4 <- factor(noControlDep$group4)
 
+noControl <- allData %>% filter(!group4 %in% c("Control"))
+noControl$group4 <- factor(noControl$group4)
+
 mSSI <-
   glmer(
   AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
@@ -1082,6 +1125,19 @@ mSSI <-
   family = binomial,
   data = noControlDep,
   control = glmerControl(optimizer = "bobyqa",optCtrl = list(maxfun = 2e4)))
+
+mSSI1 <-
+  glmer(
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 + 
+    group4*scale(`SSI.BL.CURRENT`)*ReappraisalDirection + 
+    (1 | ID/block),
+  family = binomial,
+  data = noControl,
+  control = glmerControl(optimizer = "bobyqa",optCtrl = list(maxfun = 2e4)))
+
 
 write.csv(round(summary(mSSI)$coefficients, 3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/SSIBLCURRENT.csv")
 
@@ -1410,27 +1466,40 @@ m1gPunNolag <-glmer(
   data = allData,
   control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa"))
 
-tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*group4.tiff", units="in", height = 5, width = 12, res=300)
+tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGcontext*group4.tiff", units="in", height = 5, width = 13, res=300)
 lsm <- lsmeans(m1gPun, "ReappraisalDirectionResourcesRep", by = "group4")
 lsmDf <- lsm[1:16]
 lsmDf <- as.data.frame(lsmDf)
-lsmDf <- subset(lsmDf, lsmDf$ReappraisalDirectionResourcesRep != "baseline")
+# lsmDf <- subset(lsmDf, lsmDf$ReappraisalDirectionResourcesRep != "baseline")
 lsmDf$ReappraisalDirectionResourcesRep <- factor(lsmDf$ReappraisalDirectionResourcesRep)
+lsmDf$group4 <- recode(lsmDf$group4, "attempter" = "Attempter", 
+                             "control" = "Control",
+                             "depression" = "Depression",
+                             "ideator" =  "Ideator")
+
 
 ggplot(lsmDf, aes(ReappraisalDirectionResourcesRep, lsmean)) +
   geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
                 position=position_dodge(.1)) +
   geom_point() +
-  xlab("Reappraisal Context") +
-  ylab("Least Squares Mean") +
+  xlab("Context") +
+  ylab("Logit Probability of Offer Acceptance") +
   theme_bw(base_size = 14) +
   theme(panel.spacing = unit(2, "lines")) +
   facet_grid(~ group4) +
-  scale_x_discrete(labels = c("Empathy", "Reputation", "Resources"), expand=c(0,0.3)) +
+  scale_x_discrete(labels = c("Baseline", "Empathy", "Reputation", "Resources"), expand=c(0,0.3)) +
   theme(axis.title.x = element_text(margin = margin(t = 15)),
-        axis.title.y = element_text(margin = margin(r = 15)))
+        axis.title.y = element_text(margin = margin(r = 15)),
+        panel.spacing = unit(2, "lines"),
+        strip.text.x = element_text(size = 16))
 dev.off()
 
+facet_grid(~ group4) +
+  scale_x_discrete(labels = c("Baseline", "Empathy", "Punish"), expand=c(0.05,0.40)) +
+  theme(axis.title.x = element_text(margin = margin(t = 15)),
+        axis.title.y = element_text(margin = margin(r = 15)),
+        panel.spacing = unit(2, "lines"),
+        strip.text.x = element_text(size = 16))
 
 tiff("/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/UGfair*group4.tiff",
       units="in", height = 8, width = 10, res=300)
@@ -2033,7 +2102,7 @@ HLM is needed.
 ```{r, reactivity model}
 # reactivity of each question: unfairness, sympathy, and anger under reppraisal direction
 mFair <- lmer(scale(Rating) ~ PunishingType*group4 + (1|ID), data = unfair)
-tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/QfairnessContext.tiff',
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/QfairnessContext1.tiff',
       units="in", height = 5, width = 12, res=300)
 lsm <- lsmeans(mFair, "PunishingType", by="group4")
 lsmDf <- lsm[1:12]
@@ -2043,8 +2112,8 @@ ggplot(lsmDf, aes(PunishingType, lsmean)) +
   geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
                 position=position_dodge(.1)) +
   geom_point() +
-  xlab("Reappraisal Context") +
-  ylab("Least Squares Mean") +
+  xlab("Context") +
+  ylab("Least Squares Means \n Fairness Ratings") +
   theme_bw(base_size = 14) +
   theme(panel.spacing = unit(2, "lines"),
         strip.text.x = element_text(size = 16)) +
@@ -2069,8 +2138,8 @@ ggplot(lsmDf, aes(PunishingType, lsmean)) +
   geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
                 position=position_dodge(.1)) +
   geom_point() +
-  xlab("Reappraisal Context") +
-  ylab("Least Squares Mean") +
+  xlab("Context") +
+  ylab("Logit Probability of Offer Acceptance") +
   theme_bw(base_size = 14) +
   theme(panel.spacing = unit(2, "lines"),
         strip.text.x = element_text(size = 16)) +
@@ -2093,8 +2162,8 @@ ggplot(lsmDf, aes(PunishingType, lsmean)) +
   geom_errorbar(aes(ymin = lsmean - SE, ymax = lsmean + SE), width = .1,
                 position=position_dodge(.1)) +
   geom_point() +
-  xlab("Reappraisal Context") +
-  ylab("Least Squares Mean") +
+  xlab("Context") +
+  ylab("Logit Probability of Offer Acceptance") +
   theme_bw(base_size = 14) +
   theme(panel.spacing = unit(2, "lines"),
         strip.text.x = element_text(size = 16)) +
