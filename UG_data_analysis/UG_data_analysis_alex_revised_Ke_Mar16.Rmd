@@ -167,12 +167,13 @@ levels(allData$group4)[levels(allData$group4) == "depression"] <- "Depression"
 
 allData[, c("PlayerProposedAmount", "OpponentProposedAmount")]
 # separate groups
-depression <- subset(allData, group4 == "depression")
-control <- subset(allData, group4 == "control")
-ideator <- subset(allData, group4 == "ideator")
-attempter <- subset(allData, group4 == "attempter")
+depression <- subset(demoQuestion, group4 == "depression")
+control <- subset(demoQuestion, group4 == "control")
+ideator <- subset(demoQuestion, group4 == "ideator")
+attempter <- subset(demoQuestion, group4 == "attempter")
 attHL <- subset(allData, group5 == "AttempterHL")
 attLL <- subset(allData, group5 == "AttempterLL")
+t.test(attempter$IIP15AGRESS,ideator$SSI.BL.CURRENT)
 
 #Pvars <- allData[, c("ID", "MMSE", "PROTECT2AGE", "GENDERTEXT", "IncomePerCapita", "HRSD_NO_SUI", "EDUCATION", "RACETEXT", "WTARSS", "DRS", "EXIT", "BIS_NONPLAN", "urgency", "IIP15INTAMBV", "IIP15INTSEN", "IIP15AGRESS", "IRI_EMPATHETIC_CONCERN")]
 #Pvars <- subset(Pvars, !duplicated(ID))
@@ -475,7 +476,7 @@ tb <- stargazer(summary(m1g)$coefficients,
           digits = 2)
           # out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction1.tex")
 
-write.csv(round(summary(m1g)$coefficients, 2), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction.csv")
+write.csv(round(summary(m1g)$coefficients, 3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction.csv")
 ```
 
 ```{r}
@@ -815,7 +816,34 @@ dev.off()
 ```
 
 ```{r control IRI}
+# IRI concern
+mIRI2 <-
+  glmer(
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 +
+    group4*scale(IRI_EMPATHETIC_CONCERN)*ReappraisalDirection + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
+write.csv(round(summary(mIRI2)$coefficients, 3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/IRIempathy_concern.csv")
+
+# IRI distress
+mIRI3 <-
+  glmer(
+  AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 +
+    group4*scale(IRI_PERSONAL_DISTRESS)*ReappraisalDirection + (1 | ID/block),
+  family = binomial,
+  data = allData,
+  nAGQ = 0,  
+  control = glmerControl(optimizer = "bobyqa"))
 # IRI affective empathy
+write.csv(round(summary(mIRI3)$coefficients, 3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/IRIdistress.csv")
 
 # better
 mIRI2 <-
@@ -884,6 +912,8 @@ mIRI_BISPLAN <-
 write.csv(round(summary(mIRI_BISPLAN)$coefficients, 3), 
           "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/IRIandBISNonplan.csv")
 summary(mIRI_BISPLAN)
+
+
 ```
 
 ```{r control interpersonal}
@@ -1087,8 +1117,12 @@ m1gEd_2 <-
 ### best model 
 m1gEd_3 <-
   glmer(
-  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + ReappraisalDirection *
-  group4 + scale(fairLR) * group4 + scale(totalStake) * group4 + ReappraisalDirection*scale(EDUCATION)*group4 + (1 | ID/block),
+  allData$AcceptOffer ~ ReappraisalDirection * scale(fairLR) * scale(totalStake) + 
+    ReappraisalDirection * group4 + 
+    scale(fairLR) * group4 + 
+    scale(totalStake) * group4 + 
+    ReappraisalDirection*scale(EDUCATION)*group4 + 
+    (1 | ID/block),
   family = binomial,
   data = allData,
   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
@@ -1105,6 +1139,8 @@ plot(lsm, horiz = F) +
     theme(axis.text.x=element_text(angle=90, hjust=1)) +
     facet_grid(.~ EDUCATION + group4)  + ggtitle("UGcontext*Edu*group4")
 dev.off()
+
+write.csv(round(summary(m1gEd_3)$coefficients,3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/Education.csv")
 ```
 
 ```{r SSI.BL.CURRENT}
@@ -1182,7 +1218,7 @@ mBIS_total <-
   data = allData,
   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
 
-write.csv(round(summary(mBIS_total)$coefficients,3), '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/BIStotal.csv')
+write.csv(round(summary(mBIS_total)$coefficients,3), '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/BIStotal2.csv')
 
 tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/BIStotalControl_group4*UGcontext.tiff', 
      units="in", height = 8, width = 10, res=300)
@@ -1559,7 +1595,7 @@ m3gPun <-glmer(
   data = allDataL,
   control = glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=1e6)))
 stargazer(summary(m3gPun)$coefficient, type = "text")
-write.csv(round(summary(m3gPun)$coefficients, 2), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun3.csv")
+write.csv(round(summary(m3gPun)$coefficients, 3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun3.csv")
 
 anova(m1gPun, m3gPun)
 opt <- all_fit(m3gPun)
@@ -2058,6 +2094,9 @@ levels(emoRating$group4)[levels(emoRating$group4) == "attempter"] <- "Attempter"
 levels(emoRating$group4)[levels(emoRating$group4) == "ideator"] <- "Ideator"
 levels(emoRating$group4)[levels(emoRating$group4) == "depression"] <- "Depression"
 
+# use control as the reference
+emoRating <- within(emoRating, group4 <- relevel(group4, ref = "Control"))
+
 
 unfair <- subset(emoRating, emoRating$Q_type == "unfair")
 sympathy <- subset(emoRating, emoRating$Q_type == "sympathy")
@@ -2125,7 +2164,7 @@ dev.off()
 
 stargazer(summary(mFair)$coefficients, type = "text", 
           title = "Unfairness:scale(Rating) ~ PunishingType*group4 + (1|ID)", 
-          out = '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qfairness.txt')
+          out = '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qfairness_refControl.txt')
 
 msympathy <- lmer(scale(Rating) ~ PunishingType*group4 + (1|ID), data = sympathy)
 tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/QsympathyN.jpg',
@@ -2149,7 +2188,7 @@ ggplot(lsmDf, aes(PunishingType, lsmean)) +
         axis.title.y = element_text(margin = margin(r = 15)))
 dev.off()
 
-stargazer(summary(msympathy)$coefficients, type = "text", title = "Sympathy: scale(Rating) = PunishingType*group4 + (1|ID)",out = '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qsympathy.txt')
+stargazer(summary(msympathy)$coefficients, type = "text", title = "Sympathy: scale(Rating) = PunishingType*group4 + (1|ID)",out = '/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qsympathy_refControl.txt')
 
 manger <- lmer(scale(Rating) ~ PunishingType*group4 + (1|ID), data = anger)
 tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/QangerN.jpg',
@@ -2172,6 +2211,8 @@ ggplot(lsmDf, aes(PunishingType, lsmean)) +
   theme(axis.title.x = element_text(margin = margin(t = 15)),
         axis.title.y = element_text(margin = margin(r = 15)))
 dev.off()
+stargazer(summary(manger)$coefficients, type = "text",
+          out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/Qanger_refControl.txt")
 
 
 # Reappraisal = empathy, reputation, resources
