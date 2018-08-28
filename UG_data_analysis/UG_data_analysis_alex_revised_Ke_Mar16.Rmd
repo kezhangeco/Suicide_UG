@@ -173,7 +173,7 @@ ideator <- subset(demoQuestion, group4 == "ideator")
 attempter <- subset(demoQuestion, group4 == "attempter")
 attHL <- subset(allData, group5 == "AttempterHL")
 attLL <- subset(allData, group5 == "AttempterLL")
-t.test(attempter$IIP15AGRESS,ideator$SSI.BL.CURRENT)
+t.test(depression$IIP15AGRESS,control$IIP15AGRESS)
 
 #Pvars <- allData[, c("ID", "MMSE", "PROTECT2AGE", "GENDERTEXT", "IncomePerCapita", "HRSD_NO_SUI", "EDUCATION", "RACETEXT", "WTARSS", "DRS", "EXIT", "BIS_NONPLAN", "urgency", "IIP15INTAMBV", "IIP15INTSEN", "IIP15AGRESS", "IRI_EMPATHETIC_CONCERN")]
 #Pvars <- subset(Pvars, !duplicated(ID))
@@ -1044,7 +1044,29 @@ plot(lsm, horiz = F) +
   scale_x_discrete(labels = c("low(25%)", "mdn(50%)", "high(75%)"))
 dev.off()
 
-stargazer(mIncome, type = "text")
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/individual covariate models/SES*group4*UGcontext.tiff', 
+     units="in", height = 8, width = 10, res=300)
+lsm <- lsmeans(mIncome, "ReappraisalDirection", by = c("IncomePerCapita", "group4"), at = list(IncomePerCapita=c(10625,20500,31250)))
+plot(lsm, horiz = F) +
+  facet_grid(.~IncomePerCapita + group4)  +
+  theme(axis.text.x=element_text(angle=90, hjust=1)) 
+
+
+  
+dev.off()
+
+lsm <- lsmeans(mpun1, "ReappraisalDirectionResourcesRep", by = c("EDUCATION", "group4"), at = list(EDUCATION = c(13,15,16)))
+tiff('/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/UGcontext*EDUCATION*group4.tiff', 
+     units="in", height = 8, width = 10, res=300)
+plot(lsm, horiz = F) +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    facet_grid(.~ EDUCATION + group4)  + ggtitle("UGcontext*EDUCATION*group4")
+
+lsm <- lsmeans(mSSI, "SSI.BL.CURRENT", by = "group4", at = list(SSI.BL.CURRENT = c(14,19,25)))
+plot(lsm, horiz = F) +
+  facet_grid(.~ group4) +
+  ggtitle("SSI.BL.CURRENT across groups") +
+  scale_x_discrete(labels = c("low(25%)", "mdn(50%)", "high(75%)"))
 ```
 
 ```{r drs}
@@ -1110,7 +1132,10 @@ m1gEd_2 <-
   family = binomial,
   data = allData,
   control = glmerControl(optimizer = "bobyqa",optCtrl = list(maxfun = 2e4)))
-
+lsm <- lsmeans(m1gm_2, "ReappraisalDirection", by = c("MMSE", "group4"), at = list(MMSE = c(26,15,30)))
+ggplot(lsm, horiz = F) +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    facet_grid(.~ MMSE + group4)
 
 ## ReappraisalDirection*scale(Ed)*group4
 
@@ -1126,7 +1151,7 @@ m1gEd_3 <-
   family = binomial,
   data = allData,
   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4)))
-lsm <- lsmeans(m1gm_2, "ReappraisalDirection", by = c("MMSE", "group4"), at = list(MMSE = c(26,28,30)))
+lsm <- lsmeans(m1gm_2, "ReappraisalDirection", by = c("EDUCATION", "group4"), at = list(EDUCATION = c(26,28,30)))
 ggplot(lsm, horiz = F) +
     theme(axis.text.x=element_text(angle=90, hjust=1)) +
     facet_grid(.~ MMSE + group4)
