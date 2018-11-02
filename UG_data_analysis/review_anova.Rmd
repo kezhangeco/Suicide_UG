@@ -1,0 +1,51 @@
+---
+title: "model anova"
+author: "Ke"
+date: '2018-09-13'
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r setup, include=FALSE}
+library(lme4)
+library(car)
+load("/Users/kezhang/ownCloud/Suicide_UG/UG_clean_updated/ugDATA1.RData")
+```
+
+# Table 2
+```{r}
+Anova(m1g, type = 3)
+```
+**The omnibus term for the Group x Context interaction including all 4 groups and 3 contexts (baseline, empathy, punish) was $X^2$ = 26.29, p < .001.**
+
+
+# Table 3
+## Anger reactivity model
+```{r}
+Anova(manger, type = 3)
+```
+**The omnibus term for the Group x Context interaction including all 4 groups and 3 context (empathy, reputation, resources) was $X^2$ = 4.21, p = .648.**
+
+
+## Sympathy reactivity model
+```{r}
+Anova(msympathy, type = 3)
+```
+**The omnibus term for the Group x Context interaction including all 4 groups and 3 context was $X^2$ = 5.53, p = .477.**
+
+
+## Fairness reactivity model
+```{r}
+Anova(mFair, type = 3)
+```
+**The omnibus term for the Group x Context interaction including all 4 groups and 3 context was $X^2$ = 21.72, p = .001.**
+
+# Supplementary Table 1
+```{r}
+Anova(m3gPun, type = 3)
+summary(m3gPun)
+stargazer(summary(m3gPun)$coefficient, type = "text")
+write.csv(round(summary(m3gPun)$coefficients, 3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/punishType/NoIndividual/group4InteractionPun3.csv")
+
+```
+**The omnibus term for the Group x Context interaction including all 4 groups and 4 context (baseline, empathy, reputation, resources) was $X^2$ = 41.00, p < .001.**

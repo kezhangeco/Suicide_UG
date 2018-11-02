@@ -183,7 +183,7 @@ emoRating$ReappraisalDirection[emoRating$ReappraisalDirection == 2] <- "empathy"
 emoRating$ReappraisalDirection <- as.factor(emoRating$ReappraisalDirection)
 
 # save.image("/Volumes/LAB/Suicide_UG/UG_data_analysis/ugDATA.RData")
-load("/Users/kezhang/Dropbox/ugDATA1.RData")
+
 ```
 
 ```{r fisher}
@@ -477,6 +477,8 @@ tb <- stargazer(summary(m1g)$coefficients,
           # out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction1.tex")
 
 write.csv(round(summary(m1g)$coefficients, 3), "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/main/NoIndividual/group4Interaction.csv")
+
+
 ```
 
 ```{r}
@@ -1468,6 +1470,7 @@ plot(lsm, horiz = F)
 dev.off()
 
 save.image("ouput.RData")
+
 ```
 
 ## KE's code
@@ -1658,7 +1661,43 @@ stargazer(m1gPun,
 
 stargazer(m1gPunNolag, type = "text", digits = 2)
 
+
+marginal <- lsmeans(m1gPun, pairwise ~ ReappraisalDirectionResourcesRep: group4, adjust = "tukey")
+m1gPunPairwise <- marginal$contrasts
+cld(marginal, alpha = 0.05, letters = letters, adjust = "tukey")
+
+summary(m1gPun)
 ```
+
+# Table 2
+The main model is 
+$$
+Accept\;Offer = Time \;lag + 
+    Reappraisal\;DirectionResourcesRep * scale(fairLR) + \\
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +\\
+    scale(fairLR) * group4 +
+    scale(totalStake) * group4 + (1 | ID/block)
+$$
+```{r main model Anova}
+m1gPun1 <-glmer(
+  AcceptOffer ~ AcceptOffer_lag + 
+    ReappraisalDirectionResourcesRep * scale(fairLR) + 
+    ReappraisalDirectionResourcesRep * scale(totalStake) + 
+    ReappraisalDirectionResourcesRep * group4 +
+    scale(fairLR) * group4 +
+    scale(totalStake) * group4 + (1 | ID/block),
+  family = binomial,
+  data = allDataL,
+  control=glmerControl(optCtrl=list(maxfun=1e6), optimizer = "bobyqa"))
+
+summary(m1gPun)
+
+Anova(m1gPun)
+
+```
+
+
 
 ```{r punishType covariate}
 allData$ReappraisalDirectionResourcesRep <- as.character(allData$PunishingType)
@@ -2282,6 +2321,11 @@ levels(unfair$PunishingType)
 stargazer(manger, type = "text", report = c("vcs*p"), out = "/Volumes/LAB/Suicide_UG/UG_data_analysis/outputs/reactivity/NoIndividual/emoRating.html")
 summary(manger)$coefficients
 
+marginal <- lsmeans(manger, pairwise ~ ReappraisalDirection: group4, adjust = "tukey")
+mangerPairwise <- marginal$contrasts
+cld(marginal, alpha = 0.05, letters = letters, adjust = "tukey")
+Anova(m1g)
+summary(manger)
 ```
 
 # control individual factors
